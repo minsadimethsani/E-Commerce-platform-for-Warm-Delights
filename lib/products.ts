@@ -1,4 +1,8 @@
-import { products, Product } from "@/data/products";
+import { products as localProducts, Product } from "@/data/products";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "./firebase";
+import { seedAllCollectionsIfEmpty } from "./db-seed";
+import { unstable_cache } from "next/cache";
 
 export interface FilterParams {
   category?: string;
@@ -21,25 +25,89 @@ export interface PaginatedResult {
 }
 
 /**
- * Get all products in the database
+ * Fetch all products from Firestore, executing a seed check first for all collections.
+ * Safely falls back to local data if Firestore is unreachable or errors.
+ */
+const fetchProductsFromDb = async (): Promise<Product[]> => {
+  try {
+    // Triggers check for all collections (products, users, orders, reviews)
+    await seedAllCollectionsIfEmpty();
+    
+    const productsRef = collection(db, "products");
+    const snapshot = await getDocs(productsRef);
+    
+    if (snapshot.empty) {
+      return localProducts;
+    }
+
+    const list: Product[] = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      list.push({
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        image: data.image,
+        category: data.category,
+        badge: data.badge || undefined,
+        rating: data.rating,
+        reviewsCount: data.reviewsCount,
+        isAvailable: data.isAvailable !== false,
+        ingredients: data.ingredients || [],
+        careInstructions: data.careInstructions || "",
+      } as any);
+    });
+
+    // Sort by ID order for display consistency
+    return list.sort((a, b) => {
+      const numA = parseInt(a.id.replace("prod-", ""), 10) || 0;
+      const numB = parseInt(b.id.replace("prod-", ""), 10) || 0;
+      return numA - numB;
+    });
+  } catch (error) {
+    console.error("Error fetching products from Firestore. Falling back to local data.", error);
+    return localProducts;
+  }
+};
+
+/**
+ * Next.js cached data wrapper for Firestore list query.
+ * Revalidates every 5 minutes (300 seconds).
+ */
+export const getCachedProducts = unstable_cache(
+  async () => {
+    return fetchProductsFromDb();
+  },
+  ["products-list"],
+  {
+    revalidate: 300,
+    tags: ["products"]
+  }
+);
+
+/**
+ * Get all products in the database (via server-side cache)
  */
 export async function getAllProducts(): Promise<Product[]> {
-  return products;
+  return getCachedProducts();
 }
 
 /**
- * Get a single product by its unique ID
+ * Get a single product by its unique ID (via server-side cache)
  */
 export async function getProductById(id: string): Promise<Product | undefined> {
-  return products.find((p) => p.id === id);
+  const allProducts = await getCachedProducts();
+  return allProducts.find((p) => p.id === id);
 }
 
 /**
  * Filter, sort, and paginate products based on query parameters.
- * Emulates a database query on the server side.
+ * Operates on the server-cached Firestore dataset.
  */
 export async function getFilteredProducts(filters: FilterParams): Promise<PaginatedResult> {
-  let result = [...products];
+  const allProducts = await getCachedProducts();
+  let result = [...allProducts];
 
   const {
     category = "All",
@@ -60,13 +128,13 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
     );
   }
 
-  // 2. Filter by search query
+  // 2. Filter by search query (case-insensitive substring match)
   if (search.trim() !== "") {
-    const query = search.toLowerCase();
+    const queryStr = search.toLowerCase();
     result = result.filter(
       (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
+        p.name.toLowerCase().includes(queryStr) ||
+        p.description.toLowerCase().includes(queryStr)
     );
   }
 
