@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { products } from "@/data/products";
+import { products as localProducts, Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 
 const ITEMS_PER_PAGE = 8;
@@ -9,7 +9,11 @@ const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom"] as co
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";
 
-export default function ProductCatalog() {
+interface ProductCatalogProps {
+  initialProducts?: Product[];
+}
+
+export default function ProductCatalog({ initialProducts }: ProductCatalogProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortOption>("featured");
@@ -17,7 +21,7 @@ export default function ProductCatalog() {
 
   // Filter & Sort Products
   const processedProducts = useMemo(() => {
-    let result = [...products];
+    let result = [...(initialProducts || localProducts)];
 
     // Filter by Category
     if (selectedCategory !== "All") {
@@ -118,7 +122,15 @@ export default function ProductCatalog() {
                     : "bg-[#faf5f0] text-[#55433c]/80 hover:bg-[#2d1e18]/5 hover:text-[#2d1e18]"
                 }`}
               >
-                {category === "All" ? "All Offerings" : category + "s"}
+                {category === "All" 
+                  ? "All Offerings" 
+                  : category === "Custom" 
+                  ? "Custom Creations" 
+                  : category === "Savory" 
+                  ? "Savories" 
+                  : category === "Pastry" 
+                  ? "Pastries" 
+                  : category + "s"}
               </button>
             ))}
           </div>

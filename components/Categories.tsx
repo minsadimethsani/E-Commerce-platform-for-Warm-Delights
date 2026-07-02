@@ -7,7 +7,7 @@ const categories = [
     description: "Indulgent layered cakes, classic buttercream sponges, and rich chocolate fudge creations.",
     image: "/category_cakes.png",
     linkText: "View Cakes",
-    linkHref: "#",
+    linkHref: "/menu?category=Cake",
     tag: "Bestseller",
   },
   {
@@ -15,7 +15,7 @@ const categories = [
     description: "Warm, flaky puff pastries, freshly baked quiches, and gourmet savory rolls.",
     image: "/category_savories.png",
     linkText: "View Savories",
-    linkHref: "#",
+    linkHref: "/menu?category=Savory",
     tag: "Fresh Daily",
   },
   {
@@ -23,7 +23,7 @@ const categories = [
     description: "Intricately designed cakes customized for weddings, birthdays, and milestones.",
     image: "/category_custom.png",
     linkText: "Design Your Cake",
-    linkHref: "#",
+    linkHref: "/menu?category=Custom",
     tag: "Made to Order",
   },
 ];

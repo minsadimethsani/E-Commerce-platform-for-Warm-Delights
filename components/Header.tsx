@@ -2,9 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Hide public storefront header on admin portal pages
+  if (pathname && pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#2D1E18]/8 bg-[#FDFCF9]/80 backdrop-blur-md">

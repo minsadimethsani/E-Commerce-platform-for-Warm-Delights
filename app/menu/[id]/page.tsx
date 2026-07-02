@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${product.name} | Warm Delights Menu`,
-    description: `${product.description} Handcrafted daily at Warm Delights bakery. Only $${product.price.toFixed(2)}.`,
+    description: `${product.description} Handcrafted daily at Warm Delights bakery. Only Rs. ${product.price.toFixed(2)}.`,
   };
 }
 

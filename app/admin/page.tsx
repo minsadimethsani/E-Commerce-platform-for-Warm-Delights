@@ -55,7 +55,7 @@ export default async function AdminDashboard() {
             <span className="text-lg">💰</span>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-serif font-bold text-[#2D1E18]">${totalSales.toFixed(2)}</span>
+            <span className="text-2xl font-serif font-bold text-[#2D1E18]">Rs. {totalSales.toFixed(2)}</span>
             <span className="block mt-1 text-[10px] font-semibold text-emerald-600">Excludes cancelled orders</span>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default async function AdminDashboard() {
                           {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
-                          ${order.total.toFixed(2)}
+                          Rs. {order.total.toFixed(2)}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm">
                           <span
@@ -191,7 +191,7 @@ export default async function AdminDashboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="block text-xs font-bold text-[#2D1E18]">${p.price.toFixed(2)}</span>
+                  <span className="block text-xs font-bold text-[#2D1E18]">Rs. {p.price.toFixed(2)}</span>
                   <span className="block text-[10px] font-semibold text-amber-500">⭐ {p.rating.toFixed(1)}</span>
                 </div>
               </div>

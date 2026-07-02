@@ -4,6 +4,7 @@ import { Order } from "@/types/database";
 
 /**
  * Fetch all orders from Firestore sorted by creation date descending.
+ * Converts Timestamp objects to plain ISO strings for React Server Component serialization.
  */
 export async function getAllOrders(): Promise<Order[]> {
   try {
@@ -13,6 +14,15 @@ export async function getAllOrders(): Promise<Order[]> {
     const list: Order[] = [];
     snapshot.forEach((docSnap) => {
       const data = docSnap.data();
+      
+      const createdStr = data.createdAt?.toDate 
+        ? data.createdAt.toDate().toISOString() 
+        : (typeof data.createdAt === "string" ? data.createdAt : new Date().toISOString());
+
+      const updatedStr = data.updatedAt?.toDate 
+        ? data.updatedAt.toDate().toISOString() 
+        : (typeof data.updatedAt === "string" ? data.updatedAt : new Date().toISOString());
+
       list.push({
         id: data.id,
         userId: data.userId,
@@ -24,9 +34,9 @@ export async function getAllOrders(): Promise<Order[]> {
         status: data.status,
         shippingAddress: data.shippingAddress,
         paymentDetails: data.paymentDetails,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-      } as Order);
+        createdAt: createdStr as any,
+        updatedAt: updatedStr as any,
+      });
     });
     return list;
   } catch (error) {

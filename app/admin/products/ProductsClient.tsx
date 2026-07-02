@@ -4,35 +4,144 @@ import { useState } from "react";
 import { Product } from "@/data/products";
 import { doc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import Link from "next/link";
+import { Category } from "@/lib/categories";
+import { Badge } from "@/lib/badges";
 
 interface ProductsClientProps {
   initialProducts: Product[];
+  categoriesList: Category[];
+  badgesList: Badge[];
 }
 
-const CATEGORIES = ["Cake", "Savory", "Pastry", "Cookie", "Custom"] as const;
-
-export default function ProductsClient({ initialProducts }: ProductsClientProps) {
+export default function ProductsClient({
+  initialProducts,
+  categoriesList,
+  badgesList,
+}: ProductsClientProps) {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  // Fallback to default lists if collections are empty
+  const categories = categoriesList.length > 0 ? categoriesList : [
+    { id: "cake", name: "Cake", subcategories: ["Sponge Cake", "Fudge Cake", "Cheesecakes"] },
+    { id: "savory", name: "Savory", subcategories: ["Quiches", "Bread", "Pies"] },
+    { id: "pastry", name: "Pastry", subcategories: ["Croissants", "Tarts", "Danishes"] },
+    { id: "cookie", name: "Cookie", subcategories: ["Chocolate Chip", "Macarons", "Shortbread"] },
+    { id: "custom", name: "Custom", subcategories: ["Wedding Cakes", "Birthday Cakes", "Custom Hampers"] }
+  ];
+  const badges = badgesList.length > 0 ? badgesList : [
+    { id: "bestseller", name: "Bestseller" },
+    { id: "new", name: "New" },
+    { id: "seasonal", name: "Seasonal" },
+    { id: "chef-special", name: "Chef Special" }
+  ];
 
   // Form Fields
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<Product["category"]>("Cake");
+  const [category, setCategory] = useState<string>("Cake");
+  const [subcategory, setSubcategory] = useState("");
   const [badge, setBadge] = useState("");
   const [image, setImage] = useState("/category_cakes.png");
+  const [videoUrl, setVideoUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Multiple compressed images state
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isCompressing, setIsCompressing] = useState(false);
+
+  // In-browser WebP image compression helper
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          const MAX_HEIGHT = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) {
+              height *= MAX_WIDTH / width;
+              width = MAX_WIDTH;
+            }
+          } else {
+            if (height > MAX_HEIGHT) {
+              width *= MAX_HEIGHT / height;
+              height = MAX_HEIGHT;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Compress to WebP with 0.75 quality (yielding lightweight 20-30KB data URIs)
+          const dataUrl = canvas.toDataURL("image/webp", 0.75);
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setIsCompressing(true);
+    const files = Array.from(e.target.files);
+    
+    try {
+      const compressedList: string[] = [];
+      for (const file of files) {
+        const compressed = await compressImage(file);
+        compressedList.push(compressed);
+      }
+      setUploadedImages((prev) => {
+        const nextList = [...prev, ...compressedList];
+        if (prev.length === 0 && nextList.length > 0) {
+          setImage(nextList[0]);
+        }
+        return nextList;
+      });
+    } catch (error) {
+      console.error("Image compression failed:", error);
+      alert("Failed to compress and upload images.");
+    } finally {
+      setIsCompressing(false);
+    }
+  };
+
+  const removeUploadedImage = (indexToRemove: number) => {
+    setUploadedImages((prev) => {
+      const nextList = prev.filter((_, i) => i !== indexToRemove);
+      if (image === prev[indexToRemove]) {
+        setImage(nextList.length > 0 ? nextList[0] : "/category_cakes.png");
+      }
+      return nextList;
+    });
+  };
 
   const openAddForm = () => {
     setEditingProduct(null);
     setName("");
     setPrice("");
     setDescription("");
-    setCategory("Cake");
+    setCategory(categories[0]?.name || "Cake");
+    setSubcategory("");
     setBadge("");
     setImage("/category_cakes.png");
+    setVideoUrl("");
+    setUploadedImages([]);
     setIsFormOpen(true);
   };
 
@@ -42,8 +151,11 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
     setPrice(p.price.toString());
     setDescription(p.description);
     setCategory(p.category);
+    setSubcategory((p as any).subcategory || "");
     setBadge(p.badge || "");
     setImage(p.image);
+    setVideoUrl((p as any).videoUrl || "");
+    setUploadedImages((p as any).images || [p.image]);
     setIsFormOpen(true);
   };
 
@@ -108,24 +220,32 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
       } else if (category === "Cookie") {
         ingredients = ["Pastry flour", "chocolate chunks", "brown sugar", "butter", "eggs", "vanilla"];
         careInstructions = "Store in airtight jar. Toast in toaster oven for 60 seconds.";
+      } else if (category === "Custom") {
+        ingredients = ["Handpressed organic edible flowers", "local premium flour", "farm-fresh eggs", "pure cane sugar", "natural flavor extracts"];
+        careInstructions = "Keep refrigerated. Rest at room temperature for 1 hour before serving. Consume within 3 days.";
       } else {
         ingredients = ["Premium organic ingredients", "eggs", "butter", "cane sugar"];
         careInstructions = "Keep in cool dry place. Consume within 3 days.";
       }
+
+      const finalImage = image;
 
       const savePayload = {
         id,
         name: name.trim(),
         description: description.trim(),
         price: parsedPrice,
-        image,
+        image: finalImage,
+        images: uploadedImages,
         category,
+        subcategory,
         badge: badge.trim() || "",
         rating,
         reviewsCount,
         isAvailable: true,
         ingredients,
         careInstructions,
+        videoUrl: videoUrl.trim(),
         updatedAt: Timestamp.now(),
       } as any;
 
@@ -136,17 +256,20 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
       await setDoc(doc(db, "products", id), savePayload);
 
       // Map to state array
-      const savedProduct: Product = {
+      const savedProduct: Product & { images?: string[]; subcategory?: string } = {
         id,
         name: savePayload.name,
         description: savePayload.description,
         price: savePayload.price,
         image: savePayload.image,
         category: savePayload.category,
+        subcategory: savePayload.subcategory || "",
         badge: savePayload.badge || undefined,
         rating: savePayload.rating,
         reviewsCount: savePayload.reviewsCount,
-      };
+        images: savePayload.images,
+        videoUrl: savePayload.videoUrl,
+      } as any;
 
       if (editingProduct) {
         setProducts((prev) => prev.map((p) => (p.id === id ? savedProduct : p)));
@@ -206,7 +329,9 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
                           <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
                         </div>
                         <div>
-                          <span className="block text-sm font-bold text-[#2D1E18]">{p.name}</span>
+                          <Link href={`/admin/products/${p.id}`} className="block text-sm font-bold text-[#2D1E18] hover:text-[#C2957C] transition-colors cursor-pointer">
+                            {p.name}
+                          </Link>
                           {p.badge && (
                             <span className="inline-block rounded bg-[#E5A193] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
                               {p.badge}
@@ -221,25 +346,31 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
                     </td>
                     {/* Price */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
-                      ${p.price.toFixed(2)}
+                      Rs. {p.price.toFixed(2)}
                     </td>
                     {/* Rating */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-amber-500">
                       ⭐ {p.rating.toFixed(1)} ({p.reviewsCount})
                     </td>
                     {/* Action buttons */}
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-xs font-bold space-x-3">
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-xs font-bold space-x-2">
                       <button
                         onClick={() => openEditForm(p)}
-                        className="text-[#C2957C] hover:text-[#2D1E18] transition-colors cursor-pointer"
+                        aria-label="Edit product details"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C2957C] hover:bg-[#FAF5F0] hover:text-[#2D1E18] transition-colors cursor-pointer"
                       >
-                        Edit
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 20.04a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                        </svg>
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
-                        className="text-rose-600 hover:text-rose-900 transition-colors cursor-pointer"
+                        aria-label="Delete product"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors cursor-pointer"
                       >
-                        Delete
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                        </svg>
                       </button>
                     </td>
                   </tr>
@@ -251,137 +382,299 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
 
       </div>
 
-      {/* Product Form Editor (Right Drawer/Panel, visible when form is open) */}
+      {/* Product Form Editor Modal (Full-Screen Overlay Page) */}
       {isFormOpen && (
-        <aside className="w-full lg:w-96 rounded-2xl border border-[#2D1E18]/5 bg-white p-6 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-[#2D1E18]/5 pb-4">
-            <h3 className="font-serif text-lg font-bold text-[#2D1E18]">
-              {editingProduct ? `Edit: ${editingProduct.id}` : "New Product"}
-            </h3>
+        <div className="fixed inset-0 z-50 bg-[#FDFCF9] overflow-y-auto flex flex-col">
+          {/* Header Bar */}
+          <header className="sticky top-0 z-10 flex h-20 items-center justify-between bg-[#2D1E18] text-[#FDFCF9] px-6 sm:px-10 shadow-md">
+            <div>
+              <h2 className="font-serif text-xl font-bold tracking-wide text-white">
+                {editingProduct ? `Edit Product: ${editingProduct.id}` : "Add New Product"}
+              </h2>
+              <span className="text-[#C2957C] text-[10px] uppercase font-sans font-bold tracking-wider mt-0.5 block">
+                Warm Delights Inventory Manager
+              </span>
+            </div>
+            
+            {/* Close Button */}
             <button
               onClick={() => setIsFormOpen(false)}
-              className="text-xs font-bold text-[#55433C]/60 hover:text-[#2D1E18] cursor-pointer"
+              className="rounded-full bg-white/10 p-2 text-[#FDFCF9] hover:bg-white/20 transition-all cursor-pointer"
+              aria-label="Close editor"
             >
-              Cancel
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
             </button>
+          </header>
+
+          {/* Form Content Body */}
+          <div className="flex-1 py-10 px-4 sm:px-6">
+            <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2D1E18]/5 p-8 sm:p-10 shadow-sm">
+              <form onSubmit={handleSave} className="space-y-6">
+              
+              {/* Name Input */}
+              <div className="space-y-1.5">
+                <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  Product Name *
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Signature Focaccia"
+                  required
+                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+                />
+              </div>
+
+              {/* Price Input */}
+              <div className="space-y-1.5">
+                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  Price (Rs.) *
+                </label>
+                <input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="12.50"
+                  required
+                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+                />
+              </div>
+
+              {/* Category Dropdown */}
+              <div className="space-y-1.5">
+                <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  Category *
+                </label>
+                <select
+                  id="category"
+                  value={category}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setSubcategory(""); // Reset subcategory when category changes
+                  }}
+                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Subcategory Dropdown (if active category has subcategories) */}
+              {(() => {
+                const selectedCatObj = categories.find(
+                  (c) => c.name.toLowerCase() === category.toLowerCase()
+                );
+                const subcats = selectedCatObj ? selectedCatObj.subcategories : [];
+                if (subcats.length === 0) return null;
+                return (
+                  <div className="space-y-1.5">
+                    <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                      Subcategory
+                    </label>
+                    <select
+                      id="subcategory"
+                      value={subcategory}
+                      onChange={(e) => setSubcategory(e.target.value)}
+                      className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                    >
+                      <option value="">None</option>
+                      {subcats.map((sub) => (
+                        <option key={sub} value={sub}>
+                          {sub}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
+
+              {/* Badge Dropdown */}
+              <div className="space-y-1.5">
+                <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  Badge / Promo Tag
+                </label>
+                <select
+                  id="badge"
+                  value={badge}
+                  onChange={(e) => setBadge(e.target.value)}
+                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                >
+                  <option value="">No Badge / None</option>
+                  {badges.map((bg) => (
+                    <option key={bg.id} value={bg.name}>
+                      {bg.name}
+                    </option>
+                  ))}
+                </select>
+              </div>              {/* Reel Video File Upload & Preview */}
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                    Upload Reel Video (WebM/MP4, max 2MB)
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={async (e) => {
+                      if (!e.target.files || e.target.files.length === 0) return;
+                      const file = e.target.files[0];
+                      if (file.size > 2 * 1024 * 1024) {
+                        alert("File size exceeds 2MB limit. Please upload a smaller video.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        setVideoUrl(event.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="w-full text-xs text-[#55433C]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#FAF5F0] file:text-[#2D1E18] file:hover:bg-[#C2957C] hover:file:text-[#2D1E18] transition-colors cursor-pointer"
+                  />
+                </div>
+
+                {/* Uploaded Video Preview */}
+                {videoUrl && (
+                  <div className="space-y-1.5">
+                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#55433C]/50">
+                      Active Reel Video Preview
+                    </span>
+                    <div className="relative aspect-[9/16] w-24 overflow-hidden rounded-xl bg-black border border-[#2D1E18]/10 group">
+                      <video src={videoUrl} autoPlay loop muted playsInline className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setVideoUrl("")}
+                        className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Image Upload & Selection */}
+              <div className="space-y-3">
+                {/* 1. Upload Photos */}
+                <div className="space-y-1.5">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                    Upload Photos (WebP Auto-Compressed)
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="w-full text-xs text-[#55433C]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#FAF5F0] file:text-[#2D1E18] file:hover:bg-[#C2957C] hover:file:text-[#2D1E18] transition-colors cursor-pointer"
+                  />
+                  {isCompressing && (
+                    <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
+                      ⚡ Compressing and converting to WebP...
+                    </span>
+                  )}
+                </div>
+
+                {/* 2. Uploaded Preview Thumbnails */}
+                {uploadedImages.length > 0 && (
+                  <div className="space-y-1.5">
+                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#55433C]/50">
+                      Uploaded Photos ({uploadedImages.length})
+                    </span>
+                    <div className="flex flex-wrap gap-2.5 p-2 bg-[#FAF5F0] border border-[#2D1E18]/5 rounded-xl max-h-36 overflow-y-auto">
+                      {uploadedImages.map((imgUrl, idx) => (
+                        <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2D1E18]/10 group">
+                          <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeUploadedImage(idx)}
+                            className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 3. Primary/Placeholder Selection */}
+                <div className="space-y-1.5">
+                  <label htmlFor="image" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                    Primary / Cover Photo Select
+                  </label>
+                  <select
+                    id="image"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                  >
+                    {/* Dynamically list uploaded custom images as options */}
+                    {uploadedImages.map((imgUrl, idx) => (
+                      <option key={idx} value={imgUrl}>
+                        Uploaded Image {idx + 1}
+                      </option>
+                    ))}
+                    {/* Separator line if uploads exist */}
+                    {uploadedImages.length > 0 && (
+                      <option disabled>────────── Preset Placeholders ──────────</option>
+                    )}
+                    {/* Default Preset Placeholders */}
+                    <option value="/hero_bakery.png">Chocolate Cake (/hero_bakery.png)</option>
+                    <option value="/category_cakes.png">Strawberry Gateau (/category_cakes.png)</option>
+                    <option value="/category_savories.png">Savory Quiche (/category_savories.png)</option>
+                    <option value="/category_custom.png">Custom Wedding (/category_custom.png)</option>
+                    <option value="/about_bakery.png">Hamper / Ingredients (/about_bakery.png)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Description Textarea */}
+              <div className="space-y-1.5">
+                <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  Description *
+                </label>
+                <textarea
+                  id="desc"
+                  rows={4}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Explain the taste profile, decoration, size..."
+                  required
+                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] resize-none"
+                />
+              </div>
+
+              {/* Actions row */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2D1E18]/5">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="flex-1 rounded-full bg-[#2D1E18] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer disabled:opacity-40"
+                >
+                  {isSaving ? "Saving..." : "Save Product"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFormOpen(false)}
+                  className="flex-1 rounded-full bg-transparent border border-[#2D1E18]/25 text-[#2D1E18] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#FAF5F0] transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+              </div>
+
+            </form>
           </div>
-
-          <form onSubmit={handleSave} className="space-y-4">
-            
-            {/* Name Input */}
-            <div className="space-y-1.5">
-              <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Product Name *
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Signature Focaccia"
-                required
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
-              />
-            </div>
-
-            {/* Price Input */}
-            <div className="space-y-1.5">
-              <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Price ($) *
-              </label>
-              <input
-                id="price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="12.50"
-                required
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
-              />
-            </div>
-
-            {/* Category Dropdown */}
-            <div className="space-y-1.5">
-              <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Category *
-              </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as Product["category"])}
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Badge Input */}
-            <div className="space-y-1.5">
-              <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Badge / Promo Tag
-              </label>
-              <input
-                id="badge"
-                type="text"
-                value={badge}
-                onChange={(e) => setBadge(e.target.value)}
-                placeholder="Chef Special, Bestseller, New"
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
-              />
-            </div>
-
-            {/* Image Path */}
-            <div className="space-y-1.5">
-              <label htmlFor="image" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Image Path
-              </label>
-              <select
-                id="image"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
-              >
-                <option value="/hero_bakery.png">Chocolate Cake (/hero_bakery.png)</option>
-                <option value="/category_cakes.png">Strawberry Gateau (/category_cakes.png)</option>
-                <option value="/category_savories.png">Savory Quiche (/category_savories.png)</option>
-                <option value="/category_custom.png">Custom Wedding (/category_custom.png)</option>
-                <option value="/about_bakery.png">Hamper / Ingredients (/about_bakery.png)</option>
-              </select>
-            </div>
-
-            {/* Description Textarea */}
-            <div className="space-y-1.5">
-              <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
-                Description *
-              </label>
-              <textarea
-                id="desc"
-                rows={4}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Explain the taste profile, decoration, size..."
-                required
-                className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] resize-none"
-              />
-            </div>
-
-            {/* Submit Action */}
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="w-full rounded-full bg-[#2D1E18] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer disabled:opacity-40"
-            >
-              {isSaving ? "Saving..." : "Save Product"}
-            </button>
-
-          </form>
-        </aside>
+        </div>
+      </div>
       )}
 
     </div>

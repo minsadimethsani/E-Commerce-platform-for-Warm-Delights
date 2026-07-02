@@ -8,6 +8,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: DashboardIcon },
   { name: "Orders", href: "/admin/orders", icon: OrdersIcon },
   { name: "Products", href: "/admin/products", icon: ProductsIcon },
+  { name: "Categories & Tags", href: "/admin/categories", icon: CategoriesIcon },
 ];
 
 export default function AdminLayout({
@@ -183,6 +184,15 @@ function StorefrontIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 0 0 3.75-.615 3.001 3.001 0 0 0 3.75.615m-7.5 0h18m-18 0V4.024m18 5.325V4.024m0 0a3.001 3.001 0 0 0-3.75-.615 3.001 3.001 0 0 0-3.75.615m7.5 0h-18m0 0A3.001 3.001 0 0 0 7.5 2.76a3.001 3.001 0 0 0 3.75.65m-7.5 0V1.5h18v1.26" />
+    </svg>
+  );
+}
+
+function CategoriesIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.659A2.25 2.25 0 0 0 9.568 3Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
     </svg>
   );
 }

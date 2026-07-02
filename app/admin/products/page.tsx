@@ -1,10 +1,14 @@
 import { getAllProducts } from "@/lib/products";
+import { getAllCategories } from "@/lib/categories";
+import { getAllBadges } from "@/lib/badges";
 import ProductsClient from "./ProductsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const initialProducts = await getAllProducts();
+  const categories = await getAllCategories();
+  const badges = await getAllBadges();
 
   return (
     <div className="space-y-8">
@@ -15,7 +19,11 @@ export default async function AdminProductsPage() {
         </p>
       </div>
 
-      <ProductsClient initialProducts={initialProducts} />
+      <ProductsClient 
+        initialProducts={initialProducts} 
+        categoriesList={categories} 
+        badgesList={badges} 
+      />
     </div>
   );
 }

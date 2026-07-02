@@ -87,8 +87,8 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
             </thead>
             <tbody className="divide-y divide-[#2D1E18]/5 bg-white">
               {orders.map((order) => {
-                const formattedDate = order.createdAt?.toDate
-                  ? order.createdAt.toDate().toLocaleDateString("en-US", {
+                const formattedDate = order.createdAt
+                  ? new Date(order.createdAt as any).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
@@ -113,7 +113,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                     </td>
                     {/* Total Price */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
-                      ${order.total.toFixed(2)}
+                      Rs. {order.total.toFixed(2)}
                     </td>
                     {/* Status Badge */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm">
@@ -210,7 +210,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                       <span className="text-[#55433C]/60">Qty: {item.quantity}</span>
                     </div>
                   </div>
-                  <span className="font-bold text-[#2D1E18]">${(item.price * item.quantity).toFixed(2)}</span>
+                  <span className="font-bold text-[#2D1E18]">Rs. {(item.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
             </div>
@@ -220,19 +220,19 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
           <div className="pt-4 border-t border-[#2D1E18]/5 space-y-1.5 text-xs text-[#55433C]/80">
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${selectedOrder.subtotal.toFixed(2)}</span>
+              <span>Rs. {selectedOrder.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Tax (8%)</span>
-              <span>${selectedOrder.tax.toFixed(2)}</span>
+              <span>Rs. {selectedOrder.tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>${selectedOrder.shippingFee.toFixed(2)}</span>
+              <span>Rs. {selectedOrder.shippingFee.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm font-bold text-[#2D1E18] pt-2 border-t border-dashed border-[#2D1E18]/5">
               <span>Total</span>
-              <span>${selectedOrder.total.toFixed(2)}</span>
+              <span>Rs. {selectedOrder.total.toFixed(2)}</span>
             </div>
           </div>
 

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import MenuClient from "./MenuClient";
+import MenuLoading from "./loading";
 
 export const metadata: Metadata = {
   title: "Menu | Warm Delights Artisanal Bakery",
@@ -8,5 +10,9 @@ export const metadata: Metadata = {
 };
 
 export default function MenuPage() {
-  return <MenuClient />;
+  return (
+    <Suspense fallback={<MenuLoading />}>
+      <MenuClient />
+    </Suspense>
+  );
 }

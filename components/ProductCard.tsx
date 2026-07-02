@@ -96,7 +96,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Price and Add Button */}
         <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#2d1e18]/5">
           <span className="font-serif text-lg font-bold text-[#2d1e18]">
-            ${product.price.toFixed(2)}
+            Rs. {product.price.toFixed(2)}
           </span>
           
           <button

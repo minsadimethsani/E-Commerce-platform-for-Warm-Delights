@@ -8,6 +8,8 @@ export interface Product {
   category: "Cake" | "Savory" | "Pastry" | "Cookie" | "Custom";
   rating: number;
   reviewsCount: number;
+  videoUrl?: string;
+  isAvailable?: boolean;
 }
 
 export const products: Product[] = [
@@ -21,6 +23,7 @@ export const products: Product[] = [
     category: "Cake",
     rating: 4.9,
     reviewsCount: 142,
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-pouring-hot-chocolate-on-a-cake-40545-large.mp4",
   },
   {
     id: "prod-2",
@@ -32,6 +35,7 @@ export const products: Product[] = [
     category: "Cake",
     rating: 4.8,
     reviewsCount: 88,
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-putting-strawberries-on-a-cream-cake-40549-large.mp4",
   },
   {
     id: "prod-3",
@@ -76,6 +80,7 @@ export const products: Product[] = [
     category: "Pastry",
     rating: 4.9,
     reviewsCount: 95,
+    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-decorating-a-chocolate-cake-40546-large.mp4",
   },
   {
     id: "prod-7",

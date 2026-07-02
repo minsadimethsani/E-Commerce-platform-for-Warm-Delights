@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
@@ -12,7 +13,21 @@ const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom"] as co
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";
 
 export default function MenuClient() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams ? searchParams.get("category") : null;
+
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+
+  useEffect(() => {
+    if (categoryParam) {
+      const matched = CATEGORIES.find(
+        (c) => c.toLowerCase() === categoryParam.toLowerCase()
+      );
+      if (matched) {
+        setSelectedCategory(matched);
+      }
+    }
+  }, [categoryParam]);
   const [searchQuery, setSearchQuery] = useState<string>(" "); // Space triggers instant trim reset
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
@@ -267,7 +282,15 @@ export default function MenuClient() {
                           : "text-[#55433c]/85 hover:text-[#2d1e18] hover:translate-x-0.5"
                       }`}
                     >
-                      {category === "All" ? "All Offerings" : category + "s"}
+                      {category === "All" 
+                        ? "All Offerings" 
+                        : category === "Custom" 
+                        ? "Custom Creations" 
+                        : category === "Savory" 
+                        ? "Savories" 
+                        : category === "Pastry" 
+                        ? "Pastries" 
+                        : category + "s"}
                     </button>
                   ))}
                 </div>
@@ -534,7 +557,15 @@ export default function MenuClient() {
                           : "bg-[#faf5f0] border-[#2d1e18]/5 text-[#55433c]/85 hover:bg-[#2d1e18]/5"
                       }`}
                     >
-                      {category === "All" ? "All" : category}
+                      {category === "All" 
+                        ? "All" 
+                        : category === "Custom" 
+                        ? "Custom Creations" 
+                        : category === "Savory" 
+                        ? "Savories" 
+                        : category === "Pastry" 
+                        ? "Pastries" 
+                        : category + "s"}
                     </button>
                   ))}
                 </div>

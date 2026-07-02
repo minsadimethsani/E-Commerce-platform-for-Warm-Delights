@@ -31,6 +31,7 @@ export interface Product {
   careInstructions: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  videoUrl?: string;
 }
 
 /**

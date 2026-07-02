@@ -80,6 +80,7 @@ async function seedProductsIfEmpty(batch: any) {
       const seededProduct = {
         id: p.id,
         name: p.name,
+        nameLowercase: p.name.toLowerCase(), // Index field for case-insensitive prefix search
         description: p.description,
         price: p.price,
         image: p.image,
@@ -90,6 +91,7 @@ async function seedProductsIfEmpty(batch: any) {
         isAvailable: true,
         ingredients,
         careInstructions,
+        videoUrl: p.videoUrl || "",
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       };
@@ -299,6 +301,55 @@ async function seedOrdersIfEmpty(batch: any) {
   return false;
 }
 
+// 5. Seed Categories
+async function seedCategoriesIfEmpty(batch: any) {
+  const categoriesRef = collection(db, "categories");
+  const q = query(categoriesRef, limit(1));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    console.log("Firestore categories collection is empty. Seeding...");
+    const defaultCategories = [
+      { id: "cake", name: "Cake", subcategories: ["Sponge Cake", "Fudge Cake", "Cheesecakes"] },
+      { id: "savory", name: "Savory", subcategories: ["Quiches", "Bread", "Pies"] },
+      { id: "pastry", name: "Pastry", subcategories: ["Croissants", "Tarts", "Danishes"] },
+      { id: "cookie", name: "Cookie", subcategories: ["Chocolate Chip", "Macarons", "Shortbread"] },
+      { id: "custom", name: "Custom", subcategories: ["Wedding Cakes", "Birthday Cakes", "Custom Hampers"] }
+    ];
+
+    for (const cat of defaultCategories) {
+      const docRef = doc(db, "categories", cat.id);
+      batch.set(docRef, cat);
+    }
+    return true;
+  }
+  return false;
+}
+
+// 6. Seed Badges
+async function seedBadgesIfEmpty(batch: any) {
+  const badgesRef = collection(db, "badges");
+  const q = query(badgesRef, limit(1));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    console.log("Firestore badges collection is empty. Seeding...");
+    const defaultBadges = [
+      { id: "bestseller", name: "Bestseller" },
+      { id: "new", name: "New" },
+      { id: "seasonal", name: "Seasonal" },
+      { id: "chef-special", name: "Chef Special" }
+    ];
+
+    for (const badge of defaultBadges) {
+      const docRef = doc(db, "badges", badge.id);
+      batch.set(docRef, badge);
+    }
+    return true;
+  }
+  return false;
+}
+
 /**
  * Unified database seeder that creates all collections in a batch commit.
  */
@@ -310,8 +361,10 @@ export async function seedAllCollectionsIfEmpty() {
     const seededUsers = await seedUsersIfEmpty(batch);
     const seededReviews = await seedReviewsIfEmpty(batch);
     const seededOrders = await seedOrdersIfEmpty(batch);
+    const seededCategories = await seedCategoriesIfEmpty(batch);
+    const seededBadges = await seedBadgesIfEmpty(batch);
 
-    if (seededProd || seededUsers || seededReviews || seededOrders) {
+    if (seededProd || seededUsers || seededReviews || seededOrders || seededCategories || seededBadges) {
       await batch.commit();
       console.log("Firestore database collections updated successfully!");
     }

@@ -210,7 +210,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
               {/* Price display */}
               <div className="text-3xl font-serif font-bold text-[#2d1e18] pt-2">
-                ${product.price.toFixed(2)}
+                Rs. {product.price.toFixed(2)}
               </div>
             </div>
 
