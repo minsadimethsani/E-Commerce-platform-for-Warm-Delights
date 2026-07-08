@@ -7,12 +7,18 @@ import { Product, ProductVariant } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { addToCart } from "@/lib/cart";
 
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts: Product[];
 }
 
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
+  const router = useRouter();
+  const { user } = useAuth();
+  
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdded, setIsAdded] = useState<boolean>(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
@@ -31,6 +37,10 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
     addToCart(product, quantity, selectedVariant);
     window.dispatchEvent(new Event("open-checkout"));
   };

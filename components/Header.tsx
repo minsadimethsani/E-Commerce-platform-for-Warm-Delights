@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { getCart, removeFromCart, updateCartQuantity, CartItem, clearCart } from "@/lib/cart";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, userProfile, logout } = useAuth();
 
   // Interactive States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -85,6 +87,18 @@ export default function Header() {
     };
   }, []);
 
+  // Listen to openCheckout query param from successful login redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("openCheckout") === "true") {
+      if (user) {
+        setIsCheckoutOpen(true);
+        const newUrl = window.location.pathname + window.location.search.replace(/[?&]openCheckout=true/, "");
+        window.history.replaceState({}, "", newUrl);
+      }
+    }
+  }, [user]);
+
   const cartCount = mounted ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
   const totalAmount = cartItems.reduce(
     (acc, item) => acc + (item.selectedVariant ? item.selectedVariant.price : item.product.price) * item.quantity,
@@ -102,6 +116,11 @@ export default function Header() {
   };
 
   const handleCartNext = () => {
+    if (!user) {
+      setIsCartOpen(false);
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
   };
@@ -317,9 +336,20 @@ export default function Header() {
             </div>
 
             {/* Profile Button */}
-            <button
-              aria-label="Profile"
-              className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer"
+            <Link
+              href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
+              onClick={async (e) => {
+                if (user && userProfile?.role !== "admin") {
+                  e.preventDefault();
+                  if (confirm("Are you sure you want to log out?")) {
+                    await logout();
+                    router.push("/");
+                  }
+                }
+              }}
+              title={user ? `Logged in as ${userProfile?.displayName || user.email} (Click to Logout)` : "Login / Sign Up"}
+              aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
+              className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer flex items-center space-x-1 text-[#0D1B2A]"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -335,7 +365,12 @@ export default function Header() {
                   d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                 />
               </svg>
-            </button>
+              {user && (
+                <span className="text-[10px] font-bold text-[#0D1B2A]/70 uppercase tracking-wider hidden lg:inline">
+                  {userProfile?.displayName?.split(" ")[0] || "User"}
+                </span>
+              )}
+            </Link>
 
             {/* Cart Button */}
             <button
@@ -453,9 +488,20 @@ export default function Header() {
 
             <div className="mt-4 border-t border-[#0D1B2A]/5 pt-4 flex items-center justify-around text-[#0D1B2A]">
               {/* Profile Button Mobile */}
-              <button
-                aria-label="Profile"
-                className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-[#0D1B2A]/5 cursor-pointer"
+              <Link
+                href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
+                onClick={async (e) => {
+                  if (user && userProfile?.role !== "admin") {
+                    e.preventDefault();
+                    if (confirm("Are you sure you want to log out?")) {
+                      await logout();
+                      router.push("/");
+                    }
+                  }
+                  setIsOpen(false);
+                }}
+                aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
+                className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-[#0D1B2A]/5 cursor-pointer text-[#0D1B2A]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -471,8 +517,10 @@ export default function Header() {
                     d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
                   />
                 </svg>
-                <span className="text-sm font-medium">Account</span>
-              </button>
+                <span className="text-sm font-medium">
+                  {user ? `Logout (${userProfile?.displayName?.split(" ")[0] || "User"})` : "Account"}
+                </span>
+              </Link>
 
               {/* Cart Button Mobile */}
               <button
