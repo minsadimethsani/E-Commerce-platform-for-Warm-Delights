@@ -3,6 +3,9 @@ import { Suspense } from "react";
 import MenuClient from "./MenuClient";
 import MenuLoading from "./loading";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Menu | Warm Delights Artisanal Bakery",
   description:

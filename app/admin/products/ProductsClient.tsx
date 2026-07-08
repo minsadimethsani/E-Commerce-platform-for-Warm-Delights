@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "@/data/products";
-import { doc, setDoc, deleteDoc, Timestamp } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, Timestamp, collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { Category } from "@/lib/categories";
@@ -22,6 +22,40 @@ export default function ProductsClient({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    const productsRef = collection(db, "products");
+    const q = query(productsRef, orderBy("id", "asc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list: Product[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: data.id,
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          image: data.image,
+          category: data.category,
+          badge: data.badge || undefined,
+          rating: data.rating,
+          reviewsCount: data.reviewsCount,
+          isAvailable: data.isAvailable !== false,
+          ingredients: data.ingredients || [],
+          careInstructions: data.careInstructions || "",
+          images: data.images || [],
+          videoUrl: data.videoUrl || "",
+          variants: data.variants || [],
+        } as any);
+      });
+      setProducts(list);
+    }, (error) => {
+      console.error("Firestore onSnapshot failed:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Fallback to default lists if collections are empty
   const categories = categoriesList.length > 0 ? categoriesList : [
@@ -244,6 +278,7 @@ export default function ProductsClient({
       const savePayload = {
         id,
         name: name.trim(),
+        nameLowercase: name.trim().toLowerCase(),
         description: description.trim(),
         price: parsedPrice,
         image: finalImage,

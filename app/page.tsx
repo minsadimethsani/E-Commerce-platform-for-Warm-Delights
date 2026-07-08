@@ -1,11 +1,14 @@
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
 import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
 import Story from "@/components/Story";
 import ProductCatalogSkeleton from "@/components/ProductCatalogSkeleton";
 import { getAllProducts } from "@/lib/products";
 
-const ProductCatalog = dynamic(() => import("@/components/ProductCatalog"), {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const ProductCatalog = nextDynamic(() => import("@/components/ProductCatalog"), {
   loading: () => <ProductCatalogSkeleton />,
   ssr: true,
 });

@@ -25,3 +25,18 @@ const storage = getStorage(app);
 
 // Export instances for use throughout the application
 export { app, db, auth, storage };
+
+// Helper utility to enforce timeout on Firestore queries (useful for offline mode/bad network fallback)
+export function runWithTimeout<T>(promise: Promise<T>, timeoutMs: number = 3000): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(`Firestore query timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  });
+}

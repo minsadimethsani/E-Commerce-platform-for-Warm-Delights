@@ -1,6 +1,6 @@
 import { products as localProducts, Product } from "@/data/products";
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, runWithTimeout } from "./firebase";
 import { seedAllCollectionsIfEmpty } from "./db-seed";
 
 export interface FilterParams {
@@ -32,10 +32,10 @@ export async function getAllProducts(): Promise<Product[]> {
     await seedAllCollectionsIfEmpty();
     const productsRef = collection(db, "products");
     const q = query(productsRef, orderBy("id", "asc"));
-    const snapshot = await getDocs(q);
+    const snapshot = await runWithTimeout(getDocs(q), 15000);
     
     if (snapshot.empty) {
-      return localProducts;
+      return [];
     }
 
     const list: Product[] = [];
@@ -56,6 +56,7 @@ export async function getAllProducts(): Promise<Product[]> {
         careInstructions: data.careInstructions || "",
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        variants: data.variants || [],
       } as any);
     });
     return list;
@@ -72,7 +73,7 @@ export async function getProductById(id: string): Promise<Product | undefined> {
   try {
     await seedAllCollectionsIfEmpty();
     const docRef = doc(db, "products", id);
-    const docSnap = await getDoc(docRef);
+    const docSnap = await runWithTimeout(getDoc(docRef), 15000);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
@@ -91,6 +92,7 @@ export async function getProductById(id: string): Promise<Product | undefined> {
         careInstructions: data.careInstructions || "",
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        variants: data.variants || [],
       } as any;
     }
     return undefined;
@@ -172,13 +174,13 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
 
     // 6. Execute Count Query on Server (Extremely cheap: 1 document read per 1,000 counted)
     const countQuery = query(productsRef, ...constraints);
-    const countSnapshot = await getCountFromServer(countQuery);
+    const countSnapshot = await runWithTimeout(getCountFromServer(countQuery), 15000);
     const total = countSnapshot.data().count;
 
     // 7. Execute Data Query (Paginating up to page * limit to resolve page lists)
     const maxFetchCount = page * limitVal;
     const dataQuery = query(productsRef, ...constraints, limit(maxFetchCount));
-    const snapshot = await getDocs(dataQuery);
+    const snapshot = await runWithTimeout(getDocs(dataQuery), 15000);
 
     const allFetched: Product[] = [];
     snapshot.forEach((docSnap) => {
@@ -198,6 +200,7 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
         careInstructions: data.careInstructions || "",
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        variants: data.variants || [],
       } as any);
     });
 
@@ -226,10 +229,10 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
       limit: limitVal,
     };
   } catch (error) {
-    console.error("Firestore filtered query failed. Falling back to local mocks.", error);
+    console.error("Firestore filtered query failed. Falling back to in-memory filtering of Firestore products.", error);
     
-    // Fallback to local in-memory query
-    let result = [...localProducts];
+    // Fallback to filtering all Firestore products in memory
+    let result = await getAllProducts();
     const { category = "All", search = "", minPrice, maxPrice, minRating, onlyBestsellers = false, sortBy = "featured", page = 1, limit: limitVal = 8 } = filters;
 
     if (category !== "All" && category.trim() !== "") {

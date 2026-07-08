@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { getCart, removeFromCart, updateCartQuantity, CartItem, clearCart } from "@/lib/cart";
+import { db } from "@/lib/firebase";
 
 export default function Header() {
   const pathname = usePathname();
@@ -18,6 +19,42 @@ export default function Header() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+
+  // Checkout Modal States
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isOrderSubmitting, setIsOrderSubmitting] = useState(false);
+  const [isOrderSuccess, setIsOrderSuccess] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState("");
+
+  // Billing Fields
+  const [billingFirstName, setBillingFirstName] = useState("");
+  const [billingLastName, setBillingLastName] = useState("");
+  const [billingCountry, setBillingCountry] = useState("Sri Lanka");
+  const [billingZipCode, setBillingZipCode] = useState("");
+  const [billingPhone, setBillingPhone] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
+
+  // Fulfillment Fields
+  const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">("pickup");
+
+  // Pickup specific
+  const [pickupBranch, setPickupBranch] = useState("Colombo Downtown Branch (No. 45, Galle Road, Colombo 03)");
+  const [pickupDate, setPickupDate] = useState("");
+  const [pickupTime, setPickupTime] = useState("");
+  const [pickupNote, setPickupNote] = useState("");
+
+  // Delivery specific
+  const [deliveryDetails, setDeliveryDetails] = useState({
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    phone: "",
+    recipientPhone: "",
+  });
+
+  // Payment Method
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "card" | "bank_deposit">("cod");
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,11 +70,17 @@ export default function Header() {
       setIsCartOpen(true);
     };
 
+    const handleOpenCheckout = () => {
+      setIsCheckoutOpen(true);
+    };
+
     window.addEventListener("cart-updated", handleCartUpdate);
     window.addEventListener("open-cart", handleOpenCart);
+    window.addEventListener("open-checkout", handleOpenCheckout);
     return () => {
       window.removeEventListener("cart-updated", handleCartUpdate);
       window.removeEventListener("open-cart", handleOpenCart);
+      window.removeEventListener("open-checkout", handleOpenCheckout);
       clearTimeout(timer);
     };
   }, []);
@@ -58,9 +101,119 @@ export default function Header() {
     }
   };
 
-  const handleCheckout = () => {
-    setIsOrderPlaced(true);
-    clearCart();
+  const handleCartNext = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const copyBillingToDelivery = () => {
+    setDeliveryDetails({
+      firstName: billingFirstName,
+      lastName: billingLastName,
+      address: deliveryDetails.address,
+      city: deliveryDetails.city,
+      phone: billingPhone,
+      recipientPhone: billingPhone,
+    });
+  };
+
+  const handlePlaceOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsOrderSubmitting(true);
+
+    try {
+      const generatedOrderId = `order-${Math.floor(100000 + Math.random() * 900000)}`;
+      const subtotal = totalAmount;
+      const tax = subtotal * 0.08;
+      const deliveryFee = deliveryType === "delivery" ? 350 : 0;
+      const total = subtotal + tax + deliveryFee;
+
+      const orderItems = cartItems.map((item) => ({
+        productId: item.product.id,
+        name: item.product.name + (item.selectedVariant ? ` (${item.selectedVariant.name})` : ""),
+        price: item.selectedVariant ? item.selectedVariant.price : item.product.price,
+        quantity: item.quantity,
+        image: item.product.image
+      }));
+
+      const shippingAddress = {
+        id: `addr-${Date.now()}`,
+        street: deliveryType === "pickup" 
+          ? `PICKUP: ${pickupBranch}` 
+          : deliveryDetails.address,
+        city: deliveryType === "pickup" 
+          ? "Store Pickup" 
+          : deliveryDetails.city,
+        state: deliveryType === "pickup" 
+          ? "N/A" 
+          : "Delivery Province",
+        postalCode: billingZipCode || "N/A",
+        country: billingCountry,
+        isDefault: false
+      };
+
+      const orderData = {
+        id: generatedOrderId,
+        userId: "guest",
+        items: orderItems,
+        subtotal: subtotal,
+        tax: tax,
+        shippingFee: deliveryFee,
+        total: total,
+        status: "pending",
+        shippingAddress: shippingAddress,
+        paymentDetails: {
+          method: paymentMethod,
+          status: paymentMethod === "card" ? "paid" : "unpaid"
+        },
+        billingDetails: {
+          firstName: billingFirstName,
+          lastName: billingLastName,
+          country: billingCountry,
+          zipCode: billingZipCode || "",
+          phone: billingPhone,
+          email: billingEmail
+        },
+        fulfillment: {
+          type: deliveryType,
+          pickupDetails: deliveryType === "pickup" ? {
+            branch: pickupBranch,
+            date: pickupDate,
+            time: pickupTime
+          } : null,
+          deliveryDetails: deliveryType === "delivery" ? {
+            firstName: deliveryDetails.firstName,
+            lastName: deliveryDetails.lastName,
+            address: deliveryDetails.address,
+            city: deliveryDetails.city,
+            phone: deliveryDetails.phone,
+            recipientPhone: deliveryDetails.recipientPhone
+          } : null
+        },
+        orderNote: deliveryType === "pickup" ? pickupNote : "",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Import Firestore write
+      const { doc, setDoc } = await import("firebase/firestore");
+      const orderDocRef = doc(db, "orders", generatedOrderId);
+      await setDoc(orderDocRef, orderData);
+
+      setCreatedOrderId(generatedOrderId);
+      setIsOrderSuccess(true);
+      clearCart();
+    } catch (error) {
+      console.error("Error creating order: ", error);
+      alert("Failed to place order. Please check your network or try again.");
+    } finally {
+      setIsOrderSubmitting(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsCheckoutOpen(false);
+    setIsOrderSuccess(false);
   };
 
   // Hide public storefront header on admin portal pages
@@ -69,7 +222,8 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#0D1B2A]/8 bg-[#F9F9F8]/80 backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-50 w-full border-b border-[#0D1B2A]/8 bg-[#F9F9F8]/80 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           
@@ -359,6 +513,8 @@ export default function Header() {
 
 
 
+      </header>
+
       {/* Cart Drawer */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true">
@@ -501,10 +657,10 @@ export default function Header() {
                       Shipping, taxes, and promotional discounts are calculated at final checkout page.
                     </p>
                     <button
-                      onClick={handleCheckout}
+                      onClick={handleCartNext}
                       className="w-full rounded-full bg-[#0D1B2A] text-white py-3.5 text-xs font-bold uppercase tracking-wider text-center hover:bg-[#E09F3E] hover:text-[#0D1B2A] transition-all cursor-pointer"
                     >
-                      Place Fresh Order
+                      Next
                     </button>
                   </div>
                 )}
@@ -515,6 +671,446 @@ export default function Header() {
           </div>
         </div>
       )}
-    </header>
+
+      {/* Buy Now / Cart Checkout Popup Modal */}
+      {isCheckoutOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#2A1E17]/65 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative w-full max-w-4xl bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+            
+            {/* Modal Header */}
+            <div className="px-8 py-5 border-b border-[#2A1E17]/5 flex items-center justify-between bg-[#EFEFEA]/50">
+              <div>
+                <h3 className="font-serif text-xl font-bold text-[#2A1E17]">Checkout details</h3>
+                <p className="text-[10px] text-[#3A2E2B]/60 uppercase tracking-widest font-semibold mt-0.5">Place your artisanal treats order</p>
+              </div>
+              <button
+                onClick={handleCloseModal}
+                className="h-8 w-8 rounded-full hover:bg-[#2A1E17]/5 text-[#2A1E17]/70 hover:text-[#2A1E17] flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Modal Body / Form */}
+            <div className="flex-1 overflow-y-auto p-8">
+              {isOrderSuccess ? (
+                /* Success View */
+                <div className="py-16 text-center space-y-6 max-w-md mx-auto animate-fade-in">
+                  <div className="mx-auto h-20 w-20 bg-emerald-50 rounded-full flex items-center justify-center text-3xl shadow-xs border border-emerald-100">
+                    🎉
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-serif text-2xl font-bold text-emerald-800">Order Placed!</h4>
+                    <p className="text-sm text-[#3A2E2B]/85">
+                      Your bakery order has been successfully sent to the kitchen.
+                    </p>
+                    <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-2xl p-4 text-xs font-mono text-[#2A1E17] tracking-wider mt-4">
+                      Order ID: {createdOrderId}
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className="w-full rounded-full bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
+                  >
+                    Back to Shop
+                  </button>
+                </div>
+              ) : (
+                /* Form View */
+                <form onSubmit={handlePlaceOrder} className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    
+                    {/* Left Column: Billing Details */}
+                    <div className="space-y-4">
+                      <div className="border-b border-[#2A1E17]/10 pb-2 mb-2">
+                        <h4 className="font-serif text-base font-bold text-[#2A1E17]">Billing Details</h4>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">First Name *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="John"
+                            value={billingFirstName}
+                            onChange={(e) => setBillingFirstName(e.target.value)}
+                            className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Last Name *</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Doe"
+                            value={billingLastName}
+                            onChange={(e) => setBillingLastName(e.target.value)}
+                            className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Country *</label>
+                        <select
+                          value={billingCountry}
+                          onChange={(e) => setBillingCountry(e.target.value)}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                        >
+                          <option value="Sri Lanka">Sri Lanka</option>
+                          <option value="India">India</option>
+                          <option value="United States">United States</option>
+                          <option value="United Kingdom">United Kingdom</option>
+                          <option value="Canada">Canada</option>
+                          <option value="Australia">Australia</option>
+                          <option value="Singapore">Singapore</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Zip / Postal Code (Optional)</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 10115"
+                          value={billingZipCode}
+                          onChange={(e) => setBillingZipCode(e.target.value)}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Phone *</label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="e.g. 077 123 4567"
+                          value={billingPhone}
+                          onChange={(e) => setBillingPhone(e.target.value)}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Email Address *</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="john@example.com"
+                          value={billingEmail}
+                          onChange={(e) => setBillingEmail(e.target.value)}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column: Fulfillment Details */}
+                    <div className="space-y-6">
+                      <div className="border-b border-[#2A1E17]/10 pb-2 flex items-center justify-between">
+                        <h4 className="font-serif text-base font-bold text-[#2A1E17]">Fulfillment Details</h4>
+                      </div>
+
+                      {/* Delivery Type Selector Buttons */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setDeliveryType("pickup")}
+                          className={`py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 border cursor-pointer flex items-center justify-center space-x-2 ${
+                            deliveryType === "pickup"
+                              ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
+                              : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                          }`}
+                        >
+                          <span>🏬</span>
+                          <span>Store Pickup</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeliveryType("delivery")}
+                          className={`py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 border cursor-pointer flex items-center justify-center space-x-2 ${
+                            deliveryType === "delivery"
+                              ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
+                              : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                          }`}
+                        >
+                          <span>🚚</span>
+                          <span>Home Delivery</span>
+                        </button>
+                      </div>
+
+                      {/* Pickup Fields */}
+                      {deliveryType === "pickup" && (
+                        <div className="space-y-4 animate-fade-in">
+                          <div className="space-y-1">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Location Branch *</label>
+                            <select
+                              value={pickupBranch}
+                              onChange={(e) => setPickupBranch(e.target.value)}
+                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                            >
+                              <option value="Colombo Downtown Branch (No. 45, Galle Road, Colombo 03)">Colombo Downtown Branch (No. 45, Galle Road, Colombo 03)</option>
+                              <option value="Kandy Lake Round Bakery (No. 12, Temple Road, Kandy)">Kandy Lake Round Bakery (No. 12, Temple Road, Kandy)</option>
+                              <option value="Galle Fort Cafe (No. 8, Pedlar Street, Galle Fort, Galle)">Galle Fort Cafe (No. 8, Pedlar Street, Galle Fort, Galle)</option>
+                              <option value="Negombo Beachside Hub (No. 202, Lewis Place, Negombo)">Negombo Beachside Hub (No. 202, Lewis Place, Negombo)</option>
+                            </select>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Date *</label>
+                              <input
+                                type="date"
+                                required
+                                min={new Date().toISOString().split("T")[0]}
+                                value={pickupDate}
+                                onChange={(e) => setPickupDate(e.target.value)}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Time *</label>
+                              <input
+                                type="time"
+                                required
+                                value={pickupTime}
+                                onChange={(e) => setPickupTime(e.target.value)}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Order Note (Optional)</label>
+                            <textarea
+                              rows={3}
+                              placeholder="e.g. Please pack carefully, write 'Happy Birthday John' on it..."
+                              value={pickupNote}
+                              onChange={(e) => setPickupNote(e.target.value)}
+                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] resize-none"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Delivery Fields */}
+                      {deliveryType === "delivery" && (
+                        <div className="space-y-4 animate-fade-in">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Recipient Details *</span>
+                            <button
+                              type="button"
+                              onClick={copyBillingToDelivery}
+                              className="text-[10px] font-bold uppercase tracking-wide text-[#C5A880] hover:underline cursor-pointer"
+                            >
+                              Same as Billing Details
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">First Name *</label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="First Name"
+                                value={deliveryDetails.firstName}
+                                onChange={(e) => setDeliveryDetails({ ...deliveryDetails, firstName: e.target.value })}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Last Name *</label>
+                              <input
+                                type="text"
+                                required
+                                placeholder="Last Name"
+                                value={deliveryDetails.lastName}
+                                onChange={(e) => setDeliveryDetails({ ...deliveryDetails, lastName: e.target.value })}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Delivery Address *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="No. / Street Address"
+                              value={deliveryDetails.address}
+                              onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
+                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">City *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="City"
+                              value={deliveryDetails.city}
+                              onChange={(e) => setDeliveryDetails({ ...deliveryDetails, city: e.target.value })}
+                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Phone *</label>
+                              <input
+                                type="tel"
+                                required
+                                placeholder="Your Phone"
+                                value={deliveryDetails.phone}
+                                onChange={(e) => setDeliveryDetails({ ...deliveryDetails, phone: e.target.value })}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Recipient Phone *</label>
+                              <input
+                                type="tel"
+                                required
+                                placeholder="Recipient's Phone"
+                                value={deliveryDetails.recipientPhone}
+                                onChange={(e) => setDeliveryDetails({ ...deliveryDetails, recipientPhone: e.target.value })}
+                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Section: Order Summary & Payment */}
+                  <div className="border-t border-[#2A1E17]/10 pt-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    
+                    {/* Order Details Summary */}
+                    <div className="space-y-3">
+                      <h4 className="font-serif text-base font-bold text-[#2A1E17]">Order Summary</h4>
+                      <div className="bg-[#EFEFEA]/50 rounded-2xl p-5 border border-[#2A1E17]/5 space-y-3">
+                        <div className="max-h-48 overflow-y-auto pr-2 space-y-3">
+                          {cartItems.map((item) => {
+                            const itemPrice = item.selectedVariant ? item.selectedVariant.price : item.product.price;
+                            return (
+                              <div key={`${item.product.id}-${item.selectedVariant?.name || "base"}`} className="flex items-center justify-between text-sm">
+                                <div className="flex items-center space-x-3">
+                                  <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-white border border-[#2A1E17]/5 flex-shrink-0">
+                                    <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-[#2A1E17] leading-tight text-xs">{item.product.name}</p>
+                                    {item.selectedVariant && (
+                                      <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide mt-0.5">
+                                        {item.selectedVariant.name}
+                                      </span>
+                                    )}
+                                    <p className="text-[10px] text-[#3A2E2B]/60 mt-0.5">Qty: {item.quantity}</p>
+                                  </div>
+                                </div>
+                                <span className="font-bold text-[#2A1E17] text-xs">Rs. {(itemPrice * item.quantity).toFixed(2)}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+
+                        <div className="border-t border-[#2A1E17]/5 pt-3 space-y-1.5 text-xs text-[#3A2E2B]/80 font-sans">
+                          <div className="flex justify-between">
+                            <span>Subtotal</span>
+                            <span>Rs. {totalAmount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Tax (8%)</span>
+                            <span>Rs. {(totalAmount * 0.08).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Fulfillment ({deliveryType === "pickup" ? "Pickup" : "Delivery"})</span>
+                            <span>{deliveryType === "pickup" ? "Free" : `Rs. ${(350).toFixed(2)}`}</span>
+                          </div>
+                          <div className="flex justify-between text-sm font-bold text-[#2A1E17] pt-2 border-t border-dashed border-[#2A1E17]/5">
+                            <span>Total</span>
+                            <span>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Selector */}
+                    <div className="space-y-3">
+                      <h4 className="font-serif text-base font-bold text-[#2A1E17]">Payment Method</h4>
+                      <div className="space-y-3">
+                        <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
+                          paymentMethod === "cod"
+                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
+                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                        }`}>
+                          <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="sr-only" />
+                          <span className="text-xl mr-3">💵</span>
+                          <div>
+                            <span className="block font-bold text-xs text-[#2A1E17]">Cash on Delivery</span>
+                            <span className="block text-[10px] text-[#3A2E2B]/60">Pay cash when you pick up or receive delivery</span>
+                          </div>
+                        </label>
+
+                        <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
+                          paymentMethod === "card"
+                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
+                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                        }`}>
+                          <input type="radio" name="payment" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} className="sr-only" />
+                          <span className="text-xl mr-3">💳</span>
+                          <div>
+                            <span className="block font-bold text-xs text-[#2A1E17]">Card Payment</span>
+                            <span className="block text-[10px] text-[#3A2E2B]/60">Pay online with Visa / MasterCard / Amex</span>
+                          </div>
+                        </label>
+
+                        <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
+                          paymentMethod === "bank_deposit"
+                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
+                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                        }`}>
+                          <input type="radio" name="payment" value="bank_deposit" checked={paymentMethod === "bank_deposit"} onChange={() => setPaymentMethod("bank_deposit")} className="sr-only" />
+                          <span className="text-xl mr-3">🏦</span>
+                          <div>
+                            <span className="block font-bold text-xs text-[#2A1E17]">Bank Deposit</span>
+                            <span className="block text-[10px] text-[#3A2E2B]/60">Direct bank transfer to our corporate account</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-4 border-t border-[#2A1E17]/5 flex items-center justify-end space-x-4">
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#EFEFEA]/50 transition-colors cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isOrderSubmitting}
+                      className="rounded-full bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer min-w-40 flex items-center justify-center"
+                    >
+                      {isOrderSubmitting ? (
+                        <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        "Place Fresh Order"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

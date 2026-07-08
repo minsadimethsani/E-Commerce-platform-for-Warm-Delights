@@ -71,7 +71,7 @@ export interface OrderItem {
  * Payment details status and method
  */
 export interface PaymentDetails {
-  method: "stripe" | "cod";
+  method: "stripe" | "cod" | "card" | "bank_deposit";
   paymentId?: string;
   status: "unpaid" | "paid" | "refunded";
 }
@@ -92,6 +92,31 @@ export interface Order {
   paymentDetails: PaymentDetails;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  billingDetails?: {
+    firstName: string;
+    lastName: string;
+    country: string;
+    zipCode?: string;
+    phone: string;
+    email: string;
+  };
+  fulfillment?: {
+    type: "pickup" | "delivery";
+    pickupDetails?: {
+      branch: string;
+      date: string;
+      time: string;
+    };
+    deliveryDetails?: {
+      firstName: string;
+      lastName: string;
+      address: string;
+      city: string;
+      phone: string;
+      recipientPhone: string;
+    };
+  };
+  orderNote?: string;
 }
 
 /**

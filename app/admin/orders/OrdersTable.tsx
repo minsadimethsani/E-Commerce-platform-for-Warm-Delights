@@ -166,24 +166,94 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
             </button>
           </div>
 
-          {/* Customer Info */}
-          <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Shipping Address</h4>
-            <div className="text-sm text-[#2A1E17] font-medium leading-relaxed">
-              <p className="font-bold">{selectedOrder.shippingAddress.street}</p>
-              <p>
-                {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
-              </p>
-              <p>{selectedOrder.shippingAddress.country}</p>
+          {/* Billing Info */}
+          {selectedOrder.billingDetails && (
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Billing Details</h4>
+              <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-[#EFEFEA]/30 p-3 rounded-xl border border-[#2A1E17]/5 space-y-0.5 animate-fade-in">
+                <p className="font-bold">
+                  {selectedOrder.billingDetails.firstName} {selectedOrder.billingDetails.lastName}
+                </p>
+                <p className="text-xs text-[#3A2E2B]/75">{selectedOrder.billingDetails.email}</p>
+                <p className="text-xs text-[#3A2E2B]/75">{selectedOrder.billingDetails.phone}</p>
+                <p className="text-xs text-[#3A2E2B]/60 uppercase tracking-wide font-semibold mt-1">
+                  Country: {selectedOrder.billingDetails.country}
+                  {selectedOrder.billingDetails.zipCode ? ` | Zip: ${selectedOrder.billingDetails.zipCode}` : ""}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Fulfillment Details */}
+          {selectedOrder.fulfillment ? (
+            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5 animate-fade-in">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60 flex items-center justify-between">
+                <span>Fulfillment Details</span>
+                <span className="px-2 py-0.5 bg-[#C5A880]/15 text-[#2A1E17] text-[10px] rounded-md font-bold uppercase tracking-wider">
+                  {selectedOrder.fulfillment.type}
+                </span>
+              </h4>
+
+              {selectedOrder.fulfillment.type === "pickup" && selectedOrder.fulfillment.pickupDetails && (
+                <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-amber-50/40 p-3 rounded-xl border border-amber-200/30 space-y-1">
+                  <p className="text-xs font-bold text-[#2A1E17]/60 uppercase tracking-wider">Pickup Branch:</p>
+                  <p className="font-semibold text-xs">{selectedOrder.fulfillment.pickupDetails.branch}</p>
+                  <div className="flex justify-between items-center text-xs mt-2 border-t border-[#2A1E17]/5 pt-2">
+                    <span>Date: <strong>{selectedOrder.fulfillment.pickupDetails.date}</strong></span>
+                    <span>Time: <strong>{selectedOrder.fulfillment.pickupDetails.time}</strong></span>
+                  </div>
+                </div>
+              )}
+
+              {selectedOrder.fulfillment.type === "delivery" && selectedOrder.fulfillment.deliveryDetails && (
+                <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-[#EFEFEA]/30 p-3 rounded-xl border border-[#2A1E17]/5 space-y-1">
+                  <p className="font-bold">
+                    Recipient: {selectedOrder.fulfillment.deliveryDetails.firstName} {selectedOrder.fulfillment.deliveryDetails.lastName}
+                  </p>
+                  <p className="text-xs">{selectedOrder.fulfillment.deliveryDetails.address}</p>
+                  <p className="text-xs">City: {selectedOrder.fulfillment.deliveryDetails.city}</p>
+                  <div className="text-xs mt-1 space-y-0.5 border-t border-[#2A1E17]/5 pt-1.5">
+                    <p>Phone: {selectedOrder.fulfillment.deliveryDetails.phone}</p>
+                    <p>Recipient Phone: {selectedOrder.fulfillment.deliveryDetails.recipientPhone}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Fallback to original shippingAddress if fulfillment is not set (seeded orders) */
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Shipping Address</h4>
+              <div className="text-sm text-[#2A1E17] font-medium leading-relaxed">
+                <p className="font-bold">{selectedOrder.shippingAddress.street}</p>
+                <p>
+                  {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
+                </p>
+                <p>{selectedOrder.shippingAddress.country}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Order Note */}
+          {selectedOrder.orderNote && (
+            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order Note</h4>
+              <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3 rounded-xl border border-yellow-200/25 italic">
+                "{selectedOrder.orderNote}"
+              </div>
+            </div>
+          )}
 
           {/* Payment Info */}
           <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Payment</h4>
             <div className="flex justify-between items-center text-sm">
-              <span className="font-medium uppercase text-[#3A2E2B]">
-                Method: {selectedOrder.paymentDetails.method}
+              <span className="font-medium text-[#3A2E2B]">
+                Method: <span className="font-bold text-[#2A1E17]">
+                  {selectedOrder.paymentDetails.method === "cod" ? "Cash on Delivery" :
+                   selectedOrder.paymentDetails.method === "card" ? "Card Payment" :
+                   selectedOrder.paymentDetails.method === "bank_deposit" ? "Bank Deposit" :
+                   selectedOrder.paymentDetails.method.toUpperCase()}
+                </span>
               </span>
               <span className={`inline-block rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                 selectedOrder.paymentDetails.status === "paid"

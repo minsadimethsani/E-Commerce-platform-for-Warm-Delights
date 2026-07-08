@@ -36,6 +36,9 @@ export async function getAllOrders(): Promise<Order[]> {
         paymentDetails: data.paymentDetails,
         createdAt: createdStr as any,
         updatedAt: updatedStr as any,
+        billingDetails: data.billingDetails || null,
+        fulfillment: data.fulfillment || null,
+        orderNote: data.orderNote || "",
       });
     });
     return list;

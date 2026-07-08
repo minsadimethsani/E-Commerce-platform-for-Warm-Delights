@@ -12,11 +12,8 @@ interface ProductDetailClientProps {
   relatedProducts: Product[];
 }
 
-type TabType = "details" | "ingredients" | "storage";
-
 export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
   const [quantity, setQuantity] = useState<number>(1);
-  const [activeTab, setActiveTab] = useState<TabType>("details");
   const [isAdded, setIsAdded] = useState<boolean>(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
     product.variants && product.variants.length > 0 ? product.variants[0] : undefined
@@ -35,7 +32,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
   const handleBuyNow = () => {
     addToCart(product, quantity, selectedVariant);
-    window.dispatchEvent(new Event("open-cart"));
+    window.dispatchEvent(new Event("open-checkout"));
   };
 
   // Helper to render rating stars
@@ -75,73 +72,6 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     return stars;
   };
 
-  // Get content based on category
-  const getTabContent = () => {
-    switch (activeTab) {
-      case "details":
-        return (
-          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
-            <p>{product.description}</p>
-            <p>
-              Every batch is crafted by hand in our bakery workspace using traditional slow-fermentation or whipping techniques. We ensure each item meets our strict standards of flavor profile and texture.
-            </p>
-          </div>
-        );
-      case "ingredients":
-        let ingredients = "";
-        let allergy = "Gluten, Dairy, Eggs";
-        if (product.category === "Cake") {
-          ingredients = "Organic unbleached cake flour, pasture-raised egg yolks, organic cane sugar, pure grass-fed butter, fresh whipping cream, natural vanilla paste, sea salt, premium baking powder.";
-        } else if (product.category === "Savory") {
-          ingredients = "Premium stone-ground wheat flour, whole milk, Greek feta / cheddar cheeses, fresh organic spinach / vegetables, pasture-raised eggs, unsalted butter, nutmeg, sea salt, white pepper.";
-        } else if (product.category === "Pastry") {
-          ingredients = "French style unbleached pastry flour, premium grass-fed butter (82% fat) for lamination, fresh whole milk, yeast, organic sugar, water, organic sea salt.";
-        } else if (product.category === "Cookie") {
-          ingredients = "Organic pastry flour, dark / semi-sweet chocolate chunks, organic light brown sugar, grass-fed butter, pasture-raised eggs, Madagascar vanilla extract, baking soda, sea salt flakes.";
-          allergy = "Gluten, Dairy, Eggs, may contain traces of nuts.";
-        } else {
-          ingredients = "Handpicked premium organic ingredients including local stone-ground flour, pasture-raised eggs, pure butter, cane sugar, and natural extracts.";
-        }
-        return (
-          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
-            <div>
-              <strong className="text-[#2A1E17] block mb-1">Key Ingredients:</strong>
-              <p>{ingredients}</p>
-            </div>
-            <div>
-              <strong className="text-[#2A1E17] block mb-1">Allergy Warnings:</strong>
-              <p>Contains: <span className="font-semibold text-rose-600">{allergy}</span>. Handled in a facility that also processes wheat, tree nuts, and peanuts.</p>
-            </div>
-          </div>
-        );
-      case "storage":
-        let storage = "";
-        if (product.category === "Cake") {
-          storage = "Keep refrigerated in an airtight cake container. Serve slightly chilled or let rest at room temperature for 15 minutes before serving for optimal cream texture. Best consumed within 3-4 days.";
-        } else if (product.category === "Savory") {
-          storage = "Store refrigerated. To serve, reheat in a preheated oven at 180°C (350°F) for 5-8 minutes to restore the crispy, flaky crust. Avoid microwave reheating to prevent sogginess.";
-        } else if (product.category === "Pastry") {
-          storage = "Best enjoyed fresh on the day of baking. If saving for later, store in a paper bag or airtight container at room temperature. Toast in the oven at 170°C for 2-3 minutes for maximum crispness.";
-        } else if (product.category === "Cookie") {
-          storage = "Store at room temperature in an airtight jar or container. Stays fresh for up to 7 days. For that warm out-of-the-oven feel, pop in a toaster oven for 60 seconds!";
-        } else {
-          storage = "Keep stored in a cool, dry place or in the refrigerator based on frosting needs. Bring to room temperature 1 hour before serving. Consume within 3 days.";
-        }
-        return (
-          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
-            <div>
-              <strong className="text-[#2A1E17] block mb-1">Storage Guide:</strong>
-              <p>{storage}</p>
-            </div>
-            <div>
-              <strong className="text-[#2A1E17] block mb-1">Shipping Note:</strong>
-              <p>We pack all treats in protective, insulated biodegradable boxes. Same-day local delivery is recommended to preserve optimal freshness.</p>
-            </div>
-          </div>
-        );
-    }
-  };
-
   return (
     <div className="bg-[#FBFBF9] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -172,7 +102,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
         </nav>
 
         {/* Product Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-8">
           
           {/* Left: Product Image Box */}
           <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm">
@@ -315,58 +245,11 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               </button>
             </div>
 
-            {/* Checklist of Quality Specs */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#2A1E17]/5 text-xs text-[#3A2E2B]/80 font-bold uppercase tracking-wide">
-              <div className="flex items-center space-x-2">
-                <span className="text-base text-[#C5A880]">🌾</span>
-                <span>Baked Fresh Daily</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-base text-[#C5A880]">🌱</span>
-                <span>Organic Ingredients</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-base text-[#C5A880]">🥚</span>
-                <span>Pasture-Raised Eggs</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-base text-[#C5A880]">🧈</span>
-                <span>Real Grass-Fed Butter</span>
-              </div>
-            </div>
-
-            {/* Tabbed Info Block */}
-            <div className="pt-8 border-t border-[#2A1E17]/5">
-              
-              {/* Tab Header Buttons */}
-              <div className="flex border-b border-[#2A1E17]/10 pb-2 space-x-6">
-                {(["details", "ingredients", "storage"] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all cursor-pointer ${
-                      activeTab === tab
-                        ? "border-[#C5A880] text-[#2A1E17]"
-                        : "border-transparent text-[#3A2E2B]/60 hover:text-[#2A1E17]"
-                    }`}
-                  >
-                    {tab === "details" ? "Description" : tab === "ingredients" ? "Ingredients" : "Care & Storage"}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab Panel Body */}
-              <div className="pt-4 min-h-36">
-                {getTabContent()}
-              </div>
-
-            </div>
-
           </div>
         </div>
 
         {/* Recommendations / Related Products */}
-        <section className="border-t border-[#2A1E17]/10 pt-16 mb-16">
+        <section className="border-t border-[#2A1E17]/10 pt-8 mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">

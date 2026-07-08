@@ -1,5 +1,5 @@
-import { collection, doc, getDocs, writeBatch, query, limit, Timestamp } from "firebase/firestore";
-import { db } from "./firebase";
+import { collection, doc, getDoc, getDocs, setDoc, writeBatch, query, limit, Timestamp } from "firebase/firestore";
+import { db, runWithTimeout } from "./firebase";
 import { products as localProducts } from "@/data/products";
 import { UserProfile, Order, Review, Address } from "@/types/database";
 
@@ -354,6 +354,20 @@ async function seedBadgesIfEmpty(batch: any) {
 let isSeedingChecked = false;
 
 /**
+ * Check Firestore settings to see if seeding was already performed in the past.
+ */
+async function isDatabaseSeeded(): Promise<boolean> {
+  try {
+    const docRef = doc(db, "settings", "seed_status");
+    const docSnap = await runWithTimeout(getDoc(docRef), 15000);
+    return docSnap.exists() && docSnap.data()?.seeded === true;
+  } catch (error) {
+    console.error("Error checking seed status in Firestore settings:", error);
+    return false;
+  }
+}
+
+/**
  * Unified database seeder that creates all collections in a batch commit.
  */
 export async function seedAllCollectionsIfEmpty() {
@@ -361,6 +375,13 @@ export async function seedAllCollectionsIfEmpty() {
     return;
   }
   try {
+    // Check Firestore settings first to prevent auto-re-seeding on empty collections
+    const alreadySeeded = await isDatabaseSeeded();
+    if (alreadySeeded) {
+      isSeedingChecked = true;
+      return;
+    }
+
     const batch = writeBatch(db);
     
     // Execute all check/seed functions in parallel to avoid sequential network roundtrips
@@ -382,7 +403,11 @@ export async function seedAllCollectionsIfEmpty() {
 
     if (seededProd || seededUsers || seededReviews || seededOrders || seededCategories || seededBadges) {
       await batch.commit();
-      console.log("Firestore database collections updated successfully!");
+      
+      // Save seed status setting to Firestore
+      const settingsRef = doc(db, "settings", "seed_status");
+      await setDoc(settingsRef, { seeded: true, seededAt: Timestamp.now() });
+      console.log("Firestore database collections updated and marked as seeded successfully!");
     }
     
     // Mark as successfully checked/seeded to skip database reads on subsequent requests
