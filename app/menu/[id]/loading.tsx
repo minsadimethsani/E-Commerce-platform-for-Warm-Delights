@@ -2,7 +2,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function ProductDetailLoading() {
   return (
-    <div className="bg-[#fdfcf9] min-h-screen py-10">
+    <div className="bg-[#FBFBF9] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs skeleton */}
@@ -18,7 +18,7 @@ export default function ProductDetailLoading() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-24">
           
           {/* Left: Product Image Box skeleton */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gray-200/40 border border-[#2d1e18]/5 animate-pulse" />
+          <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-gray-200/40 border border-[#2A1E17]/5 animate-pulse" />
 
           {/* Right: Info Column skeleton */}
           <div className="space-y-8">
@@ -46,13 +46,13 @@ export default function ProductDetailLoading() {
             </div>
 
             {/* Cart Controls skeleton */}
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-[#2d1e18]/5">
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-[#2A1E17]/5">
               <div className="h-11 w-full sm:w-32 bg-gray-200/50 rounded-full animate-pulse" />
               <div className="h-11 flex-1 bg-gray-200/50 rounded-full animate-pulse" />
             </div>
 
             {/* Quality Specs skeleton */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#2d1e18]/5">
+            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#2A1E17]/5">
               <div className="h-4 w-32 bg-gray-200/50 rounded animate-pulse" />
               <div className="h-4 w-36 bg-gray-200/50 rounded animate-pulse" />
               <div className="h-4 w-32 bg-gray-200/50 rounded animate-pulse" />
@@ -63,7 +63,7 @@ export default function ProductDetailLoading() {
         </div>
 
         {/* Recommendations skeleton */}
-        <section className="border-t border-[#2d1e18]/10 pt-16 mb-16">
+        <section className="border-t border-[#2A1E17]/10 pt-16 mb-16">
           <div className="flex justify-between items-end mb-10">
             <div className="space-y-2">
               <div className="h-3.5 w-24 bg-gray-200/50 rounded animate-pulse" />

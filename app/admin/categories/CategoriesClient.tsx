@@ -197,10 +197,10 @@ export default function CategoriesClient({
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
       
       {/* 1. Categories & Subcategories Manager (Left Panel) */}
-      <section className="rounded-2xl border border-[#2D1E18]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+      <section className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
         <div>
-          <h2 className="font-serif text-xl font-bold text-[#2D1E18]">Categories & Subcategories</h2>
-          <p className="text-xs text-[#55433C]/60 mt-1">
+          <h2 className="font-serif text-xl font-bold text-[#2A1E17]">Categories & Subcategories</h2>
+          <p className="text-xs text-[#3A2E2B]/60 mt-1">
             Organize catalog filters and group products into matching subcategories.
           </p>
         </div>
@@ -213,12 +213,12 @@ export default function CategoriesClient({
             onChange={(e) => setNewCatName(e.target.value)}
             placeholder="e.g. Gluten-Free, Vegan"
             required
-            className="flex-1 bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+            className="flex-1 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
           />
           <button
             type="submit"
             disabled={isAddingCat}
-            className="bg-[#2D1E18] text-white rounded-lg px-4 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer disabled:opacity-40"
+            className="bg-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
           >
             {isAddingCat ? "Adding..." : "Add"}
           </button>
@@ -229,11 +229,11 @@ export default function CategoriesClient({
           {categories.map((cat) => (
             <div
               key={cat.id}
-              className="rounded-xl border border-[#2D1E18]/5 bg-[#FAF5F0]/30 p-4 space-y-3"
+              className="rounded-xl border border-[#2A1E17]/5 bg-[#EFEFEA]/30 p-4 space-y-3"
             >
               {/* Category Header */}
               <div className="flex items-center justify-between">
-                <span className="font-serif text-sm font-bold text-[#2D1E18]">{cat.name}</span>
+                <span className="font-serif text-sm font-bold text-[#2A1E17]">{cat.name}</span>
                 <button
                   onClick={() => handleDeleteCategory(cat.id)}
                   aria-label={`Delete ${cat.name} category`}
@@ -244,25 +244,25 @@ export default function CategoriesClient({
               </div>
 
               {/* Subcategories list */}
-              <div className="space-y-2 border-t border-[#2D1E18]/5 pt-3">
-                <span className="block text-[9px] font-bold uppercase tracking-wider text-[#55433C]/65">
+              <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/65">
                   Subcategories
                 </span>
                 
                 {cat.subcategories.length === 0 ? (
-                  <span className="text-[10px] text-[#55433C]/50 block">No subcategories defined.</span>
+                  <span className="text-[10px] text-[#3A2E2B]/50 block">No subcategories defined.</span>
                 ) : (
                   <div className="flex flex-wrap gap-1.5">
                     {cat.subcategories.map((subcat) => (
                       <span
                         key={subcat}
-                        className="inline-flex items-center gap-1 bg-white border border-[#2D1E18]/5 text-[#55433C] rounded-md pl-2 pr-1 py-0.5 text-[10px] font-semibold"
+                        className="inline-flex items-center gap-1 bg-white border border-[#2A1E17]/5 text-[#3A2E2B] rounded-md pl-2 pr-1 py-0.5 text-[10px] font-semibold"
                       >
                         <span>{subcat}</span>
                         <button
                           onClick={() => handleDeleteSubcategory(cat.id, subcat)}
                           aria-label={`Delete ${subcat} subcategory`}
-                          className="hover:text-rose-600 text-[#55433C]/40 text-xs font-bold transition-colors cursor-pointer"
+                          className="hover:text-rose-600 text-[#3A2E2B]/40 text-xs font-bold transition-colors cursor-pointer"
                         >
                           ×
                         </button>
@@ -280,12 +280,12 @@ export default function CategoriesClient({
                       setNewSubcatNames((prev) => ({ ...prev, [cat.id]: e.target.value }))
                     }
                     placeholder="Add subcategory..."
-                    className="flex-1 bg-white border border-[#2D1E18]/10 rounded-md p-1.5 text-[10px] text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+                    className="flex-1 bg-white border border-[#2A1E17]/10 rounded-md p-1.5 text-[10px] text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
                   />
                   <button
                     type="button"
                     onClick={() => handleAddSubcategory(cat.id)}
-                    className="bg-[#2D1E18] text-white rounded-md px-2.5 text-[10px] font-bold hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer"
+                    className="bg-[#2A1E17] text-white rounded-md px-2.5 text-[10px] font-bold hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
                   >
                     +
                   </button>
@@ -297,10 +297,10 @@ export default function CategoriesClient({
       </section>
 
       {/* 2. Promo Badges Manager (Right Panel) */}
-      <section className="rounded-2xl border border-[#2D1E18]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+      <section className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
         <div>
-          <h2 className="font-serif text-xl font-bold text-[#2D1E18]">Promo Badges & Tags</h2>
-          <p className="text-xs text-[#55433C]/60 mt-1">
+          <h2 className="font-serif text-xl font-bold text-[#2A1E17]">Promo Badges & Tags</h2>
+          <p className="text-xs text-[#3A2E2B]/60 mt-1">
             Create visual marketing labels like "Chef Special" or "Bestseller".
           </p>
         </div>
@@ -313,12 +313,12 @@ export default function CategoriesClient({
             onChange={(e) => setNewBadgeName(e.target.value)}
             placeholder="e.g. Chef Special, Organic"
             required
-            className="flex-1 bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+            className="flex-1 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
           />
           <button
             type="submit"
             disabled={isAddingBadge}
-            className="bg-[#2D1E18] text-white rounded-lg px-4 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer disabled:opacity-40"
+            className="bg-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
           >
             {isAddingBadge ? "Adding..." : "Add"}
           </button>
@@ -329,13 +329,13 @@ export default function CategoriesClient({
           {badges.map((badge) => (
             <div
               key={badge.id}
-              className="flex items-center justify-between rounded-xl border border-[#2D1E18]/5 bg-[#FAF5F0]/30 px-4 py-3"
+              className="flex items-center justify-between rounded-xl border border-[#2A1E17]/5 bg-[#EFEFEA]/30 px-4 py-3"
             >
               <div className="flex items-center space-x-2">
-                <span className="inline-block rounded bg-[#E5A193] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">
+                <span className="inline-block rounded bg-[#EFEFEA] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider shadow-sm">
                   {badge.name}
                 </span>
-                <span className="text-[10px] text-[#55433C]/50 font-mono">({badge.id})</span>
+                <span className="text-[10px] text-[#3A2E2B]/50 font-mono">({badge.id})</span>
               </div>
               <button
                 onClick={() => handleDeleteBadge(badge.id)}

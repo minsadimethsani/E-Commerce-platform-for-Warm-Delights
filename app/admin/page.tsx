@@ -40,8 +40,8 @@ export default async function AdminDashboard() {
       
       {/* Page Header */}
       <div>
-        <h1 className="font-serif text-3xl font-bold text-[#2D1E18] tracking-tight">Overview</h1>
-        <p className="mt-1 text-sm text-[#55433C]/70">
+        <h1 className="font-serif text-3xl font-bold text-[#2A1E17] tracking-tight">Overview</h1>
+        <p className="mt-1 text-sm text-[#3A2E2B]/70">
           Real-time insights and analytics for Warm Delights bakery operations.
         </p>
       </div>
@@ -49,49 +49,49 @@ export default async function AdminDashboard() {
       {/* KPI Stats Cards Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {/* Sales Card */}
-        <div className="rounded-2xl border border-[#2D1E18]/5 bg-[#FAF5F0]/50 p-6 transition-all hover:bg-[#FAF5F0] hover:-translate-y-0.5 hover:shadow-xs">
+        <div className="rounded-2xl border border-[#2A1E17]/5 bg-[#EFEFEA]/50 p-6 transition-all hover:bg-[#EFEFEA] hover:-translate-y-0.5 hover:shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Total Revenue</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total Revenue</span>
             <span className="text-lg">💰</span>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-serif font-bold text-[#2D1E18]">Rs. {totalSales.toFixed(2)}</span>
+            <span className="text-2xl font-serif font-bold text-[#2A1E17]">Rs. {totalSales.toFixed(2)}</span>
             <span className="block mt-1 text-[10px] font-semibold text-emerald-600">Excludes cancelled orders</span>
           </div>
         </div>
 
         {/* Active Orders Card */}
-        <div className="rounded-2xl border border-[#2D1E18]/5 bg-[#FAF5F0]/50 p-6 transition-all hover:bg-[#FAF5F0] hover:-translate-y-0.5 hover:shadow-xs">
+        <div className="rounded-2xl border border-[#2A1E17]/5 bg-[#EFEFEA]/50 p-6 transition-all hover:bg-[#EFEFEA] hover:-translate-y-0.5 hover:shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Active Orders</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Active Orders</span>
             <span className="text-lg">🛒</span>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-serif font-bold text-[#2D1E18]">{activeOrders.length}</span>
-            <span className="block mt-1 text-[10px] font-semibold text-[#C2957C]">Requires baking / dispatch</span>
+            <span className="text-2xl font-serif font-bold text-[#2A1E17]">{activeOrders.length}</span>
+            <span className="block mt-1 text-[10px] font-semibold text-[#C5A880]">Requires baking / dispatch</span>
           </div>
         </div>
 
         {/* Catalog Size Card */}
-        <div className="rounded-2xl border border-[#2D1E18]/5 bg-[#FAF5F0]/50 p-6 transition-all hover:bg-[#FAF5F0] hover:-translate-y-0.5 hover:shadow-xs">
+        <div className="rounded-2xl border border-[#2A1E17]/5 bg-[#EFEFEA]/50 p-6 transition-all hover:bg-[#EFEFEA] hover:-translate-y-0.5 hover:shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Total Products</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total Products</span>
             <span className="text-lg">🍰</span>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-serif font-bold text-[#2D1E18]">{totalProducts}</span>
-            <span className="block mt-1 text-[10px] font-semibold text-[#55433C]/60">Items in online catalog</span>
+            <span className="text-2xl font-serif font-bold text-[#2A1E17]">{totalProducts}</span>
+            <span className="block mt-1 text-[10px] font-semibold text-[#3A2E2B]/60">Items in online catalog</span>
           </div>
         </div>
 
         {/* Rating Card */}
-        <div className="rounded-2xl border border-[#2D1E18]/5 bg-[#FAF5F0]/50 p-6 transition-all hover:bg-[#FAF5F0] hover:-translate-y-0.5 hover:shadow-xs">
+        <div className="rounded-2xl border border-[#2A1E17]/5 bg-[#EFEFEA]/50 p-6 transition-all hover:bg-[#EFEFEA] hover:-translate-y-0.5 hover:shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Average Rating</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Average Rating</span>
             <span className="text-lg">⭐</span>
           </div>
           <div className="mt-4">
-            <span className="text-2xl font-serif font-bold text-[#2D1E18]">{avgRating.toFixed(1)} / 5.0</span>
+            <span className="text-2xl font-serif font-bold text-[#2A1E17]">{avgRating.toFixed(1)} / 5.0</span>
             <span className="block mt-1 text-[10px] font-semibold text-amber-500">Based on {reviews.length} reviews</span>
           </div>
         </div>
@@ -103,41 +103,41 @@ export default async function AdminDashboard() {
         {/* Left Side: Recent Orders Table (Col span 2) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl font-bold text-[#2D1E18]">Recent Orders</h2>
+            <h2 className="font-serif text-xl font-bold text-[#2A1E17]">Recent Orders</h2>
             <Link
               href="/admin/orders"
-              className="text-xs font-bold uppercase tracking-wider text-[#C2957C] hover:text-[#2D1E18] transition-colors"
+              className="text-xs font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors"
             >
               Manage Orders &rarr;
             </Link>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-[#2D1E18]/5 bg-white shadow-xs">
+          <div className="overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
             {recentOrders.length === 0 ? (
-              <div className="p-12 text-center text-[#55433C]/60 text-sm">
+              <div className="p-12 text-center text-[#3A2E2B]/60 text-sm">
                 No orders placed yet.
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-[#2D1E18]/5">
-                  <thead className="bg-[#FAF5F0]">
+                <table className="min-w-full divide-y divide-[#2A1E17]/5">
+                  <thead className="bg-[#EFEFEA]">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Order ID</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Items Count</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Total</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order ID</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Items Count</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2D1E18]/5 bg-white">
+                  <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
                     {recentOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-[#FAF5F0]/30 transition-colors">
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
+                      <tr key={order.id} className="hover:bg-[#EFEFEA]/30 transition-colors">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
                           {order.id}
                         </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm text-[#55433C]">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]">
                           {order.items.reduce((sum, item) => sum + item.quantity, 0)} items
                         </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
                           Rs. {order.total.toFixed(2)}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4 text-sm">
@@ -165,20 +165,20 @@ export default async function AdminDashboard() {
         {/* Right Side: Popular Products List */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-serif text-xl font-bold text-[#2D1E18]">Highly Rated</h2>
+            <h2 className="font-serif text-xl font-bold text-[#2A1E17]">Highly Rated</h2>
             <Link
               href="/admin/products"
-              className="text-xs font-bold uppercase tracking-wider text-[#C2957C] hover:text-[#2D1E18] transition-colors"
+              className="text-xs font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors"
             >
               View All &rarr;
             </Link>
           </div>
 
-          <div className="rounded-2xl border border-[#2D1E18]/5 bg-white p-6 shadow-xs space-y-4">
+          <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-4">
             {topProducts.map((p) => (
-              <div key={p.id} className="flex items-center justify-between pb-3 border-b border-[#2D1E18]/5 last:border-0 last:pb-0">
+              <div key={p.id} className="flex items-center justify-between pb-3 border-b border-[#2A1E17]/5 last:border-0 last:pb-0">
                 <div className="flex items-center space-x-3">
-                  <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[#2D1E18]/5">
+                  <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[#2A1E17]/5">
                     <img
                       src={p.image}
                       alt={p.name}
@@ -186,12 +186,12 @@ export default async function AdminDashboard() {
                     />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-[#2D1E18] line-clamp-1">{p.name}</h4>
-                    <span className="text-[10px] text-[#55433C]/60 uppercase font-semibold">{p.category}</span>
+                    <h4 className="text-xs font-bold text-[#2A1E17] line-clamp-1">{p.name}</h4>
+                    <span className="text-[10px] text-[#3A2E2B]/60 uppercase font-semibold">{p.category}</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="block text-xs font-bold text-[#2D1E18]">Rs. {p.price.toFixed(2)}</span>
+                  <span className="block text-xs font-bold text-[#2A1E17]">Rs. {p.price.toFixed(2)}</span>
                   <span className="block text-[10px] font-semibold text-amber-500">⭐ {p.rating.toFixed(1)}</span>
                 </div>
               </div>

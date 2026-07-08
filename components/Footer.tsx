@@ -12,7 +12,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-[#2D1E18] text-[#FDFCF9]/90">
+    <footer className="bg-[#2A1E17] text-[#FBFBF9]/90">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4 lg:gap-12">
           {/* Column 1: Brand Info */}
@@ -20,15 +20,14 @@ export default function Footer() {
             <h2 className="font-serif text-2xl font-bold tracking-wide text-white">
               Warm Delights
             </h2>
-            <p className="text-sm leading-relaxed text-[#FDFCF9]/75 font-sans">
-              Handcrafting sweet moments and savory pleasures daily. We use only
-              the finest, locally sourced ingredients to bake love into every single bite.
+            <p className="text-sm leading-relaxed text-[#FBFBF9]/75 font-sans">
+              Handcrafting sweet moments and savory pleasures daily.
             </p>
             {/* Social Icons */}
             <div className="flex space-x-5">
               <Link
                 href="#"
-                className="text-[#FDFCF9]/60 hover:text-[#C2957C] transition-colors"
+                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
                 aria-label="Instagram"
               >
                 <svg
@@ -46,7 +45,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="#"
-                className="text-[#FDFCF9]/60 hover:text-[#C2957C] transition-colors"
+                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -64,7 +63,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="#"
-                className="text-[#FDFCF9]/60 hover:text-[#C2957C] transition-colors"
+                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
                 aria-label="Pinterest"
               >
                 <svg
@@ -92,31 +91,31 @@ export default function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-[#FDFCF9]/75 hover:text-[#C2957C] transition-colors"
+                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
                 >
                   Home
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
-                  className="text-[#FDFCF9]/75 hover:text-[#C2957C] transition-colors"
+                  href="/menu"
+                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
                 >
-                  Our Menu
+                  Menu
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
-                  className="text-[#FDFCF9]/75 hover:text-[#C2957C] transition-colors"
+                  href="/menu?category=Custom"
+                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
                 >
                   Custom Cakes
                 </Link>
               </li>
               <li>
                 <Link
-                  href="#"
-                  className="text-[#FDFCF9]/75 hover:text-[#C2957C] transition-colors"
+                  href="/about"
+                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
                 >
                   Our Story
                 </Link>
@@ -127,21 +126,21 @@ export default function Footer() {
           {/* Column 3: Contact & Hours */}
           <div className="space-y-4">
             <h3 className="font-serif text-lg font-semibold tracking-wide text-white">
-              Bakery Hours
+              Opening Hours
             </h3>
-            <ul className="space-y-2.5 text-sm font-sans text-[#FDFCF9]/75">
+            <ul className="space-y-2.5 text-sm font-sans text-[#FBFBF9]/75">
               <li className="flex justify-between">
                 <span>Mon - Sat:</span>
                 <span>8:00 AM - 8:00 PM</span>
               </li>
-              <li className="flex justify-between text-[#C2957C]">
+              <li className="flex justify-between text-[#C5A880]">
                 <span>Sunday:</span>
                 <span>9:00 AM - 6:00 PM</span>
               </li>
-              <li className="pt-2 border-t border-[#FDFCF9]/10">
-                <span className="block font-medium text-white">Warm Delights HQ</span>
-                <span className="block mt-1">123 Sweetwater Lane, Ste 40</span>
-                <span className="block mt-0.5">Tel: (555) 789-2345</span>
+              <li className="pt-2 border-t border-[#FBFBF9]/10">
+                <span className="block font-medium text-white">Warm Delights </span>
+                <span className="block mt-1">Boralesgamuwa, Nugegoda,Sri Lanka</span>
+                <span className="block mt-0.5">Tel: +94 75 552 4468</span>
               </li>
             </ul>
           </div>
@@ -151,8 +150,8 @@ export default function Footer() {
             <h3 className="font-serif text-lg font-semibold tracking-wide text-white">
               Newsletter
             </h3>
-            <p className="text-sm leading-relaxed text-[#FDFCF9]/75 font-sans">
-              Subscribe to receive updates on seasonal specials, baking workshops, and exclusive offers.
+            <p className="text-sm leading-relaxed text-[#FBFBF9]/75 font-sans">
+              Subscribe to receive updates on seasonal specials, New Arrivals and exclusive offers.
             </p>
             <form className="mt-4 sm:flex sm:max-w-md gap-2" onSubmit={(e) => e.preventDefault()}>
               <label htmlFor="email-address" className="sr-only">
@@ -163,12 +162,12 @@ export default function Footer() {
                 name="email"
                 id="email-address"
                 required
-                className="w-full min-w-0 rounded-md border border-[#FDFCF9]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FDFCF9]/40 focus:border-[#C2957C] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#C2957C]"
+                className="w-full min-w-0 rounded-md border border-[#FBFBF9]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FBFBF9]/40 focus:border-[#C5A880] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
                 placeholder="Enter your email"
               />
               <button
                 type="submit"
-                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-md bg-[#C2957C] px-4 py-2 text-sm font-semibold text-[#2D1E18] transition-colors hover:bg-[#E5A193] hover:text-white"
+                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-md bg-[#C5A880] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#EFEFEA] hover:text-white"
               >
                 Join
               </button>
@@ -177,7 +176,7 @@ export default function Footer() {
         </div>
 
         {/* Divider and Copyright */}
-        <div className="mt-16 border-t border-[#FDFCF9]/8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FDFCF9]/50 font-sans">
+        <div className="mt-16 border-t border-[#FBFBF9]/8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FBFBF9]/50 font-sans">
           <p>&copy; {new Date().getFullYear()} Warm Delights Bakery. All rights reserved.</p>
           <div className="mt-4 sm:mt-0 space-x-6">
             <Link href="#" className="hover:text-white transition-colors">

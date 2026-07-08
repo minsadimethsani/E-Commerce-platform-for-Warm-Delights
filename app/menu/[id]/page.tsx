@@ -37,20 +37,21 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = await params;
   const product = await getProductById(resolvedParams.id);
 
-  if (!product) {
+  if (!product || product.isAvailable === false) {
     notFound();
   }
 
   const allProducts = await getAllProducts();
+  const availableProducts = allProducts.filter((p) => p.isAvailable !== false);
 
   // Find 4 related products in the same category, excluding current product
-  const relatedProducts = allProducts
+  const relatedProducts = availableProducts
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   // If we don't have enough, pad with other products
   if (relatedProducts.length < 4) {
-    const fallbackProducts = allProducts
+    const fallbackProducts = availableProducts
       .filter((p) => p.id !== product.id && !relatedProducts.some((rp) => rp.id === p.id))
       .slice(0, 4 - relatedProducts.length);
     relatedProducts.push(...fallbackProducts);

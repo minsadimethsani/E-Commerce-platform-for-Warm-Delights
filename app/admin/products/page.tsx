@@ -13,8 +13,8 @@ export default async function AdminProductsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-serif text-3xl font-bold text-[#2D1E18] tracking-tight">Product Catalog</h1>
-        <p className="mt-1 text-sm text-[#55433C]/70">
+        <h1 className="font-serif text-3xl font-bold text-[#2A1E17] tracking-tight">Product Catalog</h1>
+        <p className="mt-1 text-sm text-[#3A2E2B]/70">
           Manage inventory, add seasonal specialties, edit pricing, and update descriptions.
         </p>
       </div>

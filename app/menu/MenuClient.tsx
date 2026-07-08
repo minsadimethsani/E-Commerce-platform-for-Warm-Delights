@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Product } from "@/data/products";
@@ -17,8 +17,10 @@ export default function MenuClient() {
   const categoryParam = searchParams ? searchParams.get("category") : null;
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [prevCategoryParam, setPrevCategoryParam] = useState<string | null>(null);
 
-  useEffect(() => {
+  if (categoryParam !== prevCategoryParam) {
+    setPrevCategoryParam(categoryParam);
     if (categoryParam) {
       const matched = CATEGORIES.find(
         (c) => c.toLowerCase() === categoryParam.toLowerCase()
@@ -26,9 +28,18 @@ export default function MenuClient() {
       if (matched) {
         setSelectedCategory(matched);
       }
+    } else {
+      setSelectedCategory("All");
     }
-  }, [categoryParam]);
-  const [searchQuery, setSearchQuery] = useState<string>(" "); // Space triggers instant trim reset
+  }
+  const searchParam = searchParams ? searchParams.get("search") : null;
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [prevSearchParam, setPrevSearchParam] = useState<string | null>(null);
+
+  if (searchParam !== prevSearchParam) {
+    setPrevSearchParam(searchParam);
+    setSearchQuery(searchParam || "");
+  }
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [minRating, setMinRating] = useState<number | null>(null);
@@ -47,10 +58,7 @@ export default function MenuClient() {
   // Search Input Debouncing State (Standard Best Practice)
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>("");
 
-  // Clean initial states
-  useEffect(() => {
-    setSearchQuery("");
-  }, []);
+
 
   // Handle Search input debounce
   useEffect(() => {
@@ -90,18 +98,17 @@ export default function MenuClient() {
         setTotalProducts(data.total);
         setTotalPages(data.totalPages);
         setError(null);
-      } catch (err: any) {
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while loading the menu.";
         console.error("Fetch API error:", err);
-        setError(err.message || "An unexpected error occurred while loading the menu.");
+        setError(errorMsg);
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Only run fetch after debouncing has initialized search value
-    if (searchQuery !== " ") {
-      fetchProducts();
-    }
+    // Fetch products
+    fetchProducts();
   }, [selectedCategory, debouncedSearchQuery, minPrice, maxPrice, minRating, onlyBestsellers, sortBy, currentPage]);
 
   // Reset all filters back to default
@@ -136,48 +143,48 @@ export default function MenuClient() {
   };
 
   return (
-    <div className="bg-[#fdfcf9] min-h-screen py-10">
+    <div className="bg-[#FBFBF9] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#55433c]/60">
+          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#3A2E2B]/60">
             <li>
-              <Link href="/" className="hover:text-[#c2957c] transition-colors">
+              <Link href="/" className="hover:text-[#C5A880] transition-colors">
                 Home
               </Link>
             </li>
             <li className="flex items-center space-x-2">
-              <svg className="h-3 w-3 text-[#55433c]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
-              <span className="text-[#2d1e18]">Menu</span>
+              <span className="text-[#2A1E17]">Menu</span>
             </li>
           </ol>
         </nav>
 
         {/* Page Banner Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#c2957c]">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">
             Handcrafted Delights
           </span>
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2d1e18]">
+          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2A1E17]">
             Our Artisanal Menu
           </h1>
-          <div className="h-1 w-16 bg-[#c2957c] mx-auto rounded-full" />
-          <p className="text-sm sm:text-base md:text-lg text-[#55433c]/80 leading-relaxed max-w-2xl mx-auto">
+          <div className="h-1 w-16 bg-[#C5A880] mx-auto rounded-full" />
+          <p className="text-sm sm:text-base md:text-lg text-[#3A2E2B]/80 leading-relaxed max-w-2xl mx-auto">
             From layered chocolate fudge cakes and buttery croissants to gourmet mushroom savory galettes—every delight is baked fresh with organic, premium ingredients.
           </p>
         </div>
 
         {/* Top Control Bar for Sorting & Mobile Filter Toggle */}
-        <div className="flex items-center justify-between border-b border-[#2d1e18]/10 pb-5 mb-8">
-          <div className="text-xs sm:text-sm font-semibold text-[#55433c]/70">
+        <div className="flex items-center justify-between border-b border-[#2A1E17]/10 pb-5 mb-8">
+          <div className="text-xs sm:text-sm font-semibold text-[#3A2E2B]/70">
             {isLoading ? (
               <span className="animate-pulse">Loading menu...</span>
             ) : (
               <>
-                Showing <span className="text-[#2d1e18] font-bold">{totalProducts}</span> {totalProducts === 1 ? "treat" : "treats"}
+                Showing <span className="text-[#2A1E17] font-bold">{totalProducts}</span> {totalProducts === 1 ? "treat" : "treats"}
               </>
             )}
           </div>
@@ -185,7 +192,7 @@ export default function MenuClient() {
           <div className="flex items-center space-x-4">
             {/* Sort Selector */}
             <div className="flex items-center space-x-2">
-              <label htmlFor="sort" className="hidden sm:inline text-xs font-bold uppercase tracking-wider text-[#55433c]/60">
+              <label htmlFor="sort" className="hidden sm:inline text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">
                 Sort By:
               </label>
               <div className="relative">
@@ -193,7 +200,7 @@ export default function MenuClient() {
                   id="sort"
                   value={sortBy}
                   onChange={handleSortChange}
-                  className="appearance-none bg-[#faf5f0] border border-[#2d1e18]/10 rounded-full py-1.5 pl-4 pr-9 text-xs sm:text-sm text-[#2d1e18] focus:outline-none focus:border-[#c2957c] focus:ring-1 focus:ring-[#c2957c] cursor-pointer transition-all"
+                  className="appearance-none bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full py-1.5 pl-4 pr-9 text-xs sm:text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] cursor-pointer transition-all"
                 >
                   <option value="featured">Featured</option>
                   <option value="price-asc">Price: Low to High</option>
@@ -206,7 +213,7 @@ export default function MenuClient() {
                   viewBox="0 0 24 24"
                   strokeWidth={2}
                   stroke="currentColor"
-                  className="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#55433c]/60 pointer-events-none"
+                  className="absolute right-3 top-2.5 w-3.5 h-3.5 text-[#3A2E2B]/60 pointer-events-none"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                 </svg>
@@ -216,7 +223,7 @@ export default function MenuClient() {
             {/* Mobile Filters Toggle Button */}
             <button
               onClick={() => setIsMobileFiltersOpen(true)}
-              className="lg:hidden flex items-center space-x-2 bg-[#faf5f0] border border-[#2d1e18]/10 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#2d1e18] hover:bg-[#2d1e18]/5 transition-all cursor-pointer"
+              className="lg:hidden flex items-center space-x-2 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#2A1E17]/5 transition-all cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
@@ -231,14 +238,14 @@ export default function MenuClient() {
           
           {/* Desktop Filters Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0 space-y-8">
-            <div className="bg-[#faf5f0]/50 border border-[#2d1e18]/5 rounded-2xl p-6 space-y-6">
+            <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-2xl p-6 space-y-6">
               
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-[#2d1e18]/5 pb-4">
-                <h3 className="font-serif text-lg font-bold text-[#2d1e18]">Filters</h3>
+              <div className="flex items-center justify-between border-b border-[#2A1E17]/5 pb-4">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17]">Filters</h3>
                 <button
                   onClick={resetFilters}
-                  className="text-[10px] font-bold uppercase tracking-wider text-[#c2957c] hover:text-[#2d1e18] transition-colors cursor-pointer"
+                  className="text-[10px] font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors cursor-pointer"
                 >
                   Clear All
                 </button>
@@ -246,14 +253,14 @@ export default function MenuClient() {
 
               {/* Search */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Search</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Search</h4>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search treats..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    className="w-full bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg py-2 pl-9 pr-3 text-xs text-[#2d1e18] placeholder-[#55433c]/50 focus:outline-none focus:border-[#c2957c] transition-all"
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg py-2 pl-9 pr-3 text-xs text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] transition-all"
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -261,7 +268,7 @@ export default function MenuClient() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="absolute left-3 top-2.5 w-4 h-4 text-[#55433c]/60"
+                    className="absolute left-3 top-2.5 w-4 h-4 text-[#3A2E2B]/60"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
@@ -270,7 +277,7 @@ export default function MenuClient() {
 
               {/* Categories */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Category</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Category</h4>
                 <div className="flex flex-col space-y-1.5">
                   {CATEGORIES.map((category) => (
                     <button
@@ -278,8 +285,8 @@ export default function MenuClient() {
                       onClick={() => handleCategoryChange(category)}
                       className={`text-left text-xs py-1 transition-all ${
                         selectedCategory === category
-                          ? "font-bold text-[#c2957c]"
-                          : "text-[#55433c]/85 hover:text-[#2d1e18] hover:translate-x-0.5"
+                          ? "font-bold text-[#C5A880]"
+                          : "text-[#3A2E2B]/85 hover:text-[#2A1E17] hover:translate-x-0.5"
                       }`}
                     >
                       {category === "All" 
@@ -298,36 +305,36 @@ export default function MenuClient() {
 
               {/* Price Filter */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Price Range</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Price Range</h4>
                 <div className="flex items-center space-x-2">
                   <input
                     type="number"
                     placeholder="Min"
                     value={minPrice}
                     onChange={(e) => { setMinPrice(e.target.value); setCurrentPage(1); }}
-                    className="w-1/2 bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg p-1.5 text-xs text-center text-[#2d1e18]"
+                    className="w-1/2 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-1.5 text-xs text-center text-[#2A1E17]"
                   />
-                  <span className="text-[#55433c]/40 text-xs">-</span>
+                  <span className="text-[#3A2E2B]/40 text-xs">-</span>
                   <input
                     type="number"
                     placeholder="Max"
                     value={maxPrice}
                     onChange={(e) => { setMaxPrice(e.target.value); setCurrentPage(1); }}
-                    className="w-1/2 bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg p-1.5 text-xs text-center text-[#2d1e18]"
+                    className="w-1/2 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-1.5 text-xs text-center text-[#2A1E17]"
                   />
                 </div>
               </div>
 
               {/* Ratings */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Minimum Rating</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Minimum Rating</h4>
                 <div className="flex flex-col space-y-1.5">
                   {[4.9, 4.8, 4.7, 4.5].map((rating) => (
                     <button
                       key={rating}
                       onClick={() => { setMinRating(minRating === rating ? null : rating); setCurrentPage(1); }}
                       className={`flex items-center text-xs py-1 text-left ${
-                        minRating === rating ? "font-bold text-[#c2957c]" : "text-[#55433c]/85 hover:text-[#2d1e18]"
+                        minRating === rating ? "font-bold text-[#C5A880]" : "text-[#3A2E2B]/85 hover:text-[#2A1E17]"
                       }`}
                     >
                       <svg className="w-3.5 h-3.5 text-amber-400 fill-current mr-1" viewBox="0 0 20 20">
@@ -340,15 +347,15 @@ export default function MenuClient() {
               </div>
 
               {/* Badges/Bestseller check */}
-              <div className="flex items-center space-x-2 pt-2 border-t border-[#2d1e18]/5">
+              <div className="flex items-center space-x-2 pt-2 border-t border-[#2A1E17]/5">
                 <input
                   type="checkbox"
                   id="only-bestsellers"
                   checked={onlyBestsellers}
                   onChange={(e) => { setOnlyBestsellers(e.target.checked); setCurrentPage(1); }}
-                  className="rounded border-[#2d1e18]/10 text-[#c2957c] focus:ring-[#c2957c] h-4 w-4 bg-[#faf5f0] cursor-pointer"
+                  className="rounded border-[#2A1E17]/10 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 bg-[#EFEFEA] cursor-pointer"
                 />
-                <label htmlFor="only-bestsellers" className="text-xs font-bold text-[#55433c]/85 cursor-pointer">
+                <label htmlFor="only-bestsellers" className="text-xs font-bold text-[#3A2E2B]/85 cursor-pointer">
                   Bestsellers Only
                 </label>
               </div>
@@ -387,14 +394,14 @@ export default function MenuClient() {
                   </div>
                 ) : productsList.length === 0 ? (
                   /* Empty State */
-                  <div className="text-center py-20 bg-[#faf5f0]/30 rounded-2xl border border-dashed border-[#2d1e18]/10">
+                  <div className="text-center py-20 bg-[#EFEFEA]/30 rounded-2xl border border-dashed border-[#2A1E17]/10">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
                       strokeWidth={1.2}
                       stroke="currentColor"
-                      className="mx-auto w-12 h-12 text-[#55433c]/40 mb-4"
+                      className="mx-auto w-12 h-12 text-[#3A2E2B]/40 mb-4"
                     >
                       <path
                         strokeLinecap="round"
@@ -402,13 +409,13 @@ export default function MenuClient() {
                         d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"
                       />
                     </svg>
-                    <h3 className="text-lg font-serif font-bold text-[#2d1e18] mb-1">No items found</h3>
-                    <p className="text-sm text-[#55433c]/70 max-w-xs mx-auto">
-                      We couldn't find any treats matching your set criteria. Try adjusting or clearing filters!
+                    <h3 className="text-lg font-serif font-bold text-[#2A1E17] mb-1">No items found</h3>
+                    <p className="text-sm text-[#3A2E2B]/70 max-w-xs mx-auto">
+                      We couldn&apos;t find any treats matching your set criteria. Try adjusting or clearing filters!
                     </p>
                     <button
                       onClick={resetFilters}
-                      className="mt-6 inline-block rounded-full bg-[#2d1e18] text-white px-5 py-2 text-xs font-bold uppercase tracking-wider hover:bg-[#c2957c] hover:text-[#2d1e18] transition-all cursor-pointer"
+                      className="mt-6 inline-block rounded-full bg-[#2A1E17] text-white px-5 py-2 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
                     >
                       Clear All Filters
                     </button>
@@ -424,13 +431,13 @@ export default function MenuClient() {
 
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
-                      <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#2d1e18]/5">
+                      <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#2A1E17]/5">
                         {/* Prev Button */}
                         <button
                           onClick={() => handlePageChange(currentPage - 1)}
                           disabled={currentPage === 1}
                           aria-label="Previous Page"
-                          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2d1e18]/10 bg-white text-[#2d1e18] transition-all hover:border-[#c2957c] hover:bg-[#faf5f0] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2d1e18]/10 disabled:cursor-not-allowed cursor-pointer"
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -453,8 +460,8 @@ export default function MenuClient() {
                               onClick={() => handlePageChange(pageNum)}
                               className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold tracking-wider transition-all cursor-pointer ${
                                 currentPage === pageNum
-                                  ? "bg-[#2d1e18] text-white shadow-sm"
-                                  : "border border-[#2d1e18]/10 bg-white text-[#2d1e18] hover:border-[#c2957c] hover:bg-[#faf5f0]"
+                                  ? "bg-[#2A1E17] text-white shadow-sm"
+                                  : "border border-[#2A1E17]/10 bg-white text-[#2A1E17] hover:border-[#C5A880] hover:bg-[#EFEFEA]"
                               }`}
                             >
                               {pageNum}
@@ -467,7 +474,7 @@ export default function MenuClient() {
                           onClick={() => handlePageChange(currentPage + 1)}
                           disabled={currentPage === totalPages}
                           aria-label="Next Page"
-                          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2d1e18]/10 bg-white text-[#2d1e18] transition-all hover:border-[#c2957c] hover:bg-[#faf5f0] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2d1e18]/10 disabled:cursor-not-allowed cursor-pointer"
+                          className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -497,18 +504,18 @@ export default function MenuClient() {
         <div className="fixed inset-0 z-50 flex lg:hidden" role="dialog" aria-modal="true">
           {/* Backdrop overlay */}
           <div
-            className="fixed inset-0 bg-[#2d1e18]/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-[#2A1E17]/40 backdrop-blur-xs transition-opacity"
             onClick={() => setIsMobileFiltersOpen(false)}
           />
 
           {/* Drawer Body */}
-          <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-[#fdfcf9] py-6 px-6 shadow-xl transition-all">
-            <div className="flex items-center justify-between border-b border-[#2d1e18]/5 pb-4 mb-6">
-              <h2 className="font-serif text-lg font-bold text-[#2d1e18]">Filter Treats</h2>
+          <div className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-[#FBFBF9] py-6 px-6 shadow-xl transition-all">
+            <div className="flex items-center justify-between border-b border-[#2A1E17]/5 pb-4 mb-6">
+              <h2 className="font-serif text-lg font-bold text-[#2A1E17]">Filter Treats</h2>
               <button
                 type="button"
                 onClick={() => setIsMobileFiltersOpen(false)}
-                className="rounded-md p-1.5 text-[#55433c] hover:bg-[#2d1e18]/5 transition-colors cursor-pointer"
+                className="rounded-md p-1.5 text-[#3A2E2B] hover:bg-[#2A1E17]/5 transition-colors cursor-pointer"
               >
                 <span className="sr-only">Close menu</span>
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -521,14 +528,14 @@ export default function MenuClient() {
             <div className="space-y-6">
               {/* Search */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Search</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Search</h4>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search treats..."
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    className="w-full bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg py-2 pl-9 pr-3 text-xs text-[#2d1e18] placeholder-[#55433c]/50 focus:outline-none focus:border-[#c2957c] transition-all"
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg py-2 pl-9 pr-3 text-xs text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] transition-all"
                   />
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -536,7 +543,7 @@ export default function MenuClient() {
                     viewBox="0 0 24 24"
                     strokeWidth={1.8}
                     stroke="currentColor"
-                    className="absolute left-3 top-2.5 w-4 h-4 text-[#55433c]/60"
+                    className="absolute left-3 top-2.5 w-4 h-4 text-[#3A2E2B]/60"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
@@ -545,7 +552,7 @@ export default function MenuClient() {
 
               {/* Categories */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Category</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Category</h4>
                 <div className="grid grid-cols-2 gap-2">
                   {CATEGORIES.map((category) => (
                     <button
@@ -553,8 +560,8 @@ export default function MenuClient() {
                       onClick={() => handleCategoryChange(category)}
                       className={`text-center text-xs py-2 px-3 rounded-lg border transition-all ${
                         selectedCategory === category
-                          ? "bg-[#2d1e18] text-white border-[#2d1e18]"
-                          : "bg-[#faf5f0] border-[#2d1e18]/5 text-[#55433c]/85 hover:bg-[#2d1e18]/5"
+                          ? "bg-[#2A1E17] text-white border-[#2A1E17]"
+                          : "bg-[#EFEFEA] border-[#2A1E17]/5 text-[#3A2E2B]/85 hover:bg-[#2A1E17]/5"
                       }`}
                     >
                       {category === "All" 
@@ -573,29 +580,29 @@ export default function MenuClient() {
 
               {/* Price Filter */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Price Range</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Price Range</h4>
                 <div className="flex items-center space-x-2">
                   <input
                     type="number"
                     placeholder="Min"
                     value={minPrice}
                     onChange={(e) => { setMinPrice(e.target.value); setCurrentPage(1); }}
-                    className="w-1/2 bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg p-2 text-xs text-center text-[#2d1e18]"
+                    className="w-1/2 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-center text-[#2A1E17]"
                   />
-                  <span className="text-[#55433c]/40 text-xs">-</span>
+                  <span className="text-[#3A2E2B]/40 text-xs">-</span>
                   <input
                     type="number"
                     placeholder="Max"
                     value={maxPrice}
                     onChange={(e) => { setMaxPrice(e.target.value); setCurrentPage(1); }}
-                    className="w-1/2 bg-[#faf5f0] border border-[#2d1e18]/10 rounded-lg p-2 text-xs text-center text-[#2d1e18]"
+                    className="w-1/2 bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-center text-[#2A1E17]"
                   />
                 </div>
               </div>
 
               {/* Ratings */}
               <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#55433c]">Minimum Rating</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]">Minimum Rating</h4>
                 <div className="flex flex-col space-y-1">
                   {[4.9, 4.8, 4.7, 4.5].map((rating) => (
                     <button
@@ -603,8 +610,8 @@ export default function MenuClient() {
                       onClick={() => { setMinRating(minRating === rating ? null : rating); setCurrentPage(1); }}
                       className={`flex items-center text-xs py-2 px-3 rounded-lg border text-left ${
                         minRating === rating
-                          ? "bg-[#2d1e18] text-white border-[#2d1e18]"
-                          : "bg-[#faf5f0] border-[#2d1e18]/5 text-[#55433c]/85"
+                          ? "bg-[#2A1E17] text-white border-[#2A1E17]"
+                          : "bg-[#EFEFEA] border-[#2A1E17]/5 text-[#3A2E2B]/85"
                       }`}
                     >
                       <svg className="w-3.5 h-3.5 text-amber-400 fill-current mr-1" viewBox="0 0 20 20">
@@ -623,23 +630,23 @@ export default function MenuClient() {
                   id="only-bestsellers-mobile"
                   checked={onlyBestsellers}
                   onChange={(e) => { setOnlyBestsellers(e.target.checked); setCurrentPage(1); }}
-                  className="rounded border-[#2d1e18]/10 text-[#c2957c] focus:ring-[#c2957c] h-4 w-4 bg-[#faf5f0]"
+                  className="rounded border-[#2A1E17]/10 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 bg-[#EFEFEA]"
                 />
-                <label htmlFor="only-bestsellers-mobile" className="text-xs font-bold text-[#55433c]/85">
+                <label htmlFor="only-bestsellers-mobile" className="text-xs font-bold text-[#3A2E2B]/85">
                   Bestsellers Only
                 </label>
               </div>
 
-              <div className="flex space-x-2 pt-6 border-t border-[#2d1e18]/5">
+              <div className="flex space-x-2 pt-6 border-t border-[#2A1E17]/5">
                 <button
                   onClick={resetFilters}
-                  className="w-1/2 border border-[#2d1e18]/25 text-[#2d1e18] rounded-full py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#faf5f0] cursor-pointer"
+                  className="w-1/2 border border-[#2A1E17]/25 text-[#2A1E17] rounded-full py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#EFEFEA] cursor-pointer"
                 >
                   Reset
                 </button>
                 <button
                   onClick={() => setIsMobileFiltersOpen(false)}
-                  className="w-1/2 bg-[#2d1e18] text-white rounded-full py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#c2957c] cursor-pointer"
+                  className="w-1/2 bg-[#2A1E17] text-white rounded-full py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] cursor-pointer"
                 >
                   Apply
                 </button>

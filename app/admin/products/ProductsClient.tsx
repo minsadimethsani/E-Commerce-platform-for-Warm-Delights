@@ -49,6 +49,11 @@ export default function ProductsClient({
   const [videoUrl, setVideoUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
+  // Variant States
+  const [variants, setVariants] = useState<{ name: string; price: number; isAvailable?: boolean }[]>([]);
+  const [newVariantName, setNewVariantName] = useState("");
+  const [newVariantPrice, setNewVariantPrice] = useState("");
+
   // Multiple compressed images state
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -142,6 +147,9 @@ export default function ProductsClient({
     setImage("/category_cakes.png");
     setVideoUrl("");
     setUploadedImages([]);
+    setVariants([]);
+    setNewVariantName("");
+    setNewVariantPrice("");
     setIsFormOpen(true);
   };
 
@@ -156,6 +164,9 @@ export default function ProductsClient({
     setImage(p.image);
     setVideoUrl((p as any).videoUrl || "");
     setUploadedImages((p as any).images || [p.image]);
+    setVariants((p as any).variants || []);
+    setNewVariantName("");
+    setNewVariantPrice("");
     setIsFormOpen(true);
   };
 
@@ -246,6 +257,7 @@ export default function ProductsClient({
         ingredients,
         careInstructions,
         videoUrl: videoUrl.trim(),
+        variants: variants,
         updatedAt: Timestamp.now(),
       } as any;
 
@@ -268,6 +280,7 @@ export default function ProductsClient({
         rating: savePayload.rating,
         reviewsCount: savePayload.reviewsCount,
         images: savePayload.images,
+        variants: savePayload.variants,
         videoUrl: savePayload.videoUrl,
       } as any;
 
@@ -295,45 +308,45 @@ export default function ProductsClient({
         
         {/* Table header control panel */}
         <div className="flex items-center justify-between pb-2">
-          <div className="text-xs font-semibold text-[#55433C]/60 uppercase tracking-wider">
+          <div className="text-xs font-semibold text-[#3A2E2B]/60 uppercase tracking-wider">
             Total Inventory: {products.length} Items
           </div>
           <button
             onClick={openAddForm}
-            className="flex items-center space-x-2 bg-[#2D1E18] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer shadow-xs"
+            className="flex items-center space-x-2 bg-[#2A1E17] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer shadow-xs"
           >
             <span>Add Product</span>
           </button>
         </div>
 
         {/* Real Table */}
-        <div className="overflow-hidden rounded-2xl border border-[#2D1E18]/5 bg-white shadow-xs">
+        <div className="overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#2D1E18]/5">
-              <thead className="bg-[#FAF5F0]">
+            <table className="min-w-full divide-y divide-[#2A1E17]/5">
+              <thead className="bg-[#EFEFEA]">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Product</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Price</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Rating</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#55433C]/60">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Product</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Category</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Price</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Rating</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2D1E18]/5 bg-white">
+              <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
                 {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-[#FAF5F0]/30 transition-colors">
+                  <tr key={p.id} className="hover:bg-[#EFEFEA]/30 transition-colors">
                     {/* Image & Title */}
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-[#2D1E18]/5">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-[#2A1E17]/5">
                           <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
                         </div>
                         <div>
-                          <Link href={`/admin/products/${p.id}`} className="block text-sm font-bold text-[#2D1E18] hover:text-[#C2957C] transition-colors cursor-pointer">
+                          <Link href={`/admin/products/${p.id}`} className="block text-sm font-bold text-[#2A1E17] hover:text-[#C5A880] transition-colors cursor-pointer">
                             {p.name}
                           </Link>
                           {p.badge && (
-                            <span className="inline-block rounded bg-[#E5A193] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
+                            <span className="inline-block rounded bg-[#EFEFEA] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
                               {p.badge}
                             </span>
                           )}
@@ -341,11 +354,11 @@ export default function ProductsClient({
                       </div>
                     </td>
                     {/* Category */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-[#55433C]">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]">
                       {p.category}
                     </td>
                     {/* Price */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2D1E18]">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
                       Rs. {p.price.toFixed(2)}
                     </td>
                     {/* Rating */}
@@ -357,7 +370,7 @@ export default function ProductsClient({
                       <button
                         onClick={() => openEditForm(p)}
                         aria-label="Edit product details"
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C2957C] hover:bg-[#FAF5F0] hover:text-[#2D1E18] transition-colors cursor-pointer"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C5A880] hover:bg-[#EFEFEA] hover:text-[#2A1E17] transition-colors cursor-pointer"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 20.04a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
@@ -384,14 +397,14 @@ export default function ProductsClient({
 
       {/* Product Form Editor Modal (Full-Screen Overlay Page) */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 bg-[#FDFCF9] overflow-y-auto flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[#FBFBF9] overflow-y-auto flex flex-col">
           {/* Header Bar */}
-          <header className="sticky top-0 z-10 flex h-20 items-center justify-between bg-[#2D1E18] text-[#FDFCF9] px-6 sm:px-10 shadow-md">
+          <header className="sticky top-0 z-10 flex h-20 items-center justify-between bg-[#2A1E17] text-[#FBFBF9] px-6 sm:px-10 shadow-md">
             <div>
               <h2 className="font-serif text-xl font-bold tracking-wide text-white">
                 {editingProduct ? `Edit Product: ${editingProduct.id}` : "Add New Product"}
               </h2>
-              <span className="text-[#C2957C] text-[10px] uppercase font-sans font-bold tracking-wider mt-0.5 block">
+              <span className="text-[#C5A880] text-[10px] uppercase font-sans font-bold tracking-wider mt-0.5 block">
                 Warm Delights Inventory Manager
               </span>
             </div>
@@ -399,7 +412,7 @@ export default function ProductsClient({
             {/* Close Button */}
             <button
               onClick={() => setIsFormOpen(false)}
-              className="rounded-full bg-white/10 p-2 text-[#FDFCF9] hover:bg-white/20 transition-all cursor-pointer"
+              className="rounded-full bg-white/10 p-2 text-[#FBFBF9] hover:bg-white/20 transition-all cursor-pointer"
               aria-label="Close editor"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
@@ -410,12 +423,12 @@ export default function ProductsClient({
 
           {/* Form Content Body */}
           <div className="flex-1 py-10 px-4 sm:px-6">
-            <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2D1E18]/5 p-8 sm:p-10 shadow-sm">
+            <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2A1E17]/5 p-8 sm:p-10 shadow-sm">
               <form onSubmit={handleSave} className="space-y-6">
               
               {/* Name Input */}
               <div className="space-y-1.5">
-                <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Product Name *
                 </label>
                 <input
@@ -425,13 +438,13 @@ export default function ProductsClient({
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Signature Focaccia"
                   required
-                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
                 />
               </div>
 
               {/* Price Input */}
               <div className="space-y-1.5">
-                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Price (Rs.) *
                 </label>
                 <input
@@ -443,13 +456,13 @@ export default function ProductsClient({
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="12.50"
                   required
-                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C]"
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
                 />
               </div>
 
               {/* Category Dropdown */}
               <div className="space-y-1.5">
-                <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Category *
                 </label>
                 <select
@@ -459,7 +472,7 @@ export default function ProductsClient({
                     setCategory(e.target.value);
                     setSubcategory(""); // Reset subcategory when category changes
                   }}
-                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
                 >
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.name}>
@@ -478,14 +491,14 @@ export default function ProductsClient({
                 if (subcats.length === 0) return null;
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                    <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                       Subcategory
                     </label>
                     <select
                       id="subcategory"
                       value={subcategory}
                       onChange={(e) => setSubcategory(e.target.value)}
-                      className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                      className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
                     >
                       <option value="">None</option>
                       {subcats.map((sub) => (
@@ -500,14 +513,14 @@ export default function ProductsClient({
 
               {/* Badge Dropdown */}
               <div className="space-y-1.5">
-                <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Badge / Promo Tag
                 </label>
                 <select
                   id="badge"
                   value={badge}
                   onChange={(e) => setBadge(e.target.value)}
-                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
                 >
                   <option value="">No Badge / None</option>
                   {badges.map((bg) => (
@@ -519,7 +532,7 @@ export default function ProductsClient({
               </div>              {/* Reel Video File Upload & Preview */}
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                     Upload Reel Video (WebM/MP4, max 2MB)
                   </label>
                   <input
@@ -538,17 +551,17 @@ export default function ProductsClient({
                       };
                       reader.readAsDataURL(file);
                     }}
-                    className="w-full text-xs text-[#55433C]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#FAF5F0] file:text-[#2D1E18] file:hover:bg-[#C2957C] hover:file:text-[#2D1E18] transition-colors cursor-pointer"
+                    className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                   />
                 </div>
 
                 {/* Uploaded Video Preview */}
                 {videoUrl && (
                   <div className="space-y-1.5">
-                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#55433C]/50">
+                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
                       Active Reel Video Preview
                     </span>
-                    <div className="relative aspect-[9/16] w-24 overflow-hidden rounded-xl bg-black border border-[#2D1E18]/10 group">
+                    <div className="relative aspect-[9/16] w-24 overflow-hidden rounded-xl bg-black border border-[#2A1E17]/10 group">
                       <video src={videoUrl} autoPlay loop muted playsInline className="h-full w-full object-cover" />
                       <button
                         type="button"
@@ -566,7 +579,7 @@ export default function ProductsClient({
               <div className="space-y-3">
                 {/* 1. Upload Photos */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                     Upload Photos (WebP Auto-Compressed)
                   </label>
                   <input
@@ -574,7 +587,7 @@ export default function ProductsClient({
                     multiple
                     accept="image/*"
                     onChange={handleImageUpload}
-                    className="w-full text-xs text-[#55433C]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#FAF5F0] file:text-[#2D1E18] file:hover:bg-[#C2957C] hover:file:text-[#2D1E18] transition-colors cursor-pointer"
+                    className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                   />
                   {isCompressing && (
                     <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
@@ -586,12 +599,12 @@ export default function ProductsClient({
                 {/* 2. Uploaded Preview Thumbnails */}
                 {uploadedImages.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#55433C]/50">
+                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
                       Uploaded Photos ({uploadedImages.length})
                     </span>
-                    <div className="flex flex-wrap gap-2.5 p-2 bg-[#FAF5F0] border border-[#2D1E18]/5 rounded-xl max-h-36 overflow-y-auto">
+                    <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
                       {uploadedImages.map((imgUrl, idx) => (
-                        <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2D1E18]/10 group">
+                        <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group">
                           <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
                           <button
                             type="button"
@@ -608,14 +621,14 @@ export default function ProductsClient({
 
                 {/* 3. Primary/Placeholder Selection */}
                 <div className="space-y-1.5">
-                  <label htmlFor="image" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                  <label htmlFor="image" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                     Primary / Cover Photo Select
                   </label>
                   <select
                     id="image"
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] cursor-pointer"
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
                   >
                     {/* Dynamically list uploaded custom images as options */}
                     {uploadedImages.map((imgUrl, idx) => (
@@ -639,7 +652,7 @@ export default function ProductsClient({
 
               {/* Description Textarea */}
               <div className="space-y-1.5">
-                <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#55433C]/75">
+                <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Description *
                 </label>
                 <textarea
@@ -649,23 +662,98 @@ export default function ProductsClient({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Explain the taste profile, decoration, size..."
                   required
-                  className="w-full bg-[#FAF5F0] border border-[#2D1E18]/10 rounded-lg p-2.5 text-xs text-[#2D1E18] focus:outline-none focus:border-[#C2957C] resize-none"
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
                 />
               </div>
 
+              {/* Variants Section */}
+              <div className="space-y-3 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
+                <div>
+                  <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variants (Optional)</h4>
+                  <p className="text-[10px] text-[#3A2E2B]/75">Add weight options, sizes, or flavors with custom pricing (e.g. 500g, 1kg).</p>
+                </div>
+
+                {variants.length === 0 ? (
+                  <p className="text-[10px] text-[#3A2E2B]/55 italic bg-[#FBFBF9] p-2.5 rounded-lg border border-[#2A1E17]/5">
+                    No variants added. Product will use the base price.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
+                    {variants.map((v, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
+                        <span className="font-semibold">{v.name}</span>
+                        <div className="flex items-center space-x-4">
+                          <span className="text-[#3A2E2B]/85 font-medium">Rs. {v.price.toFixed(2)}</span>
+                          <button
+                            type="button"
+                            onClick={() => setVariants((prev) => prev.filter((_, i) => i !== idx))}
+                            className="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add Variant Form */}
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="space-y-1">
+                    <input
+                      type="text"
+                      placeholder="e.g. 500g"
+                      value={newVariantName}
+                      onChange={(e) => setNewVariantName(e.target.value)}
+                      className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                    />
+                  </div>
+                  <div className="flex space-x-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="e.g. 38.00"
+                      value={newVariantPrice}
+                      onChange={(e) => setNewVariantPrice(e.target.value)}
+                      className="bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newVariantName.trim() || !newVariantPrice) {
+                          alert("Please fill in both variant name and price.");
+                          return;
+                        }
+                        const priceVal = parseFloat(newVariantPrice);
+                        if (isNaN(priceVal) || priceVal < 0) {
+                          alert("Invalid variant price.");
+                          return;
+                        }
+                        setVariants((prev) => [...prev, { name: newVariantName.trim(), price: priceVal, isAvailable: true }]);
+                        setNewVariantName("");
+                        setNewVariantPrice("");
+                      }}
+                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Actions row */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2D1E18]/5">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2A1E17]/5">
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 rounded-full bg-[#2D1E18] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C2957C] hover:text-[#2D1E18] transition-all cursor-pointer disabled:opacity-40"
+                  className="flex-1 rounded-full bg-[#2A1E17] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
                 >
                   {isSaving ? "Saving..." : "Save Product"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsFormOpen(false)}
-                  className="flex-1 rounded-full bg-transparent border border-[#2D1E18]/25 text-[#2D1E18] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#FAF5F0] transition-all cursor-pointer"
+                  className="flex-1 rounded-full bg-transparent border border-[#2A1E17]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#EFEFEA] transition-all cursor-pointer"
                 >
                   Cancel
                 </button>

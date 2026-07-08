@@ -11,7 +11,8 @@ const ProductCatalog = dynamic(() => import("@/components/ProductCatalog"), {
 });
 
 export default async function Home() {
-  const products = await getAllProducts();
+  const allProducts = await getAllProducts();
+  const products = allProducts.filter((p) => p.isAvailable !== false);
 
   return (
     <div className="flex flex-col w-full">
@@ -19,7 +20,7 @@ export default async function Home() {
       <Hero products={products} />
 
       {/* Categories Showcase */}
-      <Categories />
+      <Categories products={products} />
 
       {/* Our Bakery Story */}
       <Story />

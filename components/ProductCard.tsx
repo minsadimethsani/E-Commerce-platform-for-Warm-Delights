@@ -1,12 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/data/products";
+import { addToCart } from "@/lib/cart";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (product.variants && product.variants.length > 0) {
+      window.location.href = `/menu/${product.id}`;
+    } else {
+      addToCart(product, 1);
+    }
+  };
+
   // Helper to render rating stars
   const renderStars = (rating: number) => {
     const stars = [];
@@ -45,9 +56,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl bg-[#faf5f0]/50 border border-[#2d1e18]/5 transition-all duration-300 hover:bg-[#faf5f0] hover:-translate-y-1 hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-2xl bg-[#EFEFEA]/50 border border-[#2A1E17]/5 transition-all duration-300 hover:bg-[#EFEFEA] hover:-translate-y-1 hover:shadow-md">
       {/* Image Frame */}
-      <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#2d1e18]/5 block cursor-pointer">
+      <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#2A1E17]/5 block cursor-pointer">
         <Image
           src={product.image}
           alt={product.name}
@@ -59,7 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badge */}
         {product.badge && (
           <div className="absolute top-3 left-3">
-            <span className="inline-block rounded-md bg-[#e5a193] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
+            <span className="inline-block rounded-md bg-[#C5A880] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
               {product.badge}
             </span>
           </div>
@@ -70,53 +81,74 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col justify-between p-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#c2957c]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C5A880]">
               {product.category}
             </span>
             
             {/* Rating block */}
             <div className="flex items-center space-x-1">
               <div className="flex items-center">{renderStars(product.rating)}</div>
-              <span className="text-[10px] font-semibold text-[#55433c]/60">
+              <span className="text-[10px] font-semibold text-[#3A2E2B]/60">
                 ({product.reviewsCount})
               </span>
             </div>
           </div>
 
           <Link href={`/menu/${product.id}`} className="block cursor-pointer">
-            <h3 className="font-serif text-lg font-bold text-[#2d1e18] leading-snug group-hover:text-[#c2957c] transition-colors line-clamp-1">
+            <h3 className="font-serif text-lg font-bold text-[#2A1E17] leading-snug group-hover:text-[#C5A880] transition-colors line-clamp-1">
               {product.name}
             </h3>
           </Link>
-          <p className="font-sans text-xs leading-relaxed text-[#55433c]/75 line-clamp-2">
+          <p className="font-sans text-xs leading-relaxed text-[#3A2E2B]/75 line-clamp-2">
             {product.description}
           </p>
         </div>
 
         {/* Price and Add Button */}
-        <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#2d1e18]/5">
-          <span className="font-serif text-lg font-bold text-[#2d1e18]">
-            Rs. {product.price.toFixed(2)}
+        <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#2A1E17]/5">
+          <span className="font-serif text-lg font-bold text-[#2A1E17]">
+            {product.variants && product.variants.length > 0 ? (
+              <>
+                <span className="text-[10px] uppercase font-bold text-[#3A2E2B]/50 block leading-none mb-0.5">From</span>
+                Rs. {Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
+              </>
+            ) : (
+              `Rs. ${product.price.toFixed(2)}`
+            )}
           </span>
           
           <button
-            aria-label={`Add ${product.name} to cart`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2d1e18] text-white transition-all hover:bg-[#c2957c] hover:text-[#2d1e18] cursor-pointer"
+            onClick={handleAddToCart}
+            aria-label={product.variants && product.variants.length > 0 ? `View options for ${product.name}` : `Add ${product.name} to cart`}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2A1E17] text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17] cursor-pointer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-4.5 h-4.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
+            {product.variants && product.variants.length > 0 ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-4.5 h-4.5"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4.5v15m7.5-7.5h-15"
+                />
+              </svg>
+            )}
           </button>
         </div>
       </div>

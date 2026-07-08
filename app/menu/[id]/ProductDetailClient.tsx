@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Product } from "@/data/products";
+import { Product, ProductVariant } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
+import { addToCart } from "@/lib/cart";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -17,15 +18,24 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   const [quantity, setQuantity] = useState<number>(1);
   const [activeTab, setActiveTab] = useState<TabType>("details");
   const [isAdded, setIsAdded] = useState<boolean>(false);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | undefined>(
+    product.variants && product.variants.length > 0 ? product.variants[0] : undefined
+  );
 
   const incrementQty = () => setQuantity((prev) => (prev < 20 ? prev + 1 : prev));
   const decrementQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
 
   const handleAddToCart = () => {
+    addToCart(product, quantity, selectedVariant);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
     }, 2000);
+  };
+
+  const handleBuyNow = () => {
+    addToCart(product, quantity, selectedVariant);
+    window.dispatchEvent(new Event("open-cart"));
   };
 
   // Helper to render rating stars
@@ -70,7 +80,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     switch (activeTab) {
       case "details":
         return (
-          <div className="space-y-4 text-sm text-[#55433c]/85 leading-relaxed font-sans">
+          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
             <p>{product.description}</p>
             <p>
               Every batch is crafted by hand in our bakery workspace using traditional slow-fermentation or whipping techniques. We ensure each item meets our strict standards of flavor profile and texture.
@@ -93,13 +103,13 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
           ingredients = "Handpicked premium organic ingredients including local stone-ground flour, pasture-raised eggs, pure butter, cane sugar, and natural extracts.";
         }
         return (
-          <div className="space-y-4 text-sm text-[#55433c]/85 leading-relaxed font-sans">
+          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
             <div>
-              <strong className="text-[#2d1e18] block mb-1">Key Ingredients:</strong>
+              <strong className="text-[#2A1E17] block mb-1">Key Ingredients:</strong>
               <p>{ingredients}</p>
             </div>
             <div>
-              <strong className="text-[#2d1e18] block mb-1">Allergy Warnings:</strong>
+              <strong className="text-[#2A1E17] block mb-1">Allergy Warnings:</strong>
               <p>Contains: <span className="font-semibold text-rose-600">{allergy}</span>. Handled in a facility that also processes wheat, tree nuts, and peanuts.</p>
             </div>
           </div>
@@ -118,13 +128,13 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
           storage = "Keep stored in a cool, dry place or in the refrigerator based on frosting needs. Bring to room temperature 1 hour before serving. Consume within 3 days.";
         }
         return (
-          <div className="space-y-4 text-sm text-[#55433c]/85 leading-relaxed font-sans">
+          <div className="space-y-4 text-sm text-[#3A2E2B]/85 leading-relaxed font-sans">
             <div>
-              <strong className="text-[#2d1e18] block mb-1">Storage Guide:</strong>
+              <strong className="text-[#2A1E17] block mb-1">Storage Guide:</strong>
               <p>{storage}</p>
             </div>
             <div>
-              <strong className="text-[#2d1e18] block mb-1">Shipping Note:</strong>
+              <strong className="text-[#2A1E17] block mb-1">Shipping Note:</strong>
               <p>We pack all treats in protective, insulated biodegradable boxes. Same-day local delivery is recommended to preserve optimal freshness.</p>
             </div>
           </div>
@@ -133,30 +143,30 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
   };
 
   return (
-    <div className="bg-[#fdfcf9] min-h-screen py-10">
+    <div className="bg-[#FBFBF9] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#55433c]/60">
+          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#3A2E2B]/60">
             <li>
-              <Link href="/" className="hover:text-[#c2957c] transition-colors">
+              <Link href="/" className="hover:text-[#C5A880] transition-colors">
                 Home
               </Link>
             </li>
             <li className="flex items-center space-x-2">
-              <svg className="h-3 w-3 text-[#55433c]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
-              <Link href="/menu" className="hover:text-[#c2957c] transition-colors">
+              <Link href="/menu" className="hover:text-[#C5A880] transition-colors">
                 Menu
               </Link>
             </li>
             <li className="flex items-center space-x-2">
-              <svg className="h-3 w-3 text-[#55433c]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
-              <span className="text-[#2d1e18] truncate max-w-[150px] sm:max-w-none">{product.name}</span>
+              <span className="text-[#2A1E17] truncate max-w-[150px] sm:max-w-none">{product.name}</span>
             </li>
           </ol>
         </nav>
@@ -165,7 +175,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-24">
           
           {/* Left: Product Image Box */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-[#faf5f0] border border-[#2d1e18]/5 shadow-sm">
+          <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm">
             <Image
               src={product.image}
               alt={product.name}
@@ -176,7 +186,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             />
             {product.badge && (
               <div className="absolute top-6 left-6">
-                <span className="inline-block rounded-md bg-[#e5a193] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+                <span className="inline-block rounded-md bg-[#C5A880] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
                   {product.badge}
                 </span>
               </div>
@@ -188,113 +198,156 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             
             {/* Header info */}
             <div className="space-y-4">
-              <span className="inline-block px-3 py-1 bg-[#faf5f0] border border-[#2d1e18]/5 rounded-full text-xs font-bold uppercase tracking-wider text-[#c2957c]">
+              <span className="inline-block px-3 py-1 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-full text-xs font-bold uppercase tracking-wider text-[#C5A880]">
                 {product.category}
               </span>
               
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#2d1e18] leading-tight">
+              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#2A1E17] leading-tight">
                 {product.name}
               </h1>
 
               {/* Rating stars & review count */}
               <div className="flex items-center space-x-2 pt-1">
                 <div className="flex items-center">{renderStars(product.rating)}</div>
-                <span className="text-xs font-bold text-[#2d1e18]/70">
+                <span className="text-xs font-bold text-[#2A1E17]/70">
                   {product.rating.toFixed(1)} Rating
                 </span>
-                <span className="text-xs text-[#55433c]/40 font-semibold">•</span>
-                <span className="text-xs font-semibold text-[#55433c]/60">
+                <span className="text-xs text-[#3A2E2B]/40 font-semibold">•</span>
+                <span className="text-xs font-semibold text-[#3A2E2B]/60">
                   {product.reviewsCount} customer reviews
                 </span>
               </div>
 
               {/* Price display */}
-              <div className="text-3xl font-serif font-bold text-[#2d1e18] pt-2">
-                Rs. {product.price.toFixed(2)}
+              <div className="text-3xl font-serif font-bold text-[#2A1E17] pt-2">
+                Rs. {selectedVariant ? selectedVariant.price.toFixed(2) : product.price.toFixed(2)}
               </div>
             </div>
 
             {/* Quick Description */}
-            <p className="text-sm sm:text-base text-[#55433c]/85 leading-relaxed font-sans">
+            <p className="text-sm sm:text-base text-[#3A2E2B]/85 leading-relaxed font-sans">
               {product.description}
             </p>
 
-            {/* Add To Cart Controls Section */}
-            <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center pt-6 border-t border-[#2d1e18]/5">
-              
-              {/* Qty Selector */}
-              <div className="flex items-center justify-between bg-[#faf5f0] border border-[#2d1e18]/10 rounded-full px-2 py-1 sm:w-32">
+            {/* Variant Selector */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-[#2A1E17]/5">
+                <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  Select Option / Weight:
+                </span>
+                <div className="flex flex-wrap gap-3">
+                  {product.variants.map((v, idx) => {
+                    const isSelected = selectedVariant?.name === v.name;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setSelectedVariant(v)}
+                        className={`px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
+                            : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                        }`}
+                      >
+                        <span className="block font-bold">{v.name}</span>
+                        <span className={`block text-[10px] mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                          Rs. {v.price.toFixed(2)}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Quantity Selector */}
+            <div className="space-y-2 pt-6 border-t border-[#2A1E17]/5">
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                Quantity:
+              </span>
+              <div className="flex items-center justify-between bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full px-2 py-1 w-32">
                 <button
                   onClick={decrementQty}
                   disabled={quantity === 1}
                   aria-label="Decrease quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2d1e18] hover:bg-[#2d1e18]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
                   </svg>
                 </button>
-                <span className="font-semibold text-sm text-[#2d1e18] min-w-5 text-center select-none">
+                <span className="font-semibold text-sm text-[#2A1E17] min-w-5 text-center select-none">
                   {quantity}
                 </span>
                 <button
                   onClick={incrementQty}
                   disabled={quantity === 20}
                   aria-label="Increase quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2d1e18] hover:bg-[#2d1e18]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
               </div>
+            </div>
 
-              {/* Add CTA */}
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 items-stretch pt-4">
+              {/* Add to Cart CTA */}
               <button
                 onClick={handleAddToCart}
                 className={`flex-1 rounded-full py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs ${
                   isAdded
                     ? "bg-emerald-600 text-white shadow-md"
-                    : "bg-[#2d1e18] text-white hover:bg-[#c2957c] hover:text-[#2d1e18]"
+                    : "bg-[#2A1E17] text-white hover:bg-[#C5A880] hover:text-[#2A1E17]"
                 }`}
               >
                 {isAdded ? "Added to Cart ✓" : "Add to Cart"}
               </button>
+
+              {/* Buy Now CTA */}
+              <button
+                onClick={handleBuyNow}
+                className="flex-1 rounded-full py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs bg-[#C5A880] text-[#2A1E17] hover:bg-[#2A1E17] hover:text-white"
+              >
+                Buy Now
+              </button>
             </div>
 
             {/* Checklist of Quality Specs */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#2d1e18]/5 text-xs text-[#55433c]/80 font-bold uppercase tracking-wide">
+            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#2A1E17]/5 text-xs text-[#3A2E2B]/80 font-bold uppercase tracking-wide">
               <div className="flex items-center space-x-2">
-                <span className="text-base text-[#c2957c]">🌾</span>
+                <span className="text-base text-[#C5A880]">🌾</span>
                 <span>Baked Fresh Daily</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-base text-[#c2957c]">🌱</span>
+                <span className="text-base text-[#C5A880]">🌱</span>
                 <span>Organic Ingredients</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-base text-[#c2957c]">🥚</span>
+                <span className="text-base text-[#C5A880]">🥚</span>
                 <span>Pasture-Raised Eggs</span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-base text-[#c2957c]">🧈</span>
+                <span className="text-base text-[#C5A880]">🧈</span>
                 <span>Real Grass-Fed Butter</span>
               </div>
             </div>
 
             {/* Tabbed Info Block */}
-            <div className="pt-8 border-t border-[#2d1e18]/5">
+            <div className="pt-8 border-t border-[#2A1E17]/5">
               
               {/* Tab Header Buttons */}
-              <div className="flex border-b border-[#2d1e18]/10 pb-2 space-x-6">
+              <div className="flex border-b border-[#2A1E17]/10 pb-2 space-x-6">
                 {(["details", "ingredients", "storage"] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all cursor-pointer ${
                       activeTab === tab
-                        ? "border-[#c2957c] text-[#2d1e18]"
-                        : "border-transparent text-[#55433c]/60 hover:text-[#2d1e18]"
+                        ? "border-[#C5A880] text-[#2A1E17]"
+                        : "border-transparent text-[#3A2E2B]/60 hover:text-[#2A1E17]"
                     }`}
                   >
                     {tab === "details" ? "Description" : tab === "ingredients" ? "Ingredients" : "Care & Storage"}
@@ -313,19 +366,19 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
         </div>
 
         {/* Recommendations / Related Products */}
-        <section className="border-t border-[#2d1e18]/10 pt-16 mb-16">
+        <section className="border-t border-[#2A1E17]/10 pt-16 mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#c2957c]">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">
                 Recommendations
               </span>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#2d1e18]">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#2A1E17]">
                 You May Also Like
               </h2>
             </div>
             <Link
               href="/menu"
-              className="mt-4 md:mt-0 text-xs font-bold uppercase tracking-wider text-[#2d1e18] hover:text-[#c2957c] flex items-center transition-colors cursor-pointer"
+              className="mt-4 md:mt-0 text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:text-[#C5A880] flex items-center transition-colors cursor-pointer"
             >
               <span>View Full Menu</span>
               <svg className="ml-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

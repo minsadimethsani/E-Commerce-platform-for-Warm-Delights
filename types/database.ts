@@ -13,6 +13,12 @@ export interface Address {
   isDefault: boolean;
 }
 
+export interface ProductVariant {
+  name: string;
+  price: number;
+  isAvailable?: boolean;
+}
+
 /**
  * Product model stored in Firestore under /products
  */
@@ -32,6 +38,7 @@ export interface Product {
   createdAt: Timestamp;
   updatedAt: Timestamp;
   videoUrl?: string;
+  variants?: ProductVariant[];
 }
 
 /**

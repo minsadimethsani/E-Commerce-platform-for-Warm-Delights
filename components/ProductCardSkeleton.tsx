@@ -1,6 +1,6 @@
 export default function ProductCardSkeleton() {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl bg-[#faf5f0]/30 border border-[#2d1e18]/5">
+    <div className="flex flex-col overflow-hidden rounded-2xl bg-[#EFEFEA]/30 border border-[#2A1E17]/5">
       {/* Image Block shimmer */}
       <div className="relative aspect-square w-full bg-gray-200/50 animate-pulse" />
       
@@ -23,7 +23,7 @@ export default function ProductCardSkeleton() {
         </div>
         
         {/* Footer actions shimmers */}
-        <div className="pt-4 border-t border-[#2d1e18]/5 flex items-center justify-between">
+        <div className="pt-4 border-t border-[#2A1E17]/5 flex items-center justify-between">
           {/* Price label shimmer */}
           <div className="h-5 w-14 bg-gray-200/50 animate-pulse rounded" />
           {/* Add-to-cart circle button shimmer */}

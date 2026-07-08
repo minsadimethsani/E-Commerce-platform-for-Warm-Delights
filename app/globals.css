@@ -4,21 +4,21 @@
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
 
-  --color-brand-brown: #2d1e18;
-  --color-brand-gold: #c2957c;
-  --color-brand-apricot: #e5a193;
-  --color-brand-cream: #fdfcf9;
-  --color-brand-almond: #faf5f0;
-  --color-brand-espresso: #55433c;
+  --color-brand-brown: #2A1E17;
+  --color-brand-gold: #C5A880;
+  --color-brand-apricot: #EFEFEA;
+  --color-brand-cream: #FBFBF9;
+  --color-brand-almond: #EFEFEA;
+  --color-brand-espresso: #3A2E2B;
 }
 
 :root {
-  background-color: #fdfcf9;
-  color: #55433c;
+  background-color: #FBFBF9;
+  color: #3A2E2B;
 }
 
 body {
   font-family: var(--font-jakarta), system-ui, sans-serif;
-  background-color: #fdfcf9;
-  color: #55433c;
+  background-color: #FBFBF9;
+  color: #3A2E2B;
 }

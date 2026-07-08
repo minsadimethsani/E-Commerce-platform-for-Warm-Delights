@@ -350,25 +350,45 @@ async function seedBadgesIfEmpty(batch: any) {
   return false;
 }
 
+// Module-level cache to check seeding only once per application instance lifetime
+let isSeedingChecked = false;
+
 /**
  * Unified database seeder that creates all collections in a batch commit.
  */
 export async function seedAllCollectionsIfEmpty() {
+  if (isSeedingChecked) {
+    return;
+  }
   try {
     const batch = writeBatch(db);
     
-    const seededProd = await seedProductsIfEmpty(batch);
-    const seededUsers = await seedUsersIfEmpty(batch);
-    const seededReviews = await seedReviewsIfEmpty(batch);
-    const seededOrders = await seedOrdersIfEmpty(batch);
-    const seededCategories = await seedCategoriesIfEmpty(batch);
-    const seededBadges = await seedBadgesIfEmpty(batch);
+    // Execute all check/seed functions in parallel to avoid sequential network roundtrips
+    const [
+      seededProd,
+      seededUsers,
+      seededReviews,
+      seededOrders,
+      seededCategories,
+      seededBadges
+    ] = await Promise.all([
+      seedProductsIfEmpty(batch),
+      seedUsersIfEmpty(batch),
+      seedReviewsIfEmpty(batch),
+      seedOrdersIfEmpty(batch),
+      seedCategoriesIfEmpty(batch),
+      seedBadgesIfEmpty(batch),
+    ]);
 
     if (seededProd || seededUsers || seededReviews || seededOrders || seededCategories || seededBadges) {
       await batch.commit();
       console.log("Firestore database collections updated successfully!");
     }
+    
+    // Mark as successfully checked/seeded to skip database reads on subsequent requests
+    isSeedingChecked = true;
   } catch (error) {
     console.error("Failed to seed collections in Firestore:", error);
   }
 }
+

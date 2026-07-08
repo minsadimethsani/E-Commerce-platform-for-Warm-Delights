@@ -1,3 +1,9 @@
+export interface ProductVariant {
+  name: string;
+  price: number;
+  isAvailable?: boolean;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,6 +16,7 @@ export interface Product {
   reviewsCount: number;
   videoUrl?: string;
   isAvailable?: boolean;
+  variants?: ProductVariant[];
 }
 
 export const products: Product[] = [
