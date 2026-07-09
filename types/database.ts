@@ -19,6 +19,12 @@ export interface ProductVariant {
   isAvailable?: boolean;
 }
 
+export interface ProductSize {
+  name: string;
+  price: number;
+  priceMultiplier?: number;
+}
+
 /**
  * Product model stored in Firestore under /products
  */
@@ -39,6 +45,9 @@ export interface Product {
   updatedAt: Timestamp;
   videoUrl?: string;
   variants?: ProductVariant[];
+  sizes?: ProductSize[];
+  flavors?: string[];
+  icings?: string[];
 }
 
 /**

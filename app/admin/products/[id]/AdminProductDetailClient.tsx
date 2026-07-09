@@ -5,6 +5,7 @@ import { Product } from "@/data/products";
 import { Review } from "@/types/database";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 interface AdminProductDetailClientProps {
   product: Product & {
@@ -21,6 +22,7 @@ export default function AdminProductDetailClient({
   product,
   initialReviews,
 }: AdminProductDetailClientProps) {
+  const { setIsMutating } = useAuth();
   const [isAvailable, setIsAvailable] = useState<boolean>(product.isAvailable !== false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string>(product.image);
@@ -28,6 +30,7 @@ export default function AdminProductDetailClient({
   // Toggle availability status in Firestore
   const handleToggleAvailability = async () => {
     setIsUpdating(true);
+    setIsMutating(true);
     try {
       const docRef = doc(db, "products", product.id);
       const newStatus = !isAvailable;
@@ -41,6 +44,7 @@ export default function AdminProductDetailClient({
       alert("Error: Database permission denied or network error.");
     } finally {
       setIsUpdating(false);
+      setIsMutating(false);
     }
   };
 

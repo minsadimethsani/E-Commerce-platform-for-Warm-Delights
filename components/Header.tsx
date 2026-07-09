@@ -101,7 +101,12 @@ export default function Header() {
 
   const cartCount = mounted ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
   const totalAmount = cartItems.reduce(
-    (acc, item) => acc + (item.selectedVariant ? item.selectedVariant.price : item.product.price) * item.quantity,
+    (acc, item) => {
+      const itemPrice = item.calculatedPrice !== undefined
+        ? item.calculatedPrice
+        : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
+      return acc + itemPrice * item.quantity;
+    },
     0
   );
 
@@ -147,13 +152,35 @@ export default function Header() {
       const deliveryFee = deliveryType === "delivery" ? 350 : 0;
       const total = subtotal + tax + deliveryFee;
 
-      const orderItems = cartItems.map((item) => ({
-        productId: item.product.id,
-        name: item.product.name + (item.selectedVariant ? ` (${item.selectedVariant.name})` : ""),
-        price: item.selectedVariant ? item.selectedVariant.price : item.product.price,
-        quantity: item.quantity,
-        image: item.product.image
-      }));
+      const orderItems = cartItems.map((item) => {
+        const itemPrice = item.calculatedPrice !== undefined
+          ? item.calculatedPrice
+          : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
+        
+        let variantInfo = "";
+        if (item.selectedVariant) {
+          variantInfo = ` (${item.selectedVariant.name})`;
+        } else {
+          const detailList = [];
+          if (item.selectedSize) detailList.push(item.selectedSize);
+          if (item.selectedFlavor) detailList.push(item.selectedFlavor);
+          if (item.selectedIcing) detailList.push(item.selectedIcing);
+          if (item.selectedAddOns && item.selectedAddOns.length > 0) {
+            detailList.push(item.selectedAddOns.join(", "));
+          }
+          if (detailList.length > 0) {
+            variantInfo = ` (${detailList.join(" | ")})`;
+          }
+        }
+
+        return {
+          productId: item.product.id,
+          name: item.product.name + variantInfo,
+          price: itemPrice,
+          quantity: item.quantity,
+          image: item.product.image
+        };
+      });
 
       const shippingAddress = {
         id: `addr-${Date.now()}`,
@@ -633,63 +660,94 @@ export default function Header() {
                   ) : (
                     /* Items List */
                     <div className="space-y-4">
-                      {cartItems.map((item) => (
-                        <div key={`${item.product.id}-${item.selectedVariant?.name || "base"}`} className="flex items-center space-x-4 p-3 bg-white rounded-xl border border-[#0D1B2A]/5">
-                          {/* Image */}
-                          <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-[#0D1B2A]/5 flex-shrink-0">
-                            <Image
-                              src={item.product.image}
-                              alt={item.product.name}
-                              fill
-                              className="object-cover"
-                              sizes="64px"
-                            />
-                          </div>
+                      {cartItems.map((item) => {
+                        const itemKey = `${item.product.id}-${item.selectedVariant?.name || "base"}-${item.selectedSize || ""}-${item.selectedFlavor || ""}-${item.selectedIcing || ""}`;
+                        const itemPrice = item.calculatedPrice !== undefined
+                          ? item.calculatedPrice
+                          : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
+                        return (
+                          <div key={itemKey} className="flex items-center space-x-4 p-3 bg-white rounded-xl border border-[#0D1B2A]/5">
+                            {/* Image */}
+                            <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-[#0D1B2A]/5 flex-shrink-0">
+                              <Image
+                                src={item.product.image}
+                                alt={item.product.name}
+                                fill
+                                className="object-cover"
+                                sizes="64px"
+                              />
+                            </div>
 
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-serif text-sm font-bold text-[#0D1B2A] truncate">{item.product.name}</h4>
-                            {item.selectedVariant && (
-                              <span className="inline-block px-1.5 py-0.5 bg-[#EAE8E4] rounded-md text-[9px] font-bold text-[#0D1B2A]/70 uppercase tracking-wide mb-1">
-                                {item.selectedVariant.name}
+                            {/* Info */}
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-serif text-sm font-bold text-[#0D1B2A] truncate">{item.product.name}</h4>
+                              
+                              {/* Display Custom Multi-variants */}
+                              <div className="flex flex-wrap gap-1 mt-0.5 mb-1">
+                                {item.selectedVariant && (
+                                  <span className="inline-block px-1.5 py-0.5 bg-[#EAE8E4] rounded-md text-[9px] font-bold text-[#0D1B2A]/70 uppercase tracking-wide">
+                                    {item.selectedVariant.name}
+                                  </span>
+                                )}
+                                {item.selectedSize && (
+                                  <span className="inline-block px-1.5 py-0.5 bg-[#C5A880]/15 rounded-md text-[9px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                    {item.selectedSize}
+                                  </span>
+                                )}
+                                {item.selectedFlavor && (
+                                  <span className="inline-block px-1.5 py-0.5 bg-rose-50 rounded-md text-[9px] font-bold text-rose-700 uppercase tracking-wide border border-rose-100">
+                                    {item.selectedFlavor}
+                                  </span>
+                                )}
+                                {item.selectedIcing && (
+                                  <span className="inline-block px-1.5 py-0.5 bg-sky-50 rounded-md text-[9px] font-bold text-sky-700 uppercase tracking-wide border border-sky-100">
+                                    {item.selectedIcing}
+                                  </span>
+                                )}
+                                {item.selectedAddOns && item.selectedAddOns.map((addon) => (
+                                  <span key={addon} className="inline-block px-1.5 py-0.5 bg-emerald-50 rounded-md text-[9px] font-bold text-emerald-700 uppercase tracking-wide border border-emerald-100">
+                                    +{addon}
+                                  </span>
+                                ))}
+                              </div>
+
+                              <span className="text-[10px] text-[#E09F3E] font-bold uppercase tracking-wider block mb-1">
+                                {item.product.category}
                               </span>
-                            )}
-                            <span className="text-[10px] text-[#E09F3E] font-bold uppercase tracking-wider block mb-1">
-                              {item.product.category}
-                            </span>
-                            <span className="text-xs font-medium text-[#0D1B2A]/60 block">
-                              Rs. {(item.selectedVariant ? item.selectedVariant.price : item.product.price).toFixed(2)} each
-                            </span>
-                          </div>
+                              <span className="text-xs font-medium text-[#0D1B2A]/60 block">
+                                Rs. {itemPrice.toFixed(2)} each
+                              </span>
+                            </div>
 
-                          {/* Controls */}
-                          <div className="flex flex-col items-end space-y-2">
-                            <div className="flex items-center space-x-2 bg-[#EAE8E4]/50 border border-[#0D1B2A]/10 rounded-full px-1.5 py-0.5 scale-90">
+                            {/* Controls */}
+                            <div className="flex flex-col items-end space-y-2">
+                              <div className="flex items-center space-x-2 bg-[#EAE8E4]/50 border border-[#0D1B2A]/10 rounded-full px-1.5 py-0.5 scale-90">
+                                <button
+                                  onClick={() => updateCartQuantity(item.product.id, item.selectedVariant?.name, item.quantity - 1, item.selectedSize, item.selectedFlavor, item.selectedIcing)}
+                                  className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#0D1B2A]/5 font-bold cursor-pointer"
+                                >
+                                  -
+                                </button>
+                                <span className="text-xs font-semibold text-[#0D1B2A] w-4 text-center">{item.quantity}</span>
+                                <button
+                                  onClick={() => updateCartQuantity(item.product.id, item.selectedVariant?.name, item.quantity + 1, item.selectedSize, item.selectedFlavor, item.selectedIcing)}
+                                  className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#0D1B2A]/5 font-bold cursor-pointer"
+                                >
+                                  +
+                                </button>
+                              </div>
+                              
                               <button
-                                onClick={() => updateCartQuantity(item.product.id, item.selectedVariant?.name, item.quantity - 1)}
-                                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#0D1B2A]/5 font-bold cursor-pointer"
+                                onClick={() => removeFromCart(item.product.id, item.selectedVariant?.name, item.selectedSize, item.selectedFlavor, item.selectedIcing)}
+                                className="text-[10px] text-red-650 hover:underline font-bold uppercase tracking-wider cursor-pointer"
                               >
-                                -
-                              </button>
-                              <span className="text-xs font-semibold text-[#0D1B2A] w-4 text-center">{item.quantity}</span>
-                              <button
-                                onClick={() => updateCartQuantity(item.product.id, item.selectedVariant?.name, item.quantity + 1)}
-                                className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#0D1B2A]/5 font-bold cursor-pointer"
-                              >
-                                +
+                                Remove
                               </button>
                             </div>
-                            
-                            <button
-                              onClick={() => removeFromCart(item.product.id, item.selectedVariant?.name)}
-                              className="text-[10px] text-red-650 hover:underline font-bold uppercase tracking-wider cursor-pointer"
-                            >
-                              Remove
-                            </button>
-                          </div>
 
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -1041,21 +1099,49 @@ export default function Header() {
                       <div className="bg-[#EFEFEA]/50 rounded-2xl p-5 border border-[#2A1E17]/5 space-y-3">
                         <div className="max-h-48 overflow-y-auto pr-2 space-y-3">
                           {cartItems.map((item) => {
-                            const itemPrice = item.selectedVariant ? item.selectedVariant.price : item.product.price;
+                            const itemPrice = item.calculatedPrice !== undefined
+                              ? item.calculatedPrice
+                              : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
+                            const itemKey = `${item.product.id}-${item.selectedVariant?.name || "base"}-${item.selectedSize || ""}-${item.selectedFlavor || ""}-${item.selectedIcing || ""}`;
                             return (
-                              <div key={`${item.product.id}-${item.selectedVariant?.name || "base"}`} className="flex items-center justify-between text-sm">
+                              <div key={itemKey} className="flex items-center justify-between text-sm">
                                 <div className="flex items-center space-x-3">
                                   <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-white border border-[#2A1E17]/5 flex-shrink-0">
                                     <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" />
                                   </div>
                                   <div>
                                     <p className="font-bold text-[#2A1E17] leading-tight text-xs">{item.product.name}</p>
-                                    {item.selectedVariant && (
-                                      <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide mt-0.5">
-                                        {item.selectedVariant.name}
-                                      </span>
-                                    )}
-                                    <p className="text-[10px] text-[#3A2E2B]/60 mt-0.5">Qty: {item.quantity}</p>
+                                    
+                                    {/* Display custom variations */}
+                                    <div className="flex flex-wrap gap-1 mt-0.5">
+                                      {item.selectedVariant && (
+                                        <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
+                                          {item.selectedVariant.name}
+                                        </span>
+                                      )}
+                                      {item.selectedSize && (
+                                        <span className="inline-block px-1 py-0.5 bg-[#C5A880]/10 rounded text-[8px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                          {item.selectedSize}
+                                        </span>
+                                      )}
+                                      {item.selectedFlavor && (
+                                        <span className="inline-block px-1 py-0.5 bg-rose-50 rounded text-[8px] font-bold text-rose-700 uppercase tracking-wide">
+                                          {item.selectedFlavor}
+                                        </span>
+                                      )}
+                                      {item.selectedIcing && (
+                                        <span className="inline-block px-1 py-0.5 bg-sky-50 rounded text-[8px] font-bold text-sky-700 uppercase tracking-wide">
+                                          {item.selectedIcing}
+                                        </span>
+                                      )}
+                                      {item.selectedAddOns && item.selectedAddOns.map((addon) => (
+                                        <span key={addon} className="inline-block px-1 py-0.5 bg-emerald-50 rounded text-[8px] font-bold text-emerald-700 uppercase tracking-wide">
+                                          +{addon}
+                                        </span>
+                                      ))}
+                                    </div>
+                                    
+                                    <p className="text-[10px] text-[#3A2E2B]/60 mt-1">Qty: {item.quantity}</p>
                                   </div>
                                 </div>
                                 <span className="font-bold text-[#2A1E17] text-xs">Rs. {(itemPrice * item.quantity).toFixed(2)}</span>

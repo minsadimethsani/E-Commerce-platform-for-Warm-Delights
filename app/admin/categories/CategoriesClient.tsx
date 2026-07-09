@@ -5,6 +5,7 @@ import { Category } from "@/lib/categories";
 import { Badge } from "@/lib/badges";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 interface CategoriesClientProps {
   initialCategories: Category[];
@@ -15,6 +16,7 @@ export default function CategoriesClient({
   initialCategories,
   initialBadges,
 }: CategoriesClientProps) {
+  const { setIsMutating } = useAuth();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [badges, setBadges] = useState<Badge[]>(initialBadges);
 
@@ -45,6 +47,7 @@ export default function CategoriesClient({
     if (!newCatName.trim()) return;
 
     setIsAddingCat(true);
+    setIsMutating(true);
     try {
       const name = newCatName.trim();
       const id = slugify(name);
@@ -52,6 +55,7 @@ export default function CategoriesClient({
       if (categories.some((c) => c.id === id)) {
         alert("A category with this identifier already exists.");
         setIsAddingCat(false);
+        setIsMutating(false);
         return;
       }
 
@@ -69,6 +73,7 @@ export default function CategoriesClient({
       alert("Error writing category to database.");
     } finally {
       setIsAddingCat(false);
+      setIsMutating(false);
     }
   };
 
@@ -78,12 +83,15 @@ export default function CategoriesClient({
       return;
     }
 
+    setIsMutating(true);
     try {
       await deleteDoc(doc(db, "categories", id));
       setCategories((prev) => prev.filter((c) => c.id !== id));
     } catch (error) {
       console.error(`Failed to delete category ${id}:`, error);
       alert("Error deleting category from database.");
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -100,6 +108,7 @@ export default function CategoriesClient({
       return;
     }
 
+    setIsMutating(true);
     try {
       const updatedSubcategories = [...targetCat.subcategories, subcatText].sort();
       const docRef = doc(db, "categories", catId);
@@ -119,6 +128,8 @@ export default function CategoriesClient({
     } catch (error) {
       console.error("Failed to add subcategory:", error);
       alert("Error writing subcategory to database.");
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -127,6 +138,7 @@ export default function CategoriesClient({
     const targetCat = categories.find((c) => c.id === catId);
     if (!targetCat) return;
 
+    setIsMutating(true);
     try {
       const updatedSubcategories = targetCat.subcategories.filter((s) => s !== subcatText);
       const docRef = doc(db, "categories", catId);
@@ -143,6 +155,8 @@ export default function CategoriesClient({
     } catch (error) {
       console.error("Failed to delete subcategory:", error);
       alert("Error deleting subcategory from database.");
+    } finally {
+      setIsMutating(false);
     }
   };
 
@@ -152,6 +166,7 @@ export default function CategoriesClient({
     if (!newBadgeName.trim()) return;
 
     setIsAddingBadge(true);
+    setIsMutating(true);
     try {
       const name = newBadgeName.trim();
       const id = slugify(name);
@@ -159,6 +174,7 @@ export default function CategoriesClient({
       if (badges.some((b) => b.id === id)) {
         alert("A badge with this name already exists.");
         setIsAddingBadge(false);
+        setIsMutating(false);
         return;
       }
 
@@ -175,6 +191,7 @@ export default function CategoriesClient({
       alert("Error writing badge to database.");
     } finally {
       setIsAddingBadge(false);
+      setIsMutating(false);
     }
   };
 
@@ -184,12 +201,15 @@ export default function CategoriesClient({
       return;
     }
 
+    setIsMutating(true);
     try {
       await deleteDoc(doc(db, "badges", id));
       setBadges((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
       console.error(`Failed to delete badge ${id}:`, error);
       alert("Error deleting badge from database.");
+    } finally {
+      setIsMutating(false);
     }
   };
 

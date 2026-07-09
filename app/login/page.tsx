@@ -76,23 +76,43 @@ function LoginForm() {
 
         // 3. Direct roles to correct paths
         if (role === "admin") {
-          router.replace("/admin");
+          // Set administrative session cookies (valid for 1 hour)
+          document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
+          document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
+          router.replace("/admin/dashboard");
         } else {
-          // If it's a customer and they have a redirect URL, send them back
+          // Clear cookies for non-admin
+          document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+          // If a customer attempts to access the admin portal, block them
+          if (redirect && redirect.startsWith("/admin")) {
+            setGeneralError("Access denied. You do not have administrative privileges.");
+            await auth.signOut();
+          } else {
+            if (redirect) {
+              const hasQuery = redirect.includes("?");
+              router.replace(`${redirect}${hasQuery ? "&" : "?"}openCheckout=true`);
+            } else {
+              router.replace("/");
+            }
+          }
+        }
+      } else {
+        // Fallback for missing profile
+        document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+        if (redirect && redirect.startsWith("/admin")) {
+          setGeneralError("Access denied. Admin profile document not found.");
+          await auth.signOut();
+        } else {
           if (redirect) {
             const hasQuery = redirect.includes("?");
             router.replace(`${redirect}${hasQuery ? "&" : "?"}openCheckout=true`);
           } else {
             router.replace("/");
           }
-        }
-      } else {
-        // Fallback profile if profile document is missing (should not happen normally)
-        if (redirect) {
-          const hasQuery = redirect.includes("?");
-          router.replace(`${redirect}${hasQuery ? "&" : "?"}openCheckout=true`);
-        } else {
-          router.replace("/");
         }
       }
     } catch (error: any) {

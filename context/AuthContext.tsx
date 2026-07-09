@@ -11,6 +11,8 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   logout: () => Promise<void>;
+  isMutating: boolean;
+  setIsMutating: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,12 +20,15 @@ const AuthContext = createContext<AuthContextType>({
   userProfile: null,
   loading: true,
   logout: async () => {},
+  isMutating: false,
+  setIsMutating: () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMutating, setIsMutating] = useState(false);
 
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
@@ -74,7 +79,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
+    if (isMutating) {
+      alert("Cannot sign out: A database mutation or update is currently in progress. Please wait for it to complete.");
+      return;
+    }
     setLoading(true);
+    if (typeof document !== "undefined") {
+      document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    }
     await signOut(auth);
     setUser(null);
     setUserProfile(null);
@@ -82,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, logout }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, logout, isMutating, setIsMutating }}>
       {children}
     </AuthContext.Provider>
   );

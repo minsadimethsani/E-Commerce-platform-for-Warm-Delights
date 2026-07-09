@@ -4,6 +4,11 @@ export interface CartItem {
   product: Product;
   quantity: number;
   selectedVariant?: ProductVariant;
+  selectedSize?: string;
+  selectedFlavor?: string;
+  selectedIcing?: string;
+  selectedAddOns?: string[];
+  calculatedPrice?: number;
 }
 
 export function getCart(): CartItem[] {
@@ -23,35 +28,79 @@ export function saveCart(cart: CartItem[]) {
   window.dispatchEvent(new Event("cart-updated"));
 }
 
-export function addToCart(product: Product, quantity: number = 1, selectedVariant?: ProductVariant) {
+export function addToCart(
+  product: Product,
+  quantity: number = 1,
+  selectedVariant?: ProductVariant,
+  selectedSize?: string,
+  selectedFlavor?: string,
+  selectedIcing?: string,
+  selectedAddOns?: string[],
+  calculatedPrice?: number
+) {
   const cart = getCart();
   const existing = cart.find(
     (item) =>
       item.product.id === product.id &&
-      item.selectedVariant?.name === selectedVariant?.name
+      item.selectedVariant?.name === selectedVariant?.name &&
+      item.selectedSize === selectedSize &&
+      item.selectedFlavor === selectedFlavor &&
+      item.selectedIcing === selectedIcing &&
+      JSON.stringify(item.selectedAddOns) === JSON.stringify(selectedAddOns)
   );
   if (existing) {
     existing.quantity += quantity;
   } else {
-    cart.push({ product, quantity, selectedVariant });
+    cart.push({
+      product,
+      quantity,
+      selectedVariant,
+      selectedSize,
+      selectedFlavor,
+      selectedIcing,
+      selectedAddOns,
+      calculatedPrice,
+    });
   }
   saveCart(cart);
 }
 
-export function removeFromCart(productId: string, selectedVariantName?: string) {
+export function removeFromCart(
+  productId: string,
+  selectedVariantName?: string,
+  selectedSize?: string,
+  selectedFlavor?: string,
+  selectedIcing?: string
+) {
   const cart = getCart().filter(
     (item) =>
-      !(item.product.id === productId && item.selectedVariant?.name === selectedVariantName)
+      !(
+        item.product.id === productId &&
+        item.selectedVariant?.name === selectedVariantName &&
+        item.selectedSize === selectedSize &&
+        item.selectedFlavor === selectedFlavor &&
+        item.selectedIcing === selectedIcing
+      )
   );
   saveCart(cart);
 }
 
-export function updateCartQuantity(productId: string, selectedVariantName: string | undefined, quantity: number) {
+export function updateCartQuantity(
+  productId: string,
+  selectedVariantName: string | undefined,
+  quantity: number,
+  selectedSize?: string,
+  selectedFlavor?: string,
+  selectedIcing?: string
+) {
   const cart = getCart();
   const item = cart.find(
     (i) =>
       i.product.id === productId &&
-      i.selectedVariant?.name === selectedVariantName
+      i.selectedVariant?.name === selectedVariantName &&
+      i.selectedSize === selectedSize &&
+      i.selectedFlavor === selectedFlavor &&
+      i.selectedIcing === selectedIcing
   );
   if (item) {
     item.quantity = Math.max(1, quantity);

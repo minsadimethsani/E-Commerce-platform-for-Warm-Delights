@@ -4,6 +4,12 @@ export interface ProductVariant {
   isAvailable?: boolean;
 }
 
+export interface ProductSize {
+  name: string;
+  price: number;
+  priceMultiplier?: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -17,6 +23,9 @@ export interface Product {
   videoUrl?: string;
   isAvailable?: boolean;
   variants?: ProductVariant[];
+  sizes?: ProductSize[];
+  flavors?: string[];
+  icings?: string[];
 }
 
 export const products: Product[] = [

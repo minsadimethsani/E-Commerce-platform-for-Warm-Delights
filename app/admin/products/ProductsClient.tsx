@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Product } from "@/data/products";
-import { doc, setDoc, deleteDoc, Timestamp, collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, Timestamp, collection, query, orderBy, onSnapshot, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 import { Category } from "@/lib/categories";
 import { Badge } from "@/lib/badges";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProductsClientProps {
   initialProducts: Product[];
@@ -19,7 +20,10 @@ export default function ProductsClient({
   categoriesList,
   badgesList,
 }: ProductsClientProps) {
+  const { setIsMutating } = useAuth();
   const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -87,6 +91,18 @@ export default function ProductsClient({
   const [variants, setVariants] = useState<{ name: string; price: number; isAvailable?: boolean }[]>([]);
   const [newVariantName, setNewVariantName] = useState("");
   const [newVariantPrice, setNewVariantPrice] = useState("");
+
+  // Consolidated Multi-variant states
+  const [sizes, setSizes] = useState<{ name: string; price: number; priceMultiplier?: number }[]>([]);
+  const [newSizeName, setNewSizeName] = useState("");
+  const [newSizePrice, setNewSizePrice] = useState("");
+  const [newSizeMultiplier, setNewSizeMultiplier] = useState("");
+
+  const [flavors, setFlavors] = useState<string[]>([]);
+  const [newFlavor, setNewFlavor] = useState("");
+
+  const [icings, setIcings] = useState<string[]>([]);
+  const [newIcing, setNewIcing] = useState("");
 
   // Multiple compressed images state
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -184,6 +200,17 @@ export default function ProductsClient({
     setVariants([]);
     setNewVariantName("");
     setNewVariantPrice("");
+    
+    // Clear dynamic variations
+    setSizes([]);
+    setNewSizeName("");
+    setNewSizePrice("");
+    setNewSizeMultiplier("");
+    setFlavors([]);
+    setNewFlavor("");
+    setIcings([]);
+    setNewIcing("");
+    
     setIsFormOpen(true);
   };
 
@@ -201,6 +228,17 @@ export default function ProductsClient({
     setVariants((p as any).variants || []);
     setNewVariantName("");
     setNewVariantPrice("");
+    
+    // Populate dynamic variations
+    setSizes((p as any).sizes || []);
+    setNewSizeName("");
+    setNewSizePrice("");
+    setNewSizeMultiplier("");
+    setFlavors((p as any).flavors || []);
+    setNewFlavor("");
+    setIcings((p as any).icings || []);
+    setNewIcing("");
+    
     setIsFormOpen(true);
   };
 
@@ -209,6 +247,7 @@ export default function ProductsClient({
       return;
     }
 
+    setIsMutating(true);
     try {
       await deleteDoc(doc(db, "products", id));
       setProducts((prev) => prev.filter((p) => p.id !== id));
@@ -216,6 +255,40 @@ export default function ProductsClient({
     } catch (error) {
       console.error("Error deleting product from Firestore:", error);
       alert("Error: Database permission denied or network failure.");
+    } finally {
+      setIsMutating(false);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedProductIds.length === 0) return;
+
+    if (!confirm(`Are you sure you want to delete the ${selectedProductIds.length} selected products? This action cannot be undone.`)) {
+      return;
+    }
+
+    setIsUpdating(true);
+    setIsMutating(true);
+    try {
+      const batch = writeBatch(db);
+      selectedProductIds.forEach((id) => {
+        const docRef = doc(db, "products", id);
+        batch.delete(docRef);
+      });
+      await batch.commit();
+
+      // Clear the local product list display array from deleted items
+      setProducts((prev) => prev.filter((p) => !selectedProductIds.includes(p.id)));
+
+      // Empty the selection array
+      setSelectedProductIds([]);
+      console.log("Bulk deletion completed successfully.");
+    } catch (error) {
+      console.error("Error bulk deleting products from Firestore:", error);
+      alert("Error: Missing database write permissions or network failure during bulk delete.");
+    } finally {
+      setIsUpdating(false);
+      setIsMutating(false);
     }
   };
 
@@ -227,11 +300,13 @@ export default function ProductsClient({
     }
 
     setIsSaving(true);
+    setIsMutating(true);
     try {
       const parsedPrice = parseFloat(price);
       if (isNaN(parsedPrice)) {
         alert("Invalid price value.");
         setIsSaving(false);
+        setIsMutating(false);
         return;
       }
 
@@ -293,6 +368,9 @@ export default function ProductsClient({
         careInstructions,
         videoUrl: videoUrl.trim(),
         variants: variants,
+        sizes: sizes,
+        flavors: flavors,
+        icings: icings,
         updatedAt: Timestamp.now(),
       } as any;
 
@@ -316,6 +394,9 @@ export default function ProductsClient({
         reviewsCount: savePayload.reviewsCount,
         images: savePayload.images,
         variants: savePayload.variants,
+        sizes: savePayload.sizes,
+        flavors: savePayload.flavors,
+        icings: savePayload.icings,
         videoUrl: savePayload.videoUrl,
       } as any;
 
@@ -332,6 +413,7 @@ export default function ProductsClient({
       alert("Error: Database write permission denied or network failure.");
     } finally {
       setIsSaving(false);
+      setIsMutating(false);
     }
   };
 
@@ -340,6 +422,23 @@ export default function ProductsClient({
       
       {/* Products Table (Left Column) */}
       <div className="flex-1 w-full space-y-4">
+
+        {/* Contextual Action Bar for Bulk Deletion */}
+        {selectedProductIds.length > 0 && (
+          <div className="flex items-center justify-between bg-rose-50 border border-rose-250 rounded-2xl px-6 py-4 transition-all duration-300 shadow-xs">
+            <div className="flex items-center space-x-2 text-rose-800 text-xs font-bold uppercase tracking-wider">
+              <span>⚠️</span>
+              <span>{selectedProductIds.length} {selectedProductIds.length === 1 ? "Product" : "Products"} Selected</span>
+            </div>
+            <button
+              onClick={handleBulkDelete}
+              disabled={isUpdating}
+              className="bg-rose-600 text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-50 shadow-sm"
+            >
+              {isUpdating ? "Deleting..." : "Delete Selected"}
+            </button>
+          </div>
+        )}
         
         {/* Table header control panel */}
         <div className="flex items-center justify-between pb-2">
@@ -348,7 +447,8 @@ export default function ProductsClient({
           </div>
           <button
             onClick={openAddForm}
-            className="flex items-center space-x-2 bg-[#2A1E17] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer shadow-xs"
+            disabled={isUpdating}
+            className="flex items-center space-x-2 bg-[#2A1E17] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer shadow-xs disabled:opacity-50"
           >
             <span>Add Product</span>
           </button>
@@ -360,9 +460,25 @@ export default function ProductsClient({
             <table className="min-w-full divide-y divide-[#2A1E17]/5">
               <thead className="bg-[#EFEFEA]">
                 <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60 w-12">
+                    <input
+                      type="checkbox"
+                      disabled={isUpdating}
+                      checked={products.length > 0 && selectedProductIds.length === products.length}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProductIds(products.map((p) => p.id));
+                        } else {
+                          setSelectedProductIds([]);
+                        }
+                      }}
+                      className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Product</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Category</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Price</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Available Variations</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Rating</th>
                   <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
                 </tr>
@@ -370,6 +486,21 @@ export default function ProductsClient({
               <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
                 {products.map((p) => (
                   <tr key={p.id} className="hover:bg-[#EFEFEA]/30 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap w-12">
+                      <input
+                        type="checkbox"
+                        disabled={isUpdating}
+                        checked={selectedProductIds.includes(p.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProductIds((prev) => [...prev, p.id]);
+                          } else {
+                            setSelectedProductIds((prev) => prev.filter((id) => id !== p.id));
+                          }
+                        }}
+                        className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                      />
+                    </td>
                     {/* Image & Title */}
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center space-x-3">
@@ -396,6 +527,36 @@ export default function ProductsClient({
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
                       Rs. {p.price.toFixed(2)}
                     </td>
+                    {/* Available Variations Column */}
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col space-y-1 max-w-[200px]">
+                        {/* Sizes */}
+                        {p.sizes && p.sizes.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
+                            {p.sizes.map((s: any) => (
+                              <span key={s.name} className="inline-block bg-[#EFEFEA] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
+                                {s.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {/* Flavors */}
+                        {p.flavors && p.flavors.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Flavors:</span>
+                            {p.flavors.map((f: string) => (
+                              <span key={f} className="inline-block bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#C5A880]/10">
+                                {f}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {(!p.sizes || p.sizes.length === 0) && (!p.flavors || p.flavors.length === 0) && (
+                          <span className="text-[10px] text-[#3A2E2B]/40 italic">None</span>
+                        )}
+                      </div>
+                    </td>
                     {/* Rating */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-amber-500">
                       ⭐ {p.rating.toFixed(1)} ({p.reviewsCount})
@@ -404,8 +565,9 @@ export default function ProductsClient({
                     <td className="whitespace-nowrap px-6 py-4 text-right text-xs font-bold space-x-2">
                       <button
                         onClick={() => openEditForm(p)}
+                        disabled={isUpdating}
                         aria-label="Edit product details"
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C5A880] hover:bg-[#EFEFEA] hover:text-[#2A1E17] transition-colors cursor-pointer"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C5A880] hover:bg-[#EFEFEA] hover:text-[#2A1E17] transition-colors cursor-pointer disabled:opacity-30"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 20.04a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
@@ -413,8 +575,9 @@ export default function ProductsClient({
                       </button>
                       <button
                         onClick={() => handleDelete(p.id)}
+                        disabled={isUpdating}
                         aria-label="Delete product"
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors cursor-pointer"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 hover:text-rose-800 transition-colors cursor-pointer disabled:opacity-30"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -461,7 +624,7 @@ export default function ProductsClient({
             <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2A1E17]/5 p-8 sm:p-10 shadow-sm">
               <form onSubmit={handleSave} className="space-y-6">
               
-              {/* Name Input */}
+              {/* 1. Name Input */}
               <div className="space-y-1.5">
                 <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Product Name *
@@ -477,25 +640,7 @@ export default function ProductsClient({
                 />
               </div>
 
-              {/* Price Input */}
-              <div className="space-y-1.5">
-                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Price (Rs.) *
-                </label>
-                <input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="12.50"
-                  required
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
-                />
-              </div>
-
-              {/* Category Dropdown */}
+              {/* 2. Category Dropdown */}
               <div className="space-y-1.5">
                 <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Category *
@@ -517,7 +662,7 @@ export default function ProductsClient({
                 </select>
               </div>
 
-              {/* Subcategory Dropdown (if active category has subcategories) */}
+              {/* 3. Subcategory Dropdown (if active category has subcategories) */}
               {(() => {
                 const selectedCatObj = categories.find(
                   (c) => c.name.toLowerCase() === category.toLowerCase()
@@ -546,7 +691,256 @@ export default function ProductsClient({
                 );
               })()}
 
-              {/* Badge Dropdown */}
+              {/* 4. Product Variations (Size, Flavor, Icing) */}
+              <div className="space-y-4 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
+                <div>
+                  <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variations</h4>
+                  <p className="text-[10px] text-[#3A2E2B]/75">Configure multi-layered variants (sizes, flavors, icings) for this product.</p>
+                </div>
+
+                {/* A. Size Variations */}
+                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Size / Weight Variations
+                  </span>
+                  
+                  {sizes.length === 0 ? (
+                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      No sizes configured. Default base price will be used.
+                    </p>
+                  ) : (
+                    <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                      {sizes.map((s, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
+                          <span className="font-semibold">{s.name}</span>
+                          <div className="flex items-center space-x-4">
+                            <span className="text-[#3A2E2B]/85 font-medium">
+                              Rs. {s.price.toFixed(2)} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setSizes((prev) => prev.filter((_, i) => i !== idx))}
+                              className="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Add Size Input fields */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <input
+                      type="text"
+                      placeholder="e.g. 500g, 1kg"
+                      value={newSizeName}
+                      onChange={(e) => {
+                        setNewSizeName(e.target.value);
+                        setIsMutating(true);
+                      }}
+                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="Price"
+                      value={newSizePrice}
+                      onChange={(e) => {
+                        setNewSizePrice(e.target.value);
+                        setIsMutating(true);
+                      }}
+                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-20"
+                    />
+                    <input
+                      type="number"
+                      step="0.1"
+                      placeholder="Mult"
+                      value={newSizeMultiplier}
+                      onChange={(e) => {
+                        setNewSizeMultiplier(e.target.value);
+                        setIsMutating(true);
+                      }}
+                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-16"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!newSizeName.trim() || !newSizePrice) {
+                          alert("Please fill in size name and price.");
+                          return;
+                        }
+                        const priceVal = parseFloat(newSizePrice);
+                        const multVal = newSizeMultiplier ? parseFloat(newSizeMultiplier) : undefined;
+                        if (isNaN(priceVal) || priceVal < 0) {
+                          alert("Invalid price.");
+                          return;
+                        }
+                        setSizes((prev) => [
+                          ...prev,
+                          { name: newSizeName.trim(), price: priceVal, priceMultiplier: multVal }
+                        ]);
+                        setNewSizeName("");
+                        setNewSizePrice("");
+                        setNewSizeMultiplier("");
+                        setIsMutating(false);
+                      }}
+                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* B. Flavor Variations */}
+                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Flavor Variations
+                  </span>
+                  
+                  {flavors.length === 0 ? (
+                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      No flavors configured.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                      {flavors.map((f, idx) => (
+                        <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                          <span>{f}</span>
+                          <button
+                            type="button"
+                            onClick={() => setFlavors((prev) => prev.filter((_, i) => i !== idx))}
+                            className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. Vanilla Bean, Red Velvet"
+                      value={newFlavor}
+                      onChange={(e) => {
+                        setNewFlavor(e.target.value);
+                        setIsMutating(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (newFlavor.trim()) {
+                            setFlavors((prev) => [...prev, newFlavor.trim()]);
+                            setNewFlavor("");
+                            setIsMutating(false);
+                          }
+                        }
+                      }}
+                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newFlavor.trim()) {
+                          setFlavors((prev) => [...prev, newFlavor.trim()]);
+                          setNewFlavor("");
+                          setIsMutating(false);
+                        }
+                      }}
+                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+
+                {/* C. Icing Variations */}
+                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Icing Variations
+                  </span>
+                  
+                  {icings.length === 0 ? (
+                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      No icings configured.
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                      {icings.map((ic, idx) => (
+                        <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                          <span>{ic}</span>
+                          <button
+                            type="button"
+                            onClick={() => setIcings((prev) => prev.filter((_, i) => i !== idx))}
+                            className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. Buttercream, Fondant"
+                      value={newIcing}
+                      onChange={(e) => {
+                        setNewIcing(e.target.value);
+                        setIsMutating(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (newIcing.trim()) {
+                            setIcings((prev) => [...prev, newIcing.trim()]);
+                            setNewIcing("");
+                            setIsMutating(false);
+                          }
+                        }
+                      }}
+                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newIcing.trim()) {
+                          setIcings((prev) => [...prev, newIcing.trim()]);
+                          setNewIcing("");
+                          setIsMutating(false);
+                        }
+                      }}
+                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. Base Price Input */}
+              <div className="space-y-1.5">
+                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  Price (Rs.) *
+                </label>
+                <input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="12.50"
+                  required
+                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                />
+              </div>
+
+              {/* 6. Badge Dropdown */}
               <div className="space-y-1.5">
                 <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Badge / Promo Tag
@@ -564,7 +958,9 @@ export default function ProductsClient({
                     </option>
                   ))}
                 </select>
-              </div>              {/* Reel Video File Upload & Preview */}
+              </div>
+
+              {/* 7. Reel Video File Upload & Preview */}
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
@@ -610,9 +1006,9 @@ export default function ProductsClient({
                 )}
               </div>
 
-              {/* Image Upload & Selection */}
+              {/* 8. Image Upload & Selection */}
               <div className="space-y-3">
-                {/* 1. Upload Photos */}
+                {/* Upload Photos */}
                 <div className="space-y-1.5">
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                     Upload Photos (WebP Auto-Compressed)
@@ -631,7 +1027,7 @@ export default function ProductsClient({
                   )}
                 </div>
 
-                {/* 2. Uploaded Preview Thumbnails */}
+                {/* Uploaded Preview Thumbnails */}
                 {uploadedImages.length > 0 && (
                   <div className="space-y-1.5">
                     <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
@@ -654,38 +1050,60 @@ export default function ProductsClient({
                   </div>
                 )}
 
-                {/* 3. Primary/Placeholder Selection */}
+                {/* Primary/Placeholder Selection (Visual Thumbnails List) */}
                 <div className="space-y-1.5">
-                  <label htmlFor="image" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                     Primary / Cover Photo Select
                   </label>
-                  <select
-                    id="image"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
-                  >
-                    {/* Dynamically list uploaded custom images as options */}
-                    {uploadedImages.map((imgUrl, idx) => (
-                      <option key={idx} value={imgUrl}>
-                        Uploaded Image {idx + 1}
-                      </option>
-                    ))}
-                    {/* Separator line if uploads exist */}
-                    {uploadedImages.length > 0 && (
-                      <option disabled>────────── Preset Placeholders ──────────</option>
-                    )}
-                    {/* Default Preset Placeholders */}
-                    <option value="/hero_bakery.png">Chocolate Cake (/hero_bakery.png)</option>
-                    <option value="/category_cakes.png">Strawberry Gateau (/category_cakes.png)</option>
-                    <option value="/category_savories.png">Savory Quiche (/category_savories.png)</option>
-                    <option value="/category_custom.png">Custom Wedding (/category_custom.png)</option>
-                    <option value="/about_bakery.png">Hamper / Ingredients (/about_bakery.png)</option>
-                  </select>
+                  <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
+                    {[
+                      ...uploadedImages,
+                      "/hero_bakery.png",
+                      "/category_cakes.png",
+                      "/category_savories.png",
+                      "/category_custom.png",
+                      "/about_bakery.png"
+                    ].map((imgUrl, idx) => {
+                      const isSelected = image === imgUrl;
+                      const isPlaceholder = !uploadedImages.includes(imgUrl);
+                      
+                      let label = `Uploaded Photo ${uploadedImages.indexOf(imgUrl) + 1}`;
+                      if (isPlaceholder) {
+                        if (imgUrl.includes("hero")) label = "Chocolate Cake Placeholder";
+                        else if (imgUrl.includes("cakes")) label = "Strawberry Gateau Placeholder";
+                        else if (imgUrl.includes("savories")) label = "Savory Quiche Placeholder";
+                        else if (imgUrl.includes("custom")) label = "Custom Wedding Placeholder";
+                        else label = "Ingredients Hamper Placeholder";
+                      }
+
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setImage(imgUrl)}
+                          title={label}
+                          className={`relative h-14 w-14 rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                            isSelected 
+                              ? "border-[#C5A880] ring-2 ring-[#C5A880]/50" 
+                              : "border-[#2A1E17]/10 hover:border-[#C5A880]/50"
+                          }`}
+                        >
+                          <img src={imgUrl} alt={label} className="h-full w-full object-cover" />
+                          {isSelected && (
+                            <div className="absolute inset-0 bg-[#2A1E17]/35 flex items-center justify-center">
+                              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              {/* Description Textarea */}
+              {/* 9. Description Textarea */}
               <div className="space-y-1.5">
                 <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                   Description *
@@ -699,81 +1117,6 @@ export default function ProductsClient({
                   required
                   className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
                 />
-              </div>
-
-              {/* Variants Section */}
-              <div className="space-y-3 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
-                <div>
-                  <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variants (Optional)</h4>
-                  <p className="text-[10px] text-[#3A2E2B]/75">Add weight options, sizes, or flavors with custom pricing (e.g. 500g, 1kg).</p>
-                </div>
-
-                {variants.length === 0 ? (
-                  <p className="text-[10px] text-[#3A2E2B]/55 italic bg-[#FBFBF9] p-2.5 rounded-lg border border-[#2A1E17]/5">
-                    No variants added. Product will use the base price.
-                  </p>
-                ) : (
-                  <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
-                    {variants.map((v, idx) => (
-                      <div key={idx} className="flex items-center justify-between bg-white p-2.5 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
-                        <span className="font-semibold">{v.name}</span>
-                        <div className="flex items-center space-x-4">
-                          <span className="text-[#3A2E2B]/85 font-medium">Rs. {v.price.toFixed(2)}</span>
-                          <button
-                            type="button"
-                            onClick={() => setVariants((prev) => prev.filter((_, i) => i !== idx))}
-                            className="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add Variant Form */}
-                <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div className="space-y-1">
-                    <input
-                      type="text"
-                      placeholder="e.g. 500g"
-                      value={newVariantName}
-                      onChange={(e) => setNewVariantName(e.target.value)}
-                      className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
-                    />
-                  </div>
-                  <div className="flex space-x-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="e.g. 38.00"
-                      value={newVariantPrice}
-                      onChange={(e) => setNewVariantPrice(e.target.value)}
-                      className="bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!newVariantName.trim() || !newVariantPrice) {
-                          alert("Please fill in both variant name and price.");
-                          return;
-                        }
-                        const priceVal = parseFloat(newVariantPrice);
-                        if (isNaN(priceVal) || priceVal < 0) {
-                          alert("Invalid variant price.");
-                          return;
-                        }
-                        setVariants((prev) => [...prev, { name: newVariantName.trim(), price: priceVal, isAvailable: true }]);
-                        setNewVariantName("");
-                        setNewVariantPrice("");
-                      }}
-                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {/* Actions row */}

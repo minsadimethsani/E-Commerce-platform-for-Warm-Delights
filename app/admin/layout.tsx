@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: DashboardIcon },
@@ -17,7 +18,28 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, userProfile, logout, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.replace("/login?redirect=%2Fadmin");
+      } else if (userProfile?.role !== "admin") {
+        router.replace("/");
+      }
+    }
+  }, [user, userProfile, loading, router]);
+
+  if (loading || !user || userProfile?.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-[#FBFBF9] flex flex-col items-center justify-center space-y-4">
+        <span className="inline-block h-10 w-10 border-4 border-[#C5A880] border-t-transparent rounded-full animate-spin"></span>
+        <p className="text-xs font-bold uppercase tracking-widest text-[#2A1E17]/60 animate-pulse">Verifying credentials...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FBFBF9] flex flex-col lg:flex-row">
@@ -54,7 +76,7 @@ export default function AdminLayout({
         </nav>
 
         {/* Footer actions in sidebar */}
-        <div className="p-4 border-t border-[#FBFBF9]/10">
+        <div className="p-4 border-t border-[#FBFBF9]/10 space-y-3">
           <Link
             href="/"
             className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold tracking-wide text-[#FBFBF9]/70 hover:bg-white/5 hover:text-white transition-all"
@@ -62,6 +84,32 @@ export default function AdminLayout({
             <StorefrontIcon className="h-5 w-5 text-[#FBFBF9]/50" />
             <span>Storefront</span>
           </Link>
+
+          {/* Admin User Card (Bottom Left Corner) */}
+          {user && (
+            <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3 mt-2">
+              <div className="flex items-center space-x-2.5 min-w-0">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#C5A880] text-[#2A1E17] font-bold text-sm">
+                  {userProfile?.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "A"}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-bold text-white truncate">
+                    {userProfile?.displayName || "Admin User"}
+                  </span>
+                  <span className="text-[10px] text-[#FBFBF9]/50 truncate">
+                    {user.email}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign Out"
+                className="p-1.5 text-[#FBFBF9]/50 hover:text-rose-400 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
+              >
+                <LogoutIcon className="h-4.5 w-4.5" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -132,7 +180,7 @@ export default function AdminLayout({
               })}
             </nav>
 
-            <div className="mt-auto border-t border-white/10 pt-4">
+            <div className="mt-auto border-t border-white/10 pt-4 space-y-3">
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -141,6 +189,34 @@ export default function AdminLayout({
                 <StorefrontIcon className="h-5 w-5" />
                 <span>Storefront</span>
               </Link>
+
+              {user && (
+                <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
+                  <div className="flex items-center space-x-2.5 min-w-0">
+                    <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#C5A880] text-[#2A1E17] font-bold text-sm">
+                      {userProfile?.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "A"}
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-bold text-white truncate">
+                        {userProfile?.displayName || "Admin User"}
+                      </span>
+                      <span className="text-[10px] text-[#FBFBF9]/50 truncate font-mono">
+                        {user.email}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      setMobileMenuOpen(false);
+                      await logout();
+                    }}
+                    title="Sign Out"
+                    className="p-1.5 text-[#FBFBF9]/50 hover:text-rose-450 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
+                  >
+                    <LogoutIcon className="h-4.5 w-4.5" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -193,6 +269,14 @@ function CategoriesIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.659A2.25 2.25 0 0 0 9.568 3Z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+    </svg>
+  );
+}
+
+function LogoutIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
     </svg>
   );
 }

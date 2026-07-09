@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Order } from "@/types/database";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 interface OrdersTableProps {
   initialOrders: Order[];
@@ -19,6 +20,7 @@ const statusOptions: Order["status"][] = [
 ];
 
 export default function OrdersTable({ initialOrders }: OrdersTableProps) {
+  const { setIsMutating } = useAuth();
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -26,6 +28,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
   // Update order status directly in Firestore
   const handleStatusChange = async (orderId: string, newStatus: Order["status"]) => {
     setUpdatingId(orderId);
+    setIsMutating(true);
     try {
       const docRef = doc(db, "orders", orderId);
       await updateDoc(docRef, {
@@ -47,6 +50,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
       alert("Error: Missing database permissions or network error.");
     } finally {
       setUpdatingId(null);
+      setIsMutating(false);
     }
   };
 
