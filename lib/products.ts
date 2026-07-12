@@ -57,6 +57,12 @@ export async function getAllProducts(): Promise<Product[]> {
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
         variants: data.variants || [],
+        sizes: data.sizes || [],
+        flavors: data.flavors || [],
+        icings: data.icings || [],
+        defaultSize: data.defaultSize || "",
+        defaultFlavor: data.defaultFlavor || "",
+        defaultIcing: data.defaultIcing || "",
       } as any);
     });
     return list;
@@ -93,6 +99,12 @@ export async function getProductById(id: string): Promise<Product | undefined> {
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
         variants: data.variants || [],
+        sizes: data.sizes || [],
+        flavors: data.flavors || [],
+        icings: data.icings || [],
+        defaultSize: data.defaultSize || "",
+        defaultFlavor: data.defaultFlavor || "",
+        defaultIcing: data.defaultIcing || "",
       } as any;
     }
     return undefined;
@@ -201,6 +213,12 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
         images: data.images || [],
         videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
         variants: data.variants || [],
+        sizes: data.sizes || [],
+        flavors: data.flavors || [],
+        icings: data.icings || [],
+        defaultSize: data.defaultSize || "",
+        defaultFlavor: data.defaultFlavor || "",
+        defaultIcing: data.defaultIcing || "",
       } as any);
     });
 

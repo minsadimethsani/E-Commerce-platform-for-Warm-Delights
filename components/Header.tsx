@@ -17,6 +17,11 @@ export default function Header() {
   // Interactive States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
+  // Refresh router on pathname change to pull latest Firestore data on storefront
+  useEffect(() => {
+    router.refresh();
+  }, [pathname, router]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);

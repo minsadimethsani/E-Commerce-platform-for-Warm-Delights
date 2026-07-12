@@ -21,7 +21,17 @@ export default function ProductsClient({
   badgesList,
 }: ProductsClientProps) {
   const { setIsMutating } = useAuth();
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  // Deduplicate initial products by id
+  const uniqueInitial = initialProducts.reduce((acc: Product[], current) => {
+    const x = acc.find(item => item.id === current.id);
+    if (!x) {
+      return acc.concat([current]);
+    } else {
+      return acc;
+    }
+  }, []);
+
+  const [products, setProducts] = useState<Product[]>(uniqueInitial);
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -36,7 +46,7 @@ export default function ProductsClient({
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         list.push({
-          id: data.id,
+          id: data.id || docSnap.id,
           name: data.name,
           description: data.description,
           price: data.price,
@@ -51,9 +61,26 @@ export default function ProductsClient({
           images: data.images || [],
           videoUrl: data.videoUrl || "",
           variants: data.variants || [],
+          sizes: data.sizes || [],
+          flavors: data.flavors || [],
+          icings: data.icings || [],
+          defaultSize: data.defaultSize || "",
+          defaultFlavor: data.defaultFlavor || "",
+          defaultIcing: data.defaultIcing || "",
         } as any);
       });
-      setProducts(list);
+
+      // Deduplicate on live snapshot updates
+      const uniqueList = list.reduce((acc: Product[], current) => {
+        const x = acc.find(item => item.id === current.id);
+        if (!x) {
+          return acc.concat([current]);
+        } else {
+          return acc;
+        }
+      }, []);
+
+      setProducts(uniqueList);
     }, (error) => {
       console.error("Firestore onSnapshot failed:", error);
     });
@@ -96,13 +123,18 @@ export default function ProductsClient({
   const [sizes, setSizes] = useState<{ name: string; price: number; priceMultiplier?: number }[]>([]);
   const [newSizeName, setNewSizeName] = useState("");
   const [newSizePrice, setNewSizePrice] = useState("");
-  const [newSizeMultiplier, setNewSizeMultiplier] = useState("");
 
-  const [flavors, setFlavors] = useState<string[]>([]);
+  const [flavors, setFlavors] = useState<{ name: string; price: number }[]>([]);
   const [newFlavor, setNewFlavor] = useState("");
+  const [newFlavorPrice, setNewFlavorPrice] = useState("");
 
-  const [icings, setIcings] = useState<string[]>([]);
+  const [icings, setIcings] = useState<{ name: string; price: number }[]>([]);
   const [newIcing, setNewIcing] = useState("");
+  const [newIcingPrice, setNewIcingPrice] = useState("");
+
+  const [defaultSize, setDefaultSize] = useState("");
+  const [defaultFlavor, setDefaultFlavor] = useState("");
+  const [defaultIcing, setDefaultIcing] = useState("");
 
   // Multiple compressed images state
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
@@ -150,14 +182,30 @@ export default function ProductsClient({
     });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     setIsCompressing(true);
     const files = Array.from(e.target.files);
-    
+
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+    const videoFiles = files.filter((file) => file.type.startsWith("video/"));
+
+    if (videoFiles.length > 0) {
+      const videoFile = videoFiles[0];
+      if (videoFile.size > 2 * 1024 * 1024) {
+        alert("Video file size exceeds 2MB limit. Please upload a smaller video.");
+      } else {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setVideoUrl(event.target?.result as string);
+        };
+        reader.readAsDataURL(videoFile);
+      }
+    }
+
     try {
       const compressedList: string[] = [];
-      for (const file of files) {
+      for (const file of imageFiles) {
         const compressed = await compressImage(file);
         compressedList.push(compressed);
       }
@@ -200,17 +248,22 @@ export default function ProductsClient({
     setVariants([]);
     setNewVariantName("");
     setNewVariantPrice("");
-    
+
     // Clear dynamic variations
     setSizes([]);
     setNewSizeName("");
     setNewSizePrice("");
-    setNewSizeMultiplier("");
     setFlavors([]);
     setNewFlavor("");
+    setNewFlavorPrice("");
     setIcings([]);
     setNewIcing("");
-    
+    setNewIcingPrice("");
+
+    setDefaultSize("");
+    setDefaultFlavor("");
+    setDefaultIcing("");
+
     setIsFormOpen(true);
   };
 
@@ -228,17 +281,35 @@ export default function ProductsClient({
     setVariants((p as any).variants || []);
     setNewVariantName("");
     setNewVariantPrice("");
-    
-    // Populate dynamic variations
-    setSizes((p as any).sizes || []);
+
+    const defaultSz = (p as any).defaultSize || "";
+    const defaultFl = (p as any).defaultFlavor || "";
+    const defaultIc = (p as any).defaultIcing || "";
+
+    setDefaultSize(defaultSz);
+    setDefaultFlavor(defaultFl);
+    setDefaultIcing(defaultIc);
+
+    // Populate dynamic variations (filtering out defaults)
+    const rawSizes = (p as any).sizes || [];
+    setSizes(rawSizes.filter((s: any) => s.name !== defaultSz));
     setNewSizeName("");
     setNewSizePrice("");
-    setNewSizeMultiplier("");
-    setFlavors((p as any).flavors || []);
+
+    const loadedFlavors = ((p as any).flavors || []).map((f: any) => 
+      typeof f === "string" ? { name: f, price: 0 } : f
+    );
+    setFlavors(loadedFlavors.filter((f: any) => f.name !== defaultFl));
     setNewFlavor("");
-    setIcings((p as any).icings || []);
+    setNewFlavorPrice("");
+
+    const loadedIcings = ((p as any).icings || []).map((ic: any) => 
+      typeof ic === "string" ? { name: ic, price: 0 } : ic
+    );
+    setIcings(loadedIcings.filter((ic: any) => ic.name !== defaultIc));
     setNewIcing("");
-    
+    setNewIcingPrice("");
+
     setIsFormOpen(true);
   };
 
@@ -350,6 +421,22 @@ export default function ProductsClient({
 
       const finalImage = image;
 
+      // Prepend defaults with price 0 if they are specified
+      const finalSizes = [...sizes];
+      if (defaultSize.trim() && !sizes.some(s => s.name === defaultSize.trim())) {
+        finalSizes.unshift({ name: defaultSize.trim(), price: 0 });
+      }
+
+      const finalFlavors = [...flavors];
+      if (defaultFlavor.trim() && !flavors.some(f => f.name === defaultFlavor.trim())) {
+        finalFlavors.unshift({ name: defaultFlavor.trim(), price: 0 });
+      }
+
+      const finalIcings = [...icings];
+      if (defaultIcing.trim() && !icings.some(ic => ic.name === defaultIcing.trim())) {
+        finalIcings.unshift({ name: defaultIcing.trim(), price: 0 });
+      }
+
       const savePayload = {
         id,
         name: name.trim(),
@@ -368,9 +455,12 @@ export default function ProductsClient({
         careInstructions,
         videoUrl: videoUrl.trim(),
         variants: variants,
-        sizes: sizes,
-        flavors: flavors,
-        icings: icings,
+        sizes: finalSizes,
+        flavors: finalFlavors,
+        icings: finalIcings,
+        defaultSize: defaultSize.trim() || "",
+        defaultFlavor: defaultFlavor.trim() || "",
+        defaultIcing: defaultIcing.trim() || "",
         updatedAt: Timestamp.now(),
       } as any;
 
@@ -381,7 +471,7 @@ export default function ProductsClient({
       await setDoc(doc(db, "products", id), savePayload);
 
       // Map to state array
-      const savedProduct: Product & { images?: string[]; subcategory?: string } = {
+      const savedProduct: Product & { images?: string[]; subcategory?: string; defaultSize?: string; defaultFlavor?: string; defaultIcing?: string } = {
         id,
         name: savePayload.name,
         description: savePayload.description,
@@ -397,13 +487,21 @@ export default function ProductsClient({
         sizes: savePayload.sizes,
         flavors: savePayload.flavors,
         icings: savePayload.icings,
+        defaultSize: savePayload.defaultSize || "",
+        defaultFlavor: savePayload.defaultFlavor || "",
+        defaultIcing: savePayload.defaultIcing || "",
         videoUrl: savePayload.videoUrl,
       } as any;
 
       if (editingProduct) {
         setProducts((prev) => prev.map((p) => (p.id === id ? savedProduct : p)));
       } else {
-        setProducts((prev) => [...prev, savedProduct]);
+        setProducts((prev) => {
+          if (prev.some((p) => p.id === id)) {
+            return prev.map((p) => (p.id === id ? savedProduct : p));
+          }
+          return [...prev, savedProduct];
+        });
       }
 
       setIsFormOpen(false);
@@ -419,7 +517,7 @@ export default function ProductsClient({
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 items-start">
-      
+
       {/* Products Table (Left Column) */}
       <div className="flex-1 w-full space-y-4">
 
@@ -439,7 +537,7 @@ export default function ProductsClient({
             </button>
           </div>
         )}
-        
+
         {/* Table header control panel */}
         <div className="flex items-center justify-between pb-2">
           <div className="text-xs font-semibold text-[#3A2E2B]/60 uppercase tracking-wider">
@@ -534,9 +632,9 @@ export default function ProductsClient({
                         {p.sizes && p.sizes.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
-                            {p.sizes.map((s: any) => (
-                              <span key={s.name} className="inline-block bg-[#EFEFEA] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
-                                {s.name}
+                            {p.sizes.map((s: any, idx: number) => (
+                              <span key={idx} className="inline-block bg-[#EFEFEA] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
+                                {s.name} {s.price > 0 ? `(+Rs.${s.price})` : ""}
                               </span>
                             ))}
                           </div>
@@ -545,14 +643,33 @@ export default function ProductsClient({
                         {p.flavors && p.flavors.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Flavors:</span>
-                            {p.flavors.map((f: string) => (
-                              <span key={f} className="inline-block bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#C5A880]/10">
-                                {f}
-                              </span>
-                            ))}
+                            {p.flavors.map((f: any, idx: number) => {
+                              const fName = typeof f === "string" ? f : f.name;
+                              const fPrice = typeof f === "string" ? 0 : f.price;
+                              return (
+                                <span key={idx} className="inline-block bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#C5A880]/10">
+                                  {fName} {fPrice > 0 ? `(+Rs.${fPrice})` : ""}
+                                </span>
+                              );
+                            })}
                           </div>
                         )}
-                        {(!p.sizes || p.sizes.length === 0) && (!p.flavors || p.flavors.length === 0) && (
+                        {/* Icings */}
+                        {(p as any).icings && (p as any).icings.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Icings:</span>
+                            {(p as any).icings.map((ic: any, idx: number) => {
+                              const icName = typeof ic === "string" ? ic : ic.name;
+                              const icPrice = typeof ic === "string" ? 0 : ic.price;
+                              return (
+                                <span key={idx} className="inline-block bg-[#2A1E17]/10 text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
+                                  {icName} {icPrice > 0 ? `(+Rs.${icPrice})` : ""}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                        {(!p.sizes || p.sizes.length === 0) && (!p.flavors || p.flavors.length === 0) && (!(p as any).icings || (p as any).icings.length === 0) && (
                           <span className="text-[10px] text-[#3A2E2B]/40 italic">None</span>
                         )}
                       </div>
@@ -606,7 +723,7 @@ export default function ProductsClient({
                 Warm Delights Inventory Manager
               </span>
             </div>
-            
+
             {/* Close Button */}
             <button
               onClick={() => setIsFormOpen(false)}
@@ -623,524 +740,508 @@ export default function ProductsClient({
           <div className="flex-1 py-10 px-4 sm:px-6">
             <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2A1E17]/5 p-8 sm:p-10 shadow-sm">
               <form onSubmit={handleSave} className="space-y-6">
-              
-              {/* 1. Name Input */}
-              <div className="space-y-1.5">
-                <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Product Name *
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Signature Focaccia"
-                  required
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
-                />
-              </div>
 
-              {/* 2. Category Dropdown */}
-              <div className="space-y-1.5">
-                <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    setSubcategory(""); // Reset subcategory when category changes
-                  }}
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 3. Subcategory Dropdown (if active category has subcategories) */}
-              {(() => {
-                const selectedCatObj = categories.find(
-                  (c) => c.name.toLowerCase() === category.toLowerCase()
-                );
-                const subcats = selectedCatObj ? selectedCatObj.subcategories : [];
-                if (subcats.length === 0) return null;
-                return (
-                  <div className="space-y-1.5">
-                    <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                      Subcategory
-                    </label>
-                    <select
-                      id="subcategory"
-                      value={subcategory}
-                      onChange={(e) => setSubcategory(e.target.value)}
-                      className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
-                    >
-                      <option value="">None</option>
-                      {subcats.map((sub) => (
-                        <option key={sub} value={sub}>
-                          {sub}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                );
-              })()}
-
-              {/* 4. Product Variations (Size, Flavor, Icing) */}
-              <div className="space-y-4 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
-                <div>
-                  <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variations</h4>
-                  <p className="text-[10px] text-[#3A2E2B]/75">Configure multi-layered variants (sizes, flavors, icings) for this product.</p>
+                {/* 1. Name Input */}
+                <div className="space-y-1.5">
+                  <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Product Name *
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Signature Focaccia"
+                    required
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                  />
                 </div>
 
-                {/* A. Size Variations */}
-                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Size / Weight Variations
-                  </span>
-                  
-                  {sizes.length === 0 ? (
-                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
-                      No sizes configured. Default base price will be used.
+                {/* 2. Category Dropdown */}
+                <div className="space-y-1.5">
+                  <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Category *
+                  </label>
+                  <select
+                    id="category"
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      setSubcategory(""); // Reset subcategory when category changes
+                    }}
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 3. Subcategory Dropdown (if active category has subcategories) */}
+                {(() => {
+                  const selectedCatObj = categories.find(
+                    (c) => c.name.toLowerCase() === category.toLowerCase()
+                  );
+                  const subcats = selectedCatObj ? selectedCatObj.subcategories : [];
+                  if (subcats.length === 0) return null;
+                  return (
+                    <div className="space-y-1.5">
+                      <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        Subcategory
+                      </label>
+                      <select
+                        id="subcategory"
+                        value={subcategory}
+                        onChange={(e) => setSubcategory(e.target.value)}
+                        className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                      >
+                        <option value="">None</option>
+                        {subcats.map((sub) => (
+                          <option key={sub} value={sub}>
+                            {sub}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                })()}
+
+                {/* 4. Product Variations (Size, Flavor, Icing) */}
+                <div className="space-y-4 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
+                  <div>
+                    <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variations</h4>
+                    <p className="text-[10px] text-[#3A2E2B]/75">Configure default baseline variants (covered by base price) and other dynamic variants with additional costs.</p>
+                  </div>
+
+                  {/* A. Default Selections (Manual Text Inputs) */}
+                  <div className="space-y-3 border-t border-[#2A1E17]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      Default Variant Selections (Base Price Baseline)
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                          Default Size/Weight
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. 500g"
+                          value={defaultSize}
+                          onChange={(e) => {
+                            setDefaultSize(e.target.value);
+                            setIsMutating(true);
+                          }}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                          Default Flavor
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Chocolate"
+                          value={defaultFlavor}
+                          onChange={(e) => {
+                            setDefaultFlavor(e.target.value);
+                            setIsMutating(true);
+                          }}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                          Default Icing
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Butter Icing"
+                          value={defaultIcing}
+                          onChange={(e) => {
+                            setDefaultIcing(e.target.value);
+                            setIsMutating(true);
+                          }}
+                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* B. Size Variations */}
+                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      Size / Weight Variations (Other than default)
+                    </span>
+
+                    {sizes.length === 0 ? (
+                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                        No additional sizes configured.
+                      </p>
+                    ) : (
+                      <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                        {sizes.map((s, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
+                            <span className="font-semibold">{s.name}</span>
+                            <div className="flex items-center space-x-4">
+                              <span className="text-[#3A2E2B]/85 font-medium">
+                                {s.price > 0 ? `+Rs. ${s.price.toFixed(2)}` : "Rs. 0.00"} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setSizes((prev) => prev.filter((_, i) => i !== idx))}
+                                className="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add Size Input fields */}
+                    <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                      <input
+                        type="text"
+                        placeholder="e.g. 1kg"
+                        value={newSizeName}
+                        onChange={(e) => {
+                          setNewSizeName(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Add Price"
+                        value={newSizePrice}
+                        onChange={(e) => {
+                          setNewSizePrice(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!newSizeName.trim()) {
+                            alert("Please fill in size name.");
+                            return;
+                          }
+                          const priceVal = newSizePrice ? parseFloat(newSizePrice) : 0;
+                          if (isNaN(priceVal) || priceVal < 0) {
+                            alert("Invalid price.");
+                            return;
+                          }
+                          setSizes((prev) => [
+                            ...prev,
+                            { name: newSizeName.trim(), price: priceVal }
+                          ]);
+                          setNewSizeName("");
+                          setNewSizePrice("");
+                          setIsMutating(false);
+                        }}
+                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* C. Flavor Variations */}
+                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      Flavor Variations (Other than default)
+                    </span>
+
+                    {flavors.length === 0 ? (
+                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                        No additional flavors configured.
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                        {flavors.map((f, idx) => {
+                          const fName = typeof f === "string" ? f : f.name;
+                          const fPrice = typeof f === "string" ? 0 : f.price;
+                          return (
+                            <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                              <span>{fName} {fPrice > 0 ? `(+Rs. ${fPrice})` : ""}</span>
+                              <button
+                                type="button"
+                                onClick={() => setFlavors((prev) => prev.filter((_, i) => i !== idx))}
+                                className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. Red Velvet"
+                        value={newFlavor}
+                        onChange={(e) => {
+                          setNewFlavor(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Add Price"
+                        value={newFlavorPrice}
+                        onChange={(e) => {
+                          setNewFlavorPrice(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-24"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newFlavor.trim()) {
+                            const pVal = newFlavorPrice ? parseFloat(newFlavorPrice) : 0;
+                            setFlavors((prev) => [
+                              ...prev,
+                              { name: newFlavor.trim(), price: isNaN(pVal) ? 0 : pVal }
+                            ]);
+                            setNewFlavor("");
+                            setNewFlavorPrice("");
+                            setIsMutating(false);
+                          }
+                        }}
+                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* D. Icing Variations */}
+                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      Icing Variations (Other than default)
+                    </span>
+
+                    {icings.length === 0 ? (
+                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                        No additional icings configured.
+                      </p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                        {icings.map((ic, idx) => {
+                          const icName = typeof ic === "string" ? ic : ic.name;
+                          const icPrice = typeof ic === "string" ? 0 : ic.price;
+                          return (
+                            <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                              <span>{icName} {icPrice > 0 ? `(+Rs. ${icPrice})` : ""}</span>
+                              <button
+                                type="button"
+                                onClick={() => setIcings((prev) => prev.filter((_, i) => i !== idx))}
+                                className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="e.g. Fondant"
+                        value={newIcing}
+                        onChange={(e) => {
+                          setNewIcing(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        placeholder="Add Price"
+                        value={newIcingPrice}
+                        onChange={(e) => {
+                          setNewIcingPrice(e.target.value);
+                          setIsMutating(true);
+                        }}
+                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-24"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (newIcing.trim()) {
+                            const pVal = newIcingPrice ? parseFloat(newIcingPrice) : 0;
+                            setIcings((prev) => [
+                              ...prev,
+                              { name: newIcing.trim(), price: isNaN(pVal) ? 0 : pVal }
+                            ]);
+                            setNewIcing("");
+                            setNewIcingPrice("");
+                            setIsMutating(false);
+                          }
+                        }}
+                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* 5. Base Price Input */}
+                <div className="space-y-1.5">
+                  <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Price (Rs.) *
+                  </label>
+                  <input
+                    id="price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="12.50"
+                    required
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                  />
+                </div>
+
+                {/* 6. Badge Dropdown */}
+                <div className="space-y-1.5">
+                  <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Badge / Promo Tag
+                  </label>
+                  <select
+                    id="badge"
+                    value={badge}
+                    onChange={(e) => setBadge(e.target.value)}
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                  >
+                    <option value="">No Badge / None</option>
+                    {badges.map((bg) => (
+                      <option key={bg.id} value={bg.name}>
+                        {bg.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* 7. Media (Photos & Videos) Upload & Selection */}
+                <div className="space-y-3">
+                  {/* Upload Photos & Videos */}
+                  <div className="space-y-1.5">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      Upload Photos & Videos
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,video/*"
+                      onChange={handleMediaUpload}
+                      className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                    />
+                    <p className="text-[9px] text-[#3A2E2B]/55">
+                      Photos will be WebP auto-compressed. Videos must be WebM/MP4, max 2MB.
                     </p>
-                  ) : (
-                    <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                      {sizes.map((s, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
-                          <span className="font-semibold">{s.name}</span>
-                          <div className="flex items-center space-x-4">
-                            <span className="text-[#3A2E2B]/85 font-medium">
-                              Rs. {s.price.toFixed(2)} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
+                    {isCompressing && (
+                      <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
+                        ⚡ Compressing and converting to WebP...
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Uploaded Preview Thumbnails */}
+                  {(uploadedImages.length > 0 || videoUrl) && (
+                    <div className="space-y-1.5">
+                      <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
+                        Uploaded Media ({uploadedImages.length + (videoUrl ? 1 : 0)})
+                      </span>
+                      <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
+                        {videoUrl && (
+                          <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group bg-black">
+                            <video src={videoUrl} className="h-full w-full object-cover" muted playsInline />
+                            <span className="absolute top-0.5 right-0.5 bg-black/60 rounded px-1 text-[7px] text-white font-bold uppercase tracking-wider">
+                              Video
                             </span>
                             <button
                               type="button"
-                              onClick={() => setSizes((prev) => prev.filter((_, i) => i !== idx))}
-                              className="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer"
+                              onClick={() => setVideoUrl("")}
+                              className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
                             >
                               Remove
                             </button>
                           </div>
-                        </div>
-                      ))}
+                        )}
+                        {uploadedImages.map((imgUrl, idx) => (
+                          <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group">
+                            <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => removeUploadedImage(idx)}
+                              className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
-
-                  {/* Add Size Input fields */}
-                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
-                    <input
-                      type="text"
-                      placeholder="e.g. 500g, 1kg"
-                      value={newSizeName}
-                      onChange={(e) => {
-                        setNewSizeName(e.target.value);
-                        setIsMutating(true);
-                      }}
-                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="Price"
-                      value={newSizePrice}
-                      onChange={(e) => {
-                        setNewSizePrice(e.target.value);
-                        setIsMutating(true);
-                      }}
-                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-20"
-                    />
-                    <input
-                      type="number"
-                      step="0.1"
-                      placeholder="Mult"
-                      value={newSizeMultiplier}
-                      onChange={(e) => {
-                        setNewSizeMultiplier(e.target.value);
-                        setIsMutating(true);
-                      }}
-                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-16"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!newSizeName.trim() || !newSizePrice) {
-                          alert("Please fill in size name and price.");
-                          return;
-                        }
-                        const priceVal = parseFloat(newSizePrice);
-                        const multVal = newSizeMultiplier ? parseFloat(newSizeMultiplier) : undefined;
-                        if (isNaN(priceVal) || priceVal < 0) {
-                          alert("Invalid price.");
-                          return;
-                        }
-                        setSizes((prev) => [
-                          ...prev,
-                          { name: newSizeName.trim(), price: priceVal, priceMultiplier: multVal }
-                        ]);
-                        setNewSizeName("");
-                        setNewSizePrice("");
-                        setNewSizeMultiplier("");
-                        setIsMutating(false);
-                      }}
-                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      Add
-                    </button>
-                  </div>
                 </div>
 
-                {/* B. Flavor Variations */}
-                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Flavor Variations
-                  </span>
-                  
-                  {flavors.length === 0 ? (
-                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
-                      No flavors configured.
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
-                      {flavors.map((f, idx) => (
-                        <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
-                          <span>{f}</span>
-                          <button
-                            type="button"
-                            onClick={() => setFlavors((prev) => prev.filter((_, i) => i !== idx))}
-                            className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. Vanilla Bean, Red Velvet"
-                      value={newFlavor}
-                      onChange={(e) => {
-                        setNewFlavor(e.target.value);
-                        setIsMutating(true);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          if (newFlavor.trim()) {
-                            setFlavors((prev) => [...prev, newFlavor.trim()]);
-                            setNewFlavor("");
-                            setIsMutating(false);
-                          }
-                        }
-                      }}
-                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (newFlavor.trim()) {
-                          setFlavors((prev) => [...prev, newFlavor.trim()]);
-                          setNewFlavor("");
-                          setIsMutating(false);
-                        }
-                      }}
-                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-
-                {/* C. Icing Variations */}
-                <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Icing Variations
-                  </span>
-                  
-                  {icings.length === 0 ? (
-                    <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
-                      No icings configured.
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
-                      {icings.map((ic, idx) => (
-                        <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
-                          <span>{ic}</span>
-                          <button
-                            type="button"
-                            onClick={() => setIcings((prev) => prev.filter((_, i) => i !== idx))}
-                            className="ml-1.5 hover:text-rose-600 text-xs font-bold cursor-pointer"
-                          >
-                            ×
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. Buttercream, Fondant"
-                      value={newIcing}
-                      onChange={(e) => {
-                        setNewIcing(e.target.value);
-                        setIsMutating(true);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          if (newIcing.trim()) {
-                            setIcings((prev) => [...prev, newIcing.trim()]);
-                            setNewIcing("");
-                            setIsMutating(false);
-                          }
-                        }
-                      }}
-                      className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (newIcing.trim()) {
-                          setIcings((prev) => [...prev, newIcing.trim()]);
-                          setNewIcing("");
-                          setIsMutating(false);
-                        }
-                      }}
-                      className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* 5. Base Price Input */}
-              <div className="space-y-1.5">
-                <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Price (Rs.) *
-                </label>
-                <input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="12.50"
-                  required
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
-                />
-              </div>
-
-              {/* 6. Badge Dropdown */}
-              <div className="space-y-1.5">
-                <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Badge / Promo Tag
-                </label>
-                <select
-                  id="badge"
-                  value={badge}
-                  onChange={(e) => setBadge(e.target.value)}
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
-                >
-                  <option value="">No Badge / None</option>
-                  {badges.map((bg) => (
-                    <option key={bg.id} value={bg.name}>
-                      {bg.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* 7. Reel Video File Upload & Preview */}
-              <div className="space-y-3">
+                {/* 9. Description Textarea */}
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Upload Reel Video (WebM/MP4, max 2MB)
+                  <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    Description *
                   </label>
-                  <input
-                    type="file"
-                    accept="video/*"
-                    onChange={async (e) => {
-                      if (!e.target.files || e.target.files.length === 0) return;
-                      const file = e.target.files[0];
-                      if (file.size > 2 * 1024 * 1024) {
-                        alert("File size exceeds 2MB limit. Please upload a smaller video.");
-                        return;
-                      }
-                      const reader = new FileReader();
-                      reader.onload = (event) => {
-                        setVideoUrl(event.target?.result as string);
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                    className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                  <textarea
+                    id="desc"
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Explain the taste profile, decoration, size..."
+                    required
+                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
                   />
                 </div>
 
-                {/* Uploaded Video Preview */}
-                {videoUrl && (
-                  <div className="space-y-1.5">
-                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
-                      Active Reel Video Preview
-                    </span>
-                    <div className="relative aspect-[9/16] w-24 overflow-hidden rounded-xl bg-black border border-[#2A1E17]/10 group">
-                      <video src={videoUrl} autoPlay loop muted playsInline className="h-full w-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setVideoUrl("")}
-                        className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* 8. Image Upload & Selection */}
-              <div className="space-y-3">
-                {/* Upload Photos */}
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Upload Photos (WebP Auto-Compressed)
-                  </label>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
-                  />
-                  {isCompressing && (
-                    <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
-                      ⚡ Compressing and converting to WebP...
-                    </span>
-                  )}
+                {/* Actions row */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2A1E17]/5">
+                  <button
+                    type="submit"
+                    disabled={isSaving}
+                    className="flex-1 rounded-full bg-[#2A1E17] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
+                  >
+                    {isSaving ? "Saving..." : "Save Product"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsFormOpen(false)}
+                    className="flex-1 rounded-full bg-transparent border border-[#2A1E17]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#EFEFEA] transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
                 </div>
 
-                {/* Uploaded Preview Thumbnails */}
-                {uploadedImages.length > 0 && (
-                  <div className="space-y-1.5">
-                    <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
-                      Uploaded Photos ({uploadedImages.length})
-                    </span>
-                    <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
-                      {uploadedImages.map((imgUrl, idx) => (
-                        <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group">
-                          <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() => removeUploadedImage(idx)}
-                            className="absolute inset-0 bg-red-600/85 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity text-[9px] font-bold uppercase cursor-pointer"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Primary/Placeholder Selection (Visual Thumbnails List) */}
-                <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Primary / Cover Photo Select
-                  </label>
-                  <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
-                    {[
-                      ...uploadedImages,
-                      "/hero_bakery.png",
-                      "/category_cakes.png",
-                      "/category_savories.png",
-                      "/category_custom.png",
-                      "/about_bakery.png"
-                    ].map((imgUrl, idx) => {
-                      const isSelected = image === imgUrl;
-                      const isPlaceholder = !uploadedImages.includes(imgUrl);
-                      
-                      let label = `Uploaded Photo ${uploadedImages.indexOf(imgUrl) + 1}`;
-                      if (isPlaceholder) {
-                        if (imgUrl.includes("hero")) label = "Chocolate Cake Placeholder";
-                        else if (imgUrl.includes("cakes")) label = "Strawberry Gateau Placeholder";
-                        else if (imgUrl.includes("savories")) label = "Savory Quiche Placeholder";
-                        else if (imgUrl.includes("custom")) label = "Custom Wedding Placeholder";
-                        else label = "Ingredients Hamper Placeholder";
-                      }
-
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setImage(imgUrl)}
-                          title={label}
-                          className={`relative h-14 w-14 rounded-lg overflow-hidden border transition-all cursor-pointer ${
-                            isSelected 
-                              ? "border-[#C5A880] ring-2 ring-[#C5A880]/50" 
-                              : "border-[#2A1E17]/10 hover:border-[#C5A880]/50"
-                          }`}
-                        >
-                          <img src={imgUrl} alt={label} className="h-full w-full object-cover" />
-                          {isSelected && (
-                            <div className="absolute inset-0 bg-[#2A1E17]/35 flex items-center justify-center">
-                              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-              {/* 9. Description Textarea */}
-              <div className="space-y-1.5">
-                <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                  Description *
-                </label>
-                <textarea
-                  id="desc"
-                  rows={4}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Explain the taste profile, decoration, size..."
-                  required
-                  className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
-                />
-              </div>
-
-              {/* Actions row */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2A1E17]/5">
-                <button
-                  type="submit"
-                  disabled={isSaving}
-                  className="flex-1 rounded-full bg-[#2A1E17] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
-                >
-                  {isSaving ? "Saving..." : "Save Product"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsFormOpen(false)}
-                  className="flex-1 rounded-full bg-transparent border border-[#2A1E17]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#EFEFEA] transition-all cursor-pointer"
-                >
-                  Cancel
-                </button>
-              </div>
-
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
       )}
 
     </div>

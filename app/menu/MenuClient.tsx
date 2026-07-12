@@ -87,8 +87,9 @@ export default function MenuClient() {
         queryParams.set("sortBy", sortBy);
         queryParams.set("page", currentPage.toString());
         queryParams.set("limit", ITEMS_PER_PAGE.toString());
+        queryParams.set("_t", Date.now().toString());
 
-        const response = await fetch(`/api/products?${queryParams.toString()}`);
+        const response = await fetch(`/api/products?${queryParams.toString()}`, { cache: "no-store" });
         if (!response.ok) {
           throw new Error("HTTP error " + response.status + ": Failed to retrieve menu items.");
         }

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Category } from "@/lib/categories";
 import { Badge } from "@/lib/badges";
-import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -19,6 +19,50 @@ export default function CategoriesClient({
   const { setIsMutating } = useAuth();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [badges, setBadges] = useState<Badge[]>(initialBadges);
+
+  useEffect(() => {
+    const categoriesRef = collection(db, "categories");
+    const qCat = query(categoriesRef);
+    const unsubscribeCat = onSnapshot(qCat, (snapshot) => {
+      const list: Category[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          name: data.name,
+          subcategories: data.subcategories || [],
+        } as Category);
+      });
+      // Sort alphabetically by name
+      list.sort((a, b) => a.name.localeCompare(b.name));
+      setCategories(list);
+    }, (error) => {
+      console.error("Firestore onSnapshot for categories failed:", error);
+    });
+
+    const badgesRef = collection(db, "badges");
+    const qBadge = query(badgesRef);
+    const unsubscribeBadge = onSnapshot(qBadge, (snapshot) => {
+      const list: Badge[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          name: data.name,
+        } as Badge);
+      });
+      // Sort alphabetically by name
+      list.sort((a, b) => a.name.localeCompare(b.name));
+      setBadges(list);
+    }, (error) => {
+      console.error("Firestore onSnapshot for badges failed:", error);
+    });
+
+    return () => {
+      unsubscribeCat();
+      unsubscribeBadge();
+    };
+  }, []);
 
   // New Category Input
   const [newCatName, setNewCatName] = useState("");

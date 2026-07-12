@@ -24,8 +24,11 @@ export interface Product {
   isAvailable?: boolean;
   variants?: ProductVariant[];
   sizes?: ProductSize[];
-  flavors?: string[];
-  icings?: string[];
+  flavors?: (string | { name: string; price: number })[];
+  icings?: (string | { name: string; price: number })[];
+  defaultSize?: string;
+  defaultFlavor?: string;
+  defaultIcing?: string;
 }
 
 export const products: Product[] = [

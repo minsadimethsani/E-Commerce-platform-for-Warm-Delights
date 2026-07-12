@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Order } from "@/types/database";
-import { doc, updateDoc, Timestamp } from "firebase/firestore";
+import { doc, updateDoc, Timestamp, collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -24,6 +24,47 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ordersRef = collection(db, "orders");
+    const q = query(ordersRef, orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list: Order[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        list.push({
+          id: docSnap.id,
+          userId: data.userId,
+          items: data.items || [],
+          subtotal: data.subtotal,
+          tax: data.tax,
+          shippingFee: data.shippingFee,
+          total: data.total,
+          status: data.status,
+          shippingAddress: data.shippingAddress,
+          paymentDetails: data.paymentDetails,
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
+          billingDetails: data.billingDetails,
+          fulfillment: data.fulfillment,
+          orderNote: data.orderNote,
+        } as Order);
+      });
+      setOrders(list);
+
+      // Sync active selected order details
+      if (selectedOrder) {
+        const updated = list.find((o) => o.id === selectedOrder.id);
+        if (updated) {
+          setSelectedOrder(updated);
+        }
+      }
+    }, (error) => {
+      console.error("Firestore onSnapshot for orders failed:", error);
+    });
+
+    return () => unsubscribe();
+  }, [selectedOrder]);
 
   // Update order status directly in Firestore
   const handleStatusChange = async (orderId: string, newStatus: Order["status"]) => {

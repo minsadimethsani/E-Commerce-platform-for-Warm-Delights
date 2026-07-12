@@ -27,29 +27,54 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
   // Consolidated variant selection states
   const [selectedSize, setSelectedSize] = useState<string>(
-    product.sizes && product.sizes.length > 0 ? product.sizes[0].name : "500g"
+    (product as any).defaultSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0].name : "500g")
   );
   const [selectedFlavor, setSelectedFlavor] = useState<string>(
-    product.flavors && product.flavors.length > 0 ? product.flavors[0] : ""
+    (product as any).defaultFlavor || (product.flavors && product.flavors.length > 0 ? (typeof product.flavors[0] === "string" ? product.flavors[0] : (product.flavors[0] as any).name) : "")
   );
   const [selectedIcing, setSelectedIcing] = useState<string>(
-    product.icings && product.icings.length > 0 ? product.icings[0] : ""
+    (product as any).defaultIcing || (product.icings && product.icings.length > 0 ? (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name) : "")
   );
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
+  // Default Variation Values
+  const defaultSizeVal = (product as any).defaultSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0].name : "500g");
+  const defaultFlavorVal = (product as any).defaultFlavor || (product.flavors && product.flavors.length > 0 ? (typeof product.flavors[0] === "string" ? product.flavors[0] : (product.flavors[0] as any).name) : "");
+  const defaultIcingVal = (product as any).defaultIcing || (product.icings && product.icings.length > 0 ? (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name) : "");
+  const defaultVariantVal = product.variants && product.variants.length > 0 ? product.variants[0] : undefined;
+
+  // Filtered Options (Excluding defaults)
+  const availableSizes = product.sizes ? product.sizes.filter((s) => s.name !== defaultSizeVal) : [];
+  const availableFlavors = product.flavors ? product.flavors.filter((f) => (typeof f === "string" ? f : f.name) !== defaultFlavorVal) : [];
+  const availableIcings = product.icings ? product.icings.filter((ic) => (typeof ic === "string" ? ic : ic.name) !== defaultIcingVal) : [];
+  const availableVariants = product.variants ? product.variants.filter((v) => v.name !== defaultVariantVal?.name) : [];
+
+  const hasCustomizerOptions = availableSizes.length > 0 || availableFlavors.length > 0 || availableIcings.length > 0 || availableVariants.length > 0;
+
   // Dynamic Pricing Engine
-  const basePrice = product.price;
+  const basePrice = selectedVariant ? selectedVariant.price : product.price;
   const selectedSizeObj = product.sizes?.find((s) => s.name === selectedSize);
   const sizePremium = selectedSizeObj
     ? (selectedSizeObj.priceMultiplier 
         ? basePrice * (selectedSizeObj.priceMultiplier - 1) 
         : selectedSizeObj.price)
     : 0;
+
+  const selectedFlavorObj = product.flavors?.find((f) => (typeof f === "string" ? f : f.name) === selectedFlavor);
+  const flavorPremium = selectedFlavorObj && typeof selectedFlavorObj !== "string"
+    ? selectedFlavorObj.price
+    : 0;
+
+  const selectedIcingObj = product.icings?.find((ic) => (typeof ic === "string" ? ic : ic.name) === selectedIcing);
+  const icingPremium = selectedIcingObj && typeof selectedIcingObj !== "string"
+    ? selectedIcingObj.price
+    : 0;
+
   const addOnsFee = selectedAddOns.reduce(
     (sum, addOn) => sum + (addOn === "Eggless" ? 5.00 : addOn === "Gift Box" ? 8.00 : 2.00),
     0
   );
-  const finalPrice = basePrice + sizePremium + addOnsFee;
+  const finalPrice = basePrice + sizePremium + flavorPremium + icingPremium + addOnsFee;
 
   const incrementQty = () => setQuantity((prev) => (prev < 20 ? prev + 1 : prev));
   const decrementQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
@@ -213,182 +238,261 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               {product.description}
             </p>
 
-            {/* Multi-layered Variant Customizer */}
-            {((product.sizes && product.sizes.length > 0) || 
-              (product.flavors && product.flavors.length > 0) || 
-              (product.icings && product.icings.length > 0)) ? (
-              <div className="space-y-6 pt-6 border-t border-[#2A1E17]/10">
-                
-                {/* 1. Sizes (Capsule Button Chips) */}
-                {product.sizes && product.sizes.length > 0 && (
-                  <div className="space-y-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                      Select Size / Weight *
-                    </span>
-                    <div className="flex flex-wrap gap-3">
-                      {product.sizes.map((s) => {
-                        const isSelected = selectedSize === s.name;
-                        const premium = s.priceMultiplier 
-                          ? basePrice * (s.priceMultiplier - 1) 
-                          : s.price;
-                        return (
-                          <button
-                            key={s.name}
-                            type="button"
-                            onClick={() => setSelectedSize(s.name)}
-                            className={`px-4 py-2.5 rounded-full border text-xs font-bold transition-all cursor-pointer ${
-                              isSelected
-                                ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                                : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
-                            }`}
-                          >
-                            <span>{s.name}</span>
-                            {premium > 0 && (
-                              <span className={`ml-1 text-[9px] font-semibold ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
-                                (+Rs. {premium.toFixed(0)})
-                              </span>
-                            )}
-                          </button>
-                        );
-                      })}
+            {/* Default Product Details (Standard Recipe / Config) */}
+            {(((product.defaultSize || (product.sizes && product.sizes.length > 0)) ||
+              (product.defaultFlavor || (product.flavors && product.flavors.length > 0)) ||
+              (product.defaultIcing || (product.icings && product.icings.length > 0)) ||
+              (product.variants && product.variants.length > 0)) && (
+              <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-2xl p-5 space-y-3">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
+                  <span className="mr-2">✨</span> Standard Configuration (Included in Base Price)
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Default Size */}
+                  {((product.sizes && product.sizes.length > 0) || product.defaultSize) && (
+                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Size / Weight</span>
+                      <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
+                        {product.defaultSize || (product.sizes && product.sizes[0]?.name) || "Standard"}
+                      </span>
                     </div>
-                  </div>
-                )}
-
-                {/* 2. Flavors (Radio Grid/Tile Selectors) */}
-                {product.flavors && product.flavors.length > 0 && (
-                  <div className="space-y-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                      Select Flavor *
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {product.flavors.map((f) => {
-                        const isSelected = selectedFlavor === f;
-                        return (
-                          <button
-                            key={f}
-                            type="button"
-                            onClick={() => setSelectedFlavor(f)}
-                            className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
-                              isSelected
-                                ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
-                                : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
-                            }`}
-                          >
-                            {f}
-                          </button>
-                        );
-                      })}
+                  )}
+                  {/* Default Flavor */}
+                  {((product.flavors && product.flavors.length > 0) || product.defaultFlavor) && (
+                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Flavor</span>
+                      <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
+                        {product.defaultFlavor || (product.flavors && (typeof product.flavors[0] === "string" ? product.flavors[0] : (product.flavors[0] as any).name)) || "Standard"}
+                      </span>
                     </div>
-                  </div>
-                )}
-
-                {/* 3. Icings (Radio Grid/Tile Selectors) */}
-                {product.icings && product.icings.length > 0 && (
-                  <div className="space-y-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                      Select Coating / Icing *
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {product.icings.map((ic) => {
-                        const isSelected = selectedIcing === ic;
-                        return (
-                          <button
-                            key={ic}
-                            type="button"
-                            onClick={() => setSelectedIcing(ic)}
-                            className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
-                              isSelected
-                                ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
-                                : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
-                            }`}
-                          >
-                            {ic}
-                          </button>
-                        );
-                      })}
+                  )}
+                  {/* Default Coating / Icing */}
+                  {((product.icings && product.icings.length > 0) || product.defaultIcing) && (
+                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Coating / Icing</span>
+                      <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
+                        {product.defaultIcing || (product.icings && (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name)) || "Standard"}
+                      </span>
                     </div>
-                  </div>
-                )}
-
-                {/* 4. Add-Ons / Modifiers */}
-                <div className="space-y-3 pt-3 border-t border-[#2A1E17]/5">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Optional Add-Ons
-                  </span>
-                  <div className="flex flex-col space-y-2">
-                    {[
-                      { name: "Eggless", fee: 5.00, desc: "Bake eggless cake base" },
-                      { name: "Gift Box", fee: 8.00, desc: "Add premium ribbon box wrapper" },
-                      { name: "Custom Card", fee: 2.00, desc: "Include handwritten wishes message card" }
-                    ].map((addon) => {
-                      const isSelected = selectedAddOns.includes(addon.name);
-                      return (
-                        <label
-                          key={addon.name}
-                          className={`flex items-center justify-between p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-[#C5A880]/10 border-[#C5A880] text-[#2A1E17]"
-                              : "bg-white text-[#2A1E17]/70 border-[#2A1E17]/5 hover:border-[#C5A880]/40"
-                          }`}
-                        >
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setSelectedAddOns((prev) => [...prev, addon.name]);
-                                } else {
-                                  setSelectedAddOns((prev) => prev.filter((a) => a !== addon.name));
-                                }
-                              }}
-                              className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
-                            />
-                            <div>
-                              <span className="font-bold block text-[#2A1E17]">{addon.name}</span>
-                              <span className="text-[10px] text-[#3A2E2B]/60 font-medium">{addon.desc}</span>
-                            </div>
-                          </div>
-                          <span className="font-bold text-[#2A1E17]">Rs. {addon.fee.toFixed(2)}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
+                  )}
+                  {/* Fallback Default Variant */}
+                  {(!product.sizes || product.sizes.length === 0) &&
+                    (!product.flavors || product.flavors.length === 0) &&
+                    (!product.icings || product.icings.length === 0) &&
+                    product.variants && product.variants.length > 0 && (
+                      <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5 sm:col-span-3">
+                        <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Default Option</span>
+                        <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
+                          {product.variants[0].name} (Rs. {product.variants[0].price.toFixed(2)})
+                        </span>
+                      </div>
+                    )}
                 </div>
-
               </div>
-            ) : (
-              /* Fallback Variant Selector */
-              product.variants && product.variants.length > 0 && (
-                <div className="space-y-3 pt-4 border-t border-[#2A1E17]/5">
-                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
-                    Select Option / Weight:
-                  </span>
-                  <div className="flex flex-wrap gap-3">
-                    {product.variants.map((v, idx) => {
-                      const isSelected = selectedVariant?.name === v.name;
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setSelectedVariant(v)}
-                          className={`px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                              : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
-                          }`}
-                        >
-                          <span className="block font-bold">{v.name}</span>
-                          <span className={`block text-[10px] mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
-                            Rs. {v.price.toFixed(2)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+            ))}
+
+            {/* Multi-layered Variant Customizer */}
+            {((availableSizes.length > 0) || 
+              (availableFlavors.length > 0) || 
+              (availableIcings.length > 0) ||
+              (availableVariants.length > 0)) && (
+              <div className="space-y-6 pt-6 border-t border-[#2A1E17]/10">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
+                    <span className="mr-2">🎨</span> Customize Options / Variations
+                  </h3>
+                  <span className="text-[9px] text-[#3A2E2B]/60 italic font-medium">* Selection updates pricing</span>
                 </div>
-              )
+
+                {((availableSizes.length > 0) || 
+                  (availableFlavors.length > 0) || 
+                  (availableIcings.length > 0)) ? (
+                  <div className="space-y-6">
+                    {/* 1. Sizes (Capsule Button Chips) */}
+                    {availableSizes.length > 0 && (
+                      <div className="space-y-3">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                          Select Size / Weight *
+                        </span>
+                        <div className="flex flex-wrap gap-3">
+                          {availableSizes.map((s) => {
+                            const isSelected = selectedSize === s.name;
+                            const premium = s.priceMultiplier 
+                              ? basePrice * (s.priceMultiplier - 1) 
+                              : s.price;
+                            return (
+                              <button
+                                key={s.name}
+                                type="button"
+                                onClick={() => setSelectedSize(selectedSize === s.name ? defaultSizeVal : s.name)}
+                                className={`px-4 py-2.5 rounded-full border text-xs font-bold transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
+                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                }`}
+                              >
+                                <span>{s.name}</span>
+                                {premium > 0 && (
+                                  <span className={`ml-1 text-[9px] font-semibold ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                    (+Rs. {premium.toFixed(0)})
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. Flavors (Radio Grid/Tile Selectors) */}
+                    {availableFlavors.length > 0 && (
+                      <div className="space-y-3">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                          Select Flavor *
+                        </span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {availableFlavors.map((f, idx) => {
+                            const fName = typeof f === "string" ? f : f.name;
+                            const fPrice = typeof f === "string" ? 0 : f.price;
+                            const isSelected = selectedFlavor === fName;
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setSelectedFlavor(selectedFlavor === fName ? defaultFlavorVal : fName)}
+                                className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
+                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                }`}
+                              >
+                                <span>{fName}</span>
+                                {fPrice > 0 && (
+                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                    (+Rs. {fPrice.toFixed(0)})
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 3. Icings (Radio Grid/Tile Selectors) */}
+                    {availableIcings.length > 0 && (
+                      <div className="space-y-3">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                          Select Coating / Icing *
+                        </span>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                          {availableIcings.map((ic, idx) => {
+                            const icName = typeof ic === "string" ? ic : ic.name;
+                            const icPrice = typeof ic === "string" ? 0 : ic.price;
+                            const isSelected = selectedIcing === icName;
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setSelectedIcing(selectedIcing === icName ? defaultIcingVal : icName)}
+                                className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
+                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                }`}
+                              >
+                                <span>{icName}</span>
+                                {icPrice > 0 && (
+                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                    (+Rs. {icPrice.toFixed(0)})
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 4. Add-Ons / Modifiers */}
+                    <div className="space-y-3 pt-3 border-t border-[#2A1E17]/5">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        Optional Add-Ons
+                      </span>
+                      <div className="flex flex-col space-y-2">
+                        {[
+                          { name: "Eggless", fee: 5.00, desc: "Bake eggless cake base" },
+                          { name: "Gift Box", fee: 8.00, desc: "Add premium ribbon box wrapper" },
+                          { name: "Custom Card", fee: 2.00, desc: "Include handwritten wishes message card" }
+                        ].map((addon) => {
+                          const isSelected = selectedAddOns.includes(addon.name);
+                          return (
+                            <label
+                              key={addon.name}
+                              className={`flex items-center justify-between p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-[#C5A880]/10 border-[#C5A880] text-[#2A1E17]"
+                                  : "bg-white text-[#2A1E17]/70 border-[#2A1E17]/5 hover:border-[#C5A880]/40"
+                              }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedAddOns((prev) => [...prev, addon.name]);
+                                    } else {
+                                      setSelectedAddOns((prev) => prev.filter((a) => a !== addon.name));
+                                    }
+                                  }}
+                                  className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                                />
+                                <div>
+                                  <span className="font-bold block text-[#2A1E17]">{addon.name}</span>
+                                  <span className="text-[10px] text-[#3A2E2B]/60 font-medium">{addon.desc}</span>
+                                </div>
+                              </div>
+                              <span className="font-bold text-[#2A1E17]">Rs. {addon.fee.toFixed(2)}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Fallback Variant Selector */
+                  availableVariants.length > 0 && (
+                    <div className="space-y-3">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        Select Option / Weight:
+                      </span>
+                      <div className="flex flex-wrap gap-3">
+                        {availableVariants.map((v, idx) => {
+                          const isSelected = selectedVariant?.name === v.name;
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? defaultVariantVal : v)}
+                              className={`px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
+                                  : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                              }`}
+                            >
+                              <span className="block font-bold">{v.name}</span>
+                              <span className={`block text-[10px] mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                Rs. {v.price.toFixed(2)}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
             )}
 
             {/* Quantity Selector */}
