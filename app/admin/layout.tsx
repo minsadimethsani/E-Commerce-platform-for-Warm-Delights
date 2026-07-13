@@ -9,6 +9,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: DashboardIcon },
   { name: "Orders", href: "/admin/orders", icon: OrdersIcon },
   { name: "Products", href: "/admin/products", icon: ProductsIcon },
+  { name: "Optional Add-Ons", href: "/admin/addons", icon: AddOnsIcon },
   { name: "Categories & Subcategories", href: "/admin/categories", icon: CategoriesIcon },
 ];
 
@@ -274,6 +275,17 @@ function CategoriesIcon(props: React.SVGProps<SVGSVGElement>) {
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
       <path strokeLinecap="square" strokeLinejoin="miter" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.659A2.25 2.25 0 0 0 9.568 3Z" />
       <path strokeLinecap="square" strokeLinejoin="miter" d="M6 6h.008v.008H6V6Z" />
+    </svg>
+  );
+}
+
+function AddOnsIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
+      <rect x="3" y="3" width="7" height="7" strokeLinecap="square" strokeLinejoin="miter" />
+      <rect x="14" y="3" width="7" height="7" strokeLinecap="square" strokeLinejoin="miter" />
+      <rect x="3" y="14" width="7" height="7" strokeLinecap="square" strokeLinejoin="miter" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M17.5 14v7M14 17.5h7" />
     </svg>
   );
 }

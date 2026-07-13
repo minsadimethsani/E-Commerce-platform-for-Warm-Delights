@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllProducts, getProductById } from "@/lib/products";
+import { getAllAddOns } from "@/lib/addons";
 import ProductDetailClient from "../../menu/[id]/ProductDetailClient";
 
 export const dynamic = "force-dynamic";
@@ -60,5 +61,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     relatedProducts.push(...fallbackProducts);
   }
 
-  return <ProductDetailClient product={product} relatedProducts={relatedProducts} />;
+  const addons = await getAllAddOns();
+
+  return <ProductDetailClient product={product} relatedProducts={relatedProducts} initialAddOns={addons} />;
 }

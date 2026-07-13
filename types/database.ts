@@ -86,6 +86,8 @@ export interface PaymentDetails {
   method: "stripe" | "cod" | "card" | "bank_deposit";
   paymentId?: string;
   status: "unpaid" | "paid" | "refunded";
+  deliverySlipUrl?: string | null;
+  bankSlipUrl?: string | null;
 }
 
 /**

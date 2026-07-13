@@ -354,6 +354,28 @@ async function seedBadgesIfEmpty(batch: any) {
   return false;
 }
 
+async function seedAddOnsIfEmpty(batch: any) {
+  const addonsRef = collection(db, "addons");
+  const q = query(addonsRef, limit(1));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) {
+    console.log("Firestore addons collection is empty. Seeding...");
+    const defaultAddOns = [
+      { id: "eggless", name: "Eggless", fee: 5.00, desc: "Bake eggless cake base" },
+      { id: "giftbox", name: "Gift Box", fee: 8.00, desc: "Add premium ribbon box wrapper" },
+      { id: "card", name: "Custom Card", fee: 2.00, desc: "Include handwritten wishes message card" }
+    ];
+
+    for (const addon of defaultAddOns) {
+      const docRef = doc(db, "addons", addon.id);
+      batch.set(docRef, addon);
+    }
+    return true;
+  }
+  return false;
+}
+
 // Module-level cache to check seeding only once per application instance lifetime
 let isSeedingChecked = false;
 
@@ -385,8 +407,6 @@ export async function seedAllCollectionsIfEmpty(force: boolean = false) {
       }
     }
 
-
-
     const batch = writeBatch(db);
     
     // Execute all check/seed functions in parallel to avoid sequential network roundtrips
@@ -396,7 +416,8 @@ export async function seedAllCollectionsIfEmpty(force: boolean = false) {
       seededReviews,
       seededOrders,
       seededCategories,
-      seededBadges
+      seededBadges,
+      seededAddOns
     ] = await Promise.all([
       seedProductsIfEmpty(batch),
       seedUsersIfEmpty(batch),
@@ -404,9 +425,10 @@ export async function seedAllCollectionsIfEmpty(force: boolean = false) {
       seedOrdersIfEmpty(batch),
       seedCategoriesIfEmpty(batch),
       seedBadgesIfEmpty(batch),
+      seedAddOnsIfEmpty(batch),
     ]);
 
-    if (seededProd || seededUsers || seededReviews || seededOrders || seededCategories || seededBadges) {
+    if (seededProd || seededUsers || seededReviews || seededOrders || seededCategories || seededBadges || seededAddOns) {
       await batch.commit();
       
       // Save seed status setting to Firestore

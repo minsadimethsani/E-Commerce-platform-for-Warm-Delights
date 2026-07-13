@@ -63,6 +63,28 @@ export default function Header() {
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "card" | "bank_deposit">("cod");
   const [agreeToPrivacy, setAgreeToPrivacy] = useState(false);
+  const [deliverySlipUrl, setDeliverySlipUrl] = useState("");
+  const [bankSlipUrl, setBankSlipUrl] = useState("");
+
+  const handleDeliverySlipUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setDeliverySlipUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBankSlipUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setBankSlipUrl(event.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -216,7 +238,9 @@ export default function Header() {
         shippingAddress: shippingAddress,
         paymentDetails: {
           method: paymentMethod,
-          status: paymentMethod === "card" ? "paid" : "unpaid"
+          status: paymentMethod === "card" ? "paid" : "unpaid",
+          deliverySlipUrl: paymentMethod === "cod" && deliveryType === "delivery" ? (deliverySlipUrl || null) : null,
+          bankSlipUrl: paymentMethod === "bank_deposit" ? (bankSlipUrl || null) : null
         },
         billingDetails: {
           firstName: billingFirstName,
@@ -267,6 +291,8 @@ export default function Header() {
     setIsCheckoutOpen(false);
     setIsOrderSuccess(false);
     setAgreeToPrivacy(false);
+    setDeliverySlipUrl("");
+    setBankSlipUrl("");
   };
 
   // Hide public storefront header on admin portal pages
@@ -1268,14 +1294,49 @@ export default function Header() {
                       </div>
 
                       {/* Payment Method Specific Instructions */}
-                      {paymentMethod === "cod" && (
-                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
-                          <span className="font-bold uppercase tracking-wider block text-[10px]">COD Instructions</span>
-                          <p className="leading-relaxed">
-                            Please prepare the exact amount of <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to pay our dispatch rider upon delivery, or to pay the cashier at our branch counter when picking up. We accept cash and major local mobile wallets.
-                          </p>
-                        </div>
-                      )}
+                      {paymentMethod === "cod" && (() => {
+                        const taxAmount = totalAmount * 0.08;
+                        const deliveryFee = deliveryType === "delivery" ? 350 : 0;
+                        const grandTotal = totalAmount + taxAmount + deliveryFee;
+                        const remainingCodAmount = totalAmount + taxAmount; // Total minus delivery fee
+
+                        return (
+                          <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-4 animate-fade-in">
+                            <div className="space-y-2">
+                              <span className="font-bold uppercase tracking-wider block text-[10px]">COD Instructions</span>
+                              {deliveryType === "delivery" ? (
+                                <p className="leading-relaxed">
+                                  For Home Delivery, please deposit the delivery fee of <strong>Rs. 350.00</strong> beforehand to our corporate bank account (Warm Delights Bank PLC, Acc: 0987-6543-2101) and upload the payment slip below. The remaining product amount of <strong>Rs. {remainingCodAmount.toFixed(2)}</strong> is payable in cash to our dispatch rider upon delivery.
+                                </p>
+                              ) : (
+                                <p className="leading-relaxed">
+                                  For Store Pickup, there is no delivery fee! You do not need to pay in advance or upload a slip. The total amount of <strong>Rs. {grandTotal.toFixed(2)}</strong> is payable at the counter when you pick up your order.
+                                </p>
+                              )}
+                            </div>
+
+                            {deliveryType === "delivery" && (
+                              <div className="space-y-2 pt-2 border-t border-[#2A1E17]/5">
+                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                                  Upload Delivery Fee Slip *
+                                </label>
+                                <input
+                                  type="file"
+                                  required
+                                  accept="image/*"
+                                  onChange={handleDeliverySlipUpload}
+                                  className="w-full text-[11px] text-[#3A2E2B]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#2A1E17]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                                />
+                                {deliverySlipUrl && (
+                                  <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#2A1E17]/10 bg-white mt-2">
+                                    <img src={deliverySlipUrl} alt="Delivery fee slip preview" className="h-full w-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {paymentMethod === "card" && (
                         <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
@@ -1287,7 +1348,7 @@ export default function Header() {
                       )}
 
                       {paymentMethod === "bank_deposit" && (
-                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2.5 animate-fade-in">
+                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-3.5 animate-fade-in">
                           <span className="font-bold uppercase tracking-wider block text-[10px]">Bank Deposit Instructions</span>
                           <div className="space-y-1 bg-white p-3 border border-[#2A1E17]/5 font-mono text-[10.5px]">
                             <p><strong>Bank:</strong> Warm Delights Bank PLC</p>
@@ -1296,8 +1357,25 @@ export default function Header() {
                             <p><strong>Branch:</strong> Colombo Corporate Branch</p>
                           </div>
                           <p className="leading-relaxed text-[11px]">
-                            Please transfer <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to the account above. Write your phone number as reference, and email the deposit receipt to <strong>billing@warmdelights.com</strong> or WhatsApp it to <strong>+94 77 123 4567</strong>. Baking will commence once the deposit is confirmed.
+                            Please transfer the total amount of <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to the account above, and upload your deposit slip below. Baking will commence once the deposit slip is uploaded and verified.
                           </p>
+                          <div className="space-y-2 pt-2 border-t border-[#2A1E17]/5">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                              Upload Bank Deposit Slip *
+                            </label>
+                            <input
+                              type="file"
+                              required
+                              accept="image/*"
+                              onChange={handleBankSlipUpload}
+                              className="w-full text-[11px] text-[#3A2E2B]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#2A1E17]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                            />
+                            {bankSlipUrl && (
+                              <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#2A1E17]/10 bg-white mt-2">
+                                <img src={bankSlipUrl} alt="Bank deposit slip preview" className="h-full w-full object-cover" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>

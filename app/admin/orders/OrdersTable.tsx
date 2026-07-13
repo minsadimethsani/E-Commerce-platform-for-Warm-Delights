@@ -322,6 +322,40 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                     {selectedOrder.paymentDetails.status}
                   </span>
                 </div>
+                {selectedOrder.paymentDetails.deliverySlipUrl && (
+                  <div className="pt-3 border-t border-[#2A1E17]/5 space-y-1.5">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Delivery Fee Slip</span>
+                    <a
+                      href={selectedOrder.paymentDetails.deliverySlipUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#2A1E17]/10 bg-white hover:opacity-90 transition-opacity"
+                    >
+                      <img
+                        src={selectedOrder.paymentDetails.deliverySlipUrl}
+                        alt="Uploaded delivery fee slip"
+                        className="h-full w-full object-cover"
+                      />
+                    </a>
+                  </div>
+                )}
+                {selectedOrder.paymentDetails.bankSlipUrl && (
+                  <div className="pt-3 border-t border-[#2A1E17]/5 space-y-1.5">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Bank Deposit Slip</span>
+                    <a
+                      href={selectedOrder.paymentDetails.bankSlipUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#2A1E17]/10 bg-white hover:opacity-90 transition-opacity"
+                    >
+                      <img
+                        src={selectedOrder.paymentDetails.bankSlipUrl}
+                        alt="Uploaded bank deposit slip"
+                        className="h-full w-full object-cover"
+                      />
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 

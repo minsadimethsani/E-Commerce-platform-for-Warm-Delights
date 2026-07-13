@@ -9,13 +9,15 @@ import { addToCart } from "@/lib/cart";
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { AddOn } from "@/lib/addons";
 
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts: Product[];
+  initialAddOns: AddOn[];
 }
 
-export default function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, relatedProducts, initialAddOns }: ProductDetailClientProps) {
   const router = useRouter();
   const { user } = useAuth();
   
@@ -36,6 +38,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     (product as any).defaultIcing || (product.icings && product.icings.length > 0 ? (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name) : "")
   );
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
+  const [showAllAddOns, setShowAllAddOns] = useState<boolean>(false);
 
   // Default Variation Values
   const defaultSizeVal = (product as any).defaultSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0].name : "500g");
@@ -90,10 +93,10 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
     ? defaultIcingObj.price
     : 0;
 
-  const addOnsFee = selectedAddOns.reduce(
-    (sum, addOn) => sum + (addOn === "Eggless" ? 5.00 : addOn === "Gift Box" ? 8.00 : 2.00),
-    0
-  );
+  const addOnsFee = selectedAddOns.reduce((sum, addOnName) => {
+    const matched = initialAddOns.find((a) => a.name === addOnName);
+    return sum + (matched ? matched.fee : 0);
+  }, 0);
 
   const finalPrice = basePrice + 
                      (sizePremiumSelected - sizePremiumDefault) + 
@@ -445,15 +448,11 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                         Optional Add-Ons
                       </span>
                       <div className="flex flex-col space-y-2">
-                        {[
-                          { name: "Eggless", fee: 5.00, desc: "Bake eggless cake base" },
-                          { name: "Gift Box", fee: 8.00, desc: "Add premium ribbon box wrapper" },
-                          { name: "Custom Card", fee: 2.00, desc: "Include handwritten wishes message card" }
-                        ].map((addon) => {
+                        {(showAllAddOns ? initialAddOns : initialAddOns.slice(0, 3)).map((addon) => {
                           const isSelected = selectedAddOns.includes(addon.name);
                           return (
                             <label
-                              key={addon.name}
+                              key={addon.id}
                               className={`flex items-center justify-between p-3 rounded-none border text-xs font-semibold transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-[#C5A880]/10 border-[#C5A880] text-[#2A1E17]"
@@ -483,6 +482,25 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                           );
                         })}
                       </div>
+
+                      {initialAddOns.length > 3 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllAddOns(!showAllAddOns)}
+                          className="inline-flex items-center text-xs font-bold text-[#C5A880] hover:text-[#2A1E17] transition-colors mt-2 focus:outline-none cursor-pointer"
+                        >
+                          <span>{showAllAddOns ? "See less options" : "See more options"}</span>
+                          <svg
+                            className={`ml-1.5 h-3.5 w-3.5 transform transition-transform ${showAllAddOns ? "rotate-180" : ""}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="2.5"
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="square" strokeLinejoin="miter" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </div>
                 ) : (
