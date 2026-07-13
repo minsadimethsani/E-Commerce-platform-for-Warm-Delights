@@ -1,6 +1,5 @@
 import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
-import { seedAllCollectionsIfEmpty } from "./db-seed";
 
 export interface Category {
   id: string;
@@ -13,7 +12,6 @@ export interface Category {
  */
 export async function getAllCategories(): Promise<Category[]> {
   try {
-    await seedAllCollectionsIfEmpty();
     const categoriesRef = collection(db, "categories");
     const q = query(categoriesRef, orderBy("name", "asc"));
     const snapshot = await getDocs(q);

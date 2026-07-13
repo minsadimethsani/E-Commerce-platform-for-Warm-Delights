@@ -1,7 +1,11 @@
+import "./load-env";
 import { collection, doc, getDoc, getDocs, setDoc, writeBatch, query, limit, Timestamp } from "firebase/firestore";
 import { db, runWithTimeout } from "./firebase";
 import { products as localProducts } from "@/data/products";
 import { UserProfile, Order, Review, Address } from "@/types/database";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // 1. Seed Products
 async function seedProductsIfEmpty(batch: any) {
@@ -367,20 +371,21 @@ async function isDatabaseSeeded(): Promise<boolean> {
   }
 }
 
-/**
- * Unified database seeder that creates all collections in a batch commit.
- */
-export async function seedAllCollectionsIfEmpty() {
-  if (isSeedingChecked) {
+export async function seedAllCollectionsIfEmpty(force: boolean = false) {
+  if (isSeedingChecked && !force) {
     return;
   }
   try {
-    // Check Firestore settings first to prevent auto-re-seeding on empty collections
-    const alreadySeeded = await isDatabaseSeeded();
-    if (alreadySeeded) {
-      isSeedingChecked = true;
-      return;
+    if (!force) {
+      // Check Firestore settings first to prevent auto-re-seeding on empty collections
+      const alreadySeeded = await isDatabaseSeeded();
+      if (alreadySeeded) {
+        isSeedingChecked = true;
+        return;
+      }
     }
+
+
 
     const batch = writeBatch(db);
     
@@ -416,4 +421,21 @@ export async function seedAllCollectionsIfEmpty() {
     console.error("Failed to seed collections in Firestore:", error);
   }
 }
+
+// Support direct CLI execution
+const isDirectRun = 
+  (typeof require !== 'undefined' && require.main === module) ||
+  (typeof process !== 'undefined' && process.argv[1] && 
+   (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) || 
+    path.resolve(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url))));
+
+if (isDirectRun) {
+  (async () => {
+    console.log("Starting manual database seeding...");
+    await seedAllCollectionsIfEmpty(true);
+    console.log("Manual database seeding operation completed.");
+    process.exit(0);
+  })();
+}
+
 

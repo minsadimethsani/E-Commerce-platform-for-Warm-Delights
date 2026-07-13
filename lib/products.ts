@@ -1,7 +1,6 @@
 import { products as localProducts, Product } from "@/data/products";
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
 import { db, runWithTimeout } from "./firebase";
-import { seedAllCollectionsIfEmpty } from "./db-seed";
 
 export interface FilterParams {
   category?: string;
@@ -29,7 +28,6 @@ export interface PaginatedResult {
  */
 export async function getAllProducts(): Promise<Product[]> {
   try {
-    await seedAllCollectionsIfEmpty();
     const productsRef = collection(db, "products");
     const q = query(productsRef, orderBy("id", "asc"));
     const snapshot = await runWithTimeout(getDocs(q), 15000);
@@ -77,7 +75,6 @@ export async function getAllProducts(): Promise<Product[]> {
  */
 export async function getProductById(id: string): Promise<Product | undefined> {
   try {
-    await seedAllCollectionsIfEmpty();
     const docRef = doc(db, "products", id);
     const docSnap = await runWithTimeout(getDoc(docRef), 15000);
     
@@ -120,7 +117,6 @@ export async function getProductById(id: string): Promise<Product | undefined> {
  */
 export async function getFilteredProducts(filters: FilterParams): Promise<PaginatedResult> {
   try {
-    await seedAllCollectionsIfEmpty();
     const productsRef = collection(db, "products");
     const constraints: any[] = [where("isAvailable", "==", true)];
 

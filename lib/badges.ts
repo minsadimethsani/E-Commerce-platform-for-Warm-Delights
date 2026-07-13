@@ -1,6 +1,5 @@
 import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
-import { seedAllCollectionsIfEmpty } from "./db-seed";
 
 export interface Badge {
   id: string;
@@ -12,7 +11,6 @@ export interface Badge {
  */
 export async function getAllBadges(): Promise<Badge[]> {
   try {
-    await seedAllCollectionsIfEmpty();
     const badgesRef = collection(db, "badges");
     const q = query(badgesRef, orderBy("name", "asc"));
     const snapshot = await getDocs(q);
