@@ -12,10 +12,10 @@ export default function Story() {
           {/* Column 1: Image Frame */}
           <div className="relative">
             {/* Decorative Gold Frame Background - Adjusted alignment to fit closer to image top border */}
-            <div className="absolute top-0 -left-4 h-full w-full rounded-2xl border-2 border-[#C5A880]/30 -z-10 hidden sm:block translate-x-2" />
+            <div className="absolute top-0 -left-4 h-full w-full rounded-none border-2 border-[#C5A880]/30 -z-10 hidden sm:block translate-x-2" />
 
             {/* Image */}
-            <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-4/3 sm:aspect-square lg:aspect-4/3">
+            <div className="relative overflow-hidden rounded-none shadow-lg aspect-4/3 sm:aspect-square lg:aspect-4/3">
               <Image
                 src="/about_bakery.png"
                 alt="Baking ingredients and artisanal preparation on a counter"
@@ -27,7 +27,7 @@ export default function Story() {
             </div>
 
             {/* Overlay Badge */}
-            <div className="absolute -bottom-6 right-6 rounded-2xl bg-[#2A1E17] p-6 text-white shadow-xl max-w-xs hidden sm:block">
+            <div className="absolute -bottom-6 right-6 rounded-none bg-[#2A1E17] p-6 text-white shadow-xl max-w-xs hidden sm:block">
               <p className="font-serif text-2xl font-bold text-[#C5A880]">Since 2018</p>
               <p className="mt-1 text-xs text-[#FBFBF9]/80 font-sans leading-relaxed">
                 Handcrafting warm memories and premium baked goods daily.
@@ -75,7 +75,7 @@ export default function Story() {
             <div className="pt-4">
               <Link
                 href="/about"
-                className="inline-flex items-center rounded-full bg-[#2A1E17] px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17]"
+                className="inline-flex items-center rounded-none bg-[#2A1E17] px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17]"
               >
                 Read Our Story
               </Link>

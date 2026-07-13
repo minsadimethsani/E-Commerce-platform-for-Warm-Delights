@@ -80,7 +80,7 @@ export default function Hero({ products = [] }: HeroProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 text-left max-w-xl animate-fade-in-up">
-              <span className="inline-block rounded-full bg-[#EFEFEA]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10">
+              <span className="inline-block rounded-none bg-[#EFEFEA]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10">
                 Handcrafted Daily in Small Batches
               </span>
               
@@ -98,13 +98,13 @@ export default function Hero({ products = [] }: HeroProps) {
               <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
                 <Link
                   href="/menu"
-                  className="w-full sm:w-auto rounded-full bg-[#C5A880] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#EFEFEA] hover:text-white hover:scale-102 hover:shadow-xl text-center"
+                  className="w-full sm:w-auto rounded-none bg-[#C5A880] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#EFEFEA] hover:text-white hover:scale-102 hover:shadow-xl text-center"
                 >
                   Order Online
                 </Link>
                 <a
                   href="#catalog-section"
-                  className="w-full sm:w-auto rounded-full border-2 border-white/80 bg-transparent px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all hover:bg-white hover:text-[#2A1E17] hover:scale-102 text-center"
+                  className="w-full sm:w-auto rounded-none border-2 border-white/80 bg-transparent px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all hover:bg-white hover:text-[#2A1E17] hover:scale-102 text-center"
                 >
                   Explore Menu
                 </a>
@@ -116,7 +116,7 @@ export default function Hero({ products = [] }: HeroProps) {
               <div className="absolute w-[80%] aspect-square bg-[#C5A880]/10 rounded-full blur-3xl -z-10" />
               <Link
                 href={`/menu/${availableProduct?.id}`}
-                className="relative w-full max-w-[400px] aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white/15 group block"
+                className="relative w-full max-w-[400px] aspect-square rounded-none overflow-hidden shadow-2xl border-4 border-white/15 group block"
               >
                 <img
                   src={availableProduct?.image}
@@ -137,7 +137,7 @@ export default function Hero({ products = [] }: HeroProps) {
           } ${isTransitioning ? "opacity-0" : ""}`}
         >
           <div className="text-center max-w-3xl mx-auto mb-6">
-            <span className="inline-block rounded-full bg-[#EFEFEA]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10 mb-3">
+            <span className="inline-block rounded-none bg-[#EFEFEA]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10 mb-3">
               Our Signature Delights
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -153,7 +153,7 @@ export default function Hero({ products = [] }: HeroProps) {
               <Link
                 key={p.id}
                 href={`/menu/${p.id}`}
-                className="group relative flex-1 hover:md:flex-[2] transition-all duration-500 ease-in-out overflow-hidden rounded-2xl border border-white/10 shadow-lg cursor-pointer bg-[#2A1E17] flex flex-col justify-end text-left"
+                className="group relative flex-1 hover:md:flex-[2] transition-all duration-500 ease-in-out overflow-hidden rounded-none border border-white/10 shadow-lg cursor-pointer bg-[#2A1E17] flex flex-col justify-end text-left"
               >
                 {/* Product Image */}
                 <img
@@ -201,7 +201,7 @@ export default function Hero({ products = [] }: HeroProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 text-left max-w-xl">
-              <span className="inline-block rounded-full bg-[#EFEFEA]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10">
+              <span className="inline-block rounded-none bg-[#EFEFEA]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#EFEFEA] uppercase backdrop-blur-sm border border-white/10">
                 Tailored for Milestones
               </span>
               
@@ -219,13 +219,13 @@ export default function Hero({ products = [] }: HeroProps) {
               <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
                 <Link
                   href="/menu?category=Custom"
-                  className="w-full sm:w-auto rounded-full bg-[#C5A880] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#EFEFEA] hover:text-white hover:scale-102 hover:shadow-xl text-center"
+                  className="w-full sm:w-auto rounded-none bg-[#C5A880] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#EFEFEA] hover:text-white hover:scale-102 hover:shadow-xl text-center"
                 >
                   Browse Custom Options
                 </Link>
                 <Link
                   href="/#catalog-section"
-                  className="w-full sm:w-auto rounded-full border-2 border-white/80 bg-transparent px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all hover:bg-white hover:text-[#2A1E17] hover:scale-102 text-center"
+                  className="w-full sm:w-auto rounded-none border-2 border-white/80 bg-transparent px-8 py-4 text-sm font-semibold tracking-wide text-white transition-all hover:bg-white hover:text-[#2A1E17] hover:scale-102 text-center"
                 >
                   View Catalog
                 </Link>
@@ -240,7 +240,7 @@ export default function Hero({ products = [] }: HeroProps) {
               <div className="relative w-full h-full max-w-[450px]">
                 {/* Photo 1 (Back left, tilted) */}
                 {customCakes[0] && (
-                  <div className="absolute top-[10%] left-0 w-[55%] aspect-square rounded-2xl overflow-hidden shadow-lg border-4 border-white/95 rotate-[-6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
+                  <div className="absolute top-[10%] left-0 w-[55%] aspect-square rounded-none overflow-hidden shadow-lg border-4 border-white/95 rotate-[-6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
                     <img
                       src={customCakes[0].image}
                       alt={customCakes[0].name}
@@ -254,7 +254,7 @@ export default function Hero({ products = [] }: HeroProps) {
 
                 {/* Photo 2 (Top right, tilted) */}
                 {customCakes[1] && (
-                  <div className="absolute top-0 right-4 w-[48%] aspect-square rounded-2xl overflow-hidden shadow-xl border-4 border-white/95 rotate-[6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
+                  <div className="absolute top-0 right-4 w-[48%] aspect-square rounded-none overflow-hidden shadow-xl border-4 border-white/95 rotate-[6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
                     <img
                       src={customCakes[1].image}
                       alt={customCakes[1].name}
@@ -268,7 +268,7 @@ export default function Hero({ products = [] }: HeroProps) {
 
                 {/* Photo 3 (Bottom center-right, overlapping) */}
                 {customCakes[2] && (
-                  <div className="absolute bottom-[8%] left-[25%] w-[50%] aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white/95 rotate-[-2deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
+                  <div className="absolute bottom-[8%] left-[25%] w-[50%] aspect-square rounded-none overflow-hidden shadow-2xl border-4 border-white/95 rotate-[-2deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
                     <img
                       src={customCakes[2].image}
                       alt={customCakes[2].name}
@@ -290,7 +290,7 @@ export default function Hero({ products = [] }: HeroProps) {
             <button
               key={idx}
               onClick={() => handleSlideChange(idx)}
-              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+              className={`h-2.5 rounded-none transition-all duration-300 cursor-pointer ${
                 currentSlide === idx
                   ? "bg-[#C5A880] w-8"
                   : "bg-white/20 hover:bg-white/40 w-2.5"

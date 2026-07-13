@@ -79,7 +79,7 @@ export default function NotFound() {
 
         {/* Text Section */}
         <div className="space-y-4">
-          <span className="inline-block text-xs font-bold uppercase tracking-widest text-[#C5A880] bg-[#C5A880]/10 px-3 py-1 rounded-full">
+          <span className="inline-block text-xs font-bold uppercase tracking-widest text-[#C5A880] bg-[#C5A880]/10 px-3 py-1 rounded-none">
             Error 404
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-[#2A1E17]">
@@ -94,13 +94,13 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
           <Link
             href="/"
-            className="w-full sm:w-auto px-8 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-white bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer text-center"
+            className="w-full sm:w-auto px-8 py-3 rounded-none text-xs font-bold uppercase tracking-wider text-white bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer text-center"
           >
             Return to Home
           </Link>
           <Link
             href="/menu"
-            className="w-full sm:w-auto px-8 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-[#2A1E17] border border-[#2A1E17]/20 hover:border-[#2A1E17] hover:bg-[#EFEFEA] transition-all duration-300 cursor-pointer text-center"
+            className="w-full sm:w-auto px-8 py-3 rounded-none text-xs font-bold uppercase tracking-wider text-[#2A1E17] border border-[#2A1E17]/20 hover:border-[#2A1E17] hover:bg-[#EFEFEA] transition-all duration-300 cursor-pointer text-center"
           >
             Browse Menu
           </Link>

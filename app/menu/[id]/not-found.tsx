@@ -100,7 +100,7 @@ export default async function ProductNotFound() {
 
           <Link
             href="/menu"
-            className="rounded-full bg-[#2A1E17] text-white px-8 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:bg-[#C5A880] hover:text-[#2A1E17] shadow-sm hover:shadow-md cursor-pointer"
+            className="rounded-none bg-[#2A1E17] text-white px-8 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:bg-[#C5A880] hover:text-[#2A1E17] shadow-sm hover:shadow-md cursor-pointer"
           >
             Explore All Treats
           </Link>

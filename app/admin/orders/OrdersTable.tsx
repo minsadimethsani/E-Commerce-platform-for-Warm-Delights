@@ -114,246 +114,310 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
     }
   };
 
-  return (
-    <div className="flex flex-col lg:flex-row gap-8 items-start">
-      
-      {/* Table Container (Left Column) */}
-      <div className="flex-1 w-full overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[#2A1E17]/5">
-            <thead className="bg-[#EFEFEA]">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order</th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Date</th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total</th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</th>
-                <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
-              {orders.map((order) => {
-                const formattedDate = order.createdAt
-                  ? new Date(order.createdAt as any).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : new Date().toLocaleDateString();
+  if (selectedOrder) {
+    const formattedDate = selectedOrder.createdAt
+      ? new Date(selectedOrder.createdAt as any).toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : new Date().toLocaleDateString();
 
-                return (
-                  <tr
-                    key={order.id}
-                    className={`hover:bg-[#EFEFEA]/30 transition-colors cursor-pointer ${
-                      selectedOrder?.id === order.id ? "bg-[#EFEFEA]/40" : ""
-                    }`}
-                    onClick={() => setSelectedOrder(order)}
-                  >
-                    {/* Order ID */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
-                      {order.id}
-                    </td>
-                    {/* Date */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]/80">
-                      {formattedDate}
-                    </td>
-                    {/* Total Price */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
-                      Rs. {order.total.toFixed(2)}
-                    </td>
-                    {/* Status Badge */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm">
-                      <span className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    {/* Actions Status Selector */}
-                    <td
-                      className="whitespace-nowrap px-6 py-4 text-right text-sm"
-                      onClick={(e) => e.stopPropagation()} // Stop row click trigger
-                    >
-                      <div className="relative inline-block text-left">
-                        <select
-                          value={order.status}
-                          disabled={updatingId === order.id}
-                          onChange={(e) =>
-                            handleStatusChange(order.id, e.target.value as Order["status"])
-                          }
-                          className="bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg py-1 pl-2.5 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer disabled:opacity-40"
-                        >
-                          {statusOptions.map((opt) => (
-                            <option key={opt} value={opt}>
-                              {opt}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Details Side Panel (Right Column, visible when order selected) */}
-      {selectedOrder && (
-        <aside className="w-full lg:w-96 rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b border-[#2A1E17]/5 pb-4">
-            <h3 className="font-serif text-lg font-bold text-[#2A1E17]">
-              Details: {selectedOrder.id}
-            </h3>
+    return (
+      <div className="space-y-6 animate-fade-in">
+        {/* Navigation & Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#2A1E17]/10 pb-6">
+          <div className="space-y-1.5">
             <button
               onClick={() => setSelectedOrder(null)}
-              className="text-xs font-bold text-[#3A2E2B]/60 hover:text-[#2A1E17]"
+              className="group flex items-center text-xs font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors mb-2 cursor-pointer"
             >
-              Close
+              <span className="mr-1.5 transition-transform group-hover:-translate-x-1">&larr;</span> Back to Orders
             </button>
-          </div>
-
-          {/* Billing Info */}
-          {selectedOrder.billingDetails && (
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Billing Details</h4>
-              <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-[#EFEFEA]/30 p-3 rounded-xl border border-[#2A1E17]/5 space-y-0.5 animate-fade-in">
-                <p className="font-bold">
-                  {selectedOrder.billingDetails.firstName} {selectedOrder.billingDetails.lastName}
-                </p>
-                <p className="text-xs text-[#3A2E2B]/75">{selectedOrder.billingDetails.email}</p>
-                <p className="text-xs text-[#3A2E2B]/75">{selectedOrder.billingDetails.phone}</p>
-                <p className="text-xs text-[#3A2E2B]/60 uppercase tracking-wide font-semibold mt-1">
-                  Country: {selectedOrder.billingDetails.country}
-                  {selectedOrder.billingDetails.zipCode ? ` | Zip: ${selectedOrder.billingDetails.zipCode}` : ""}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Fulfillment Details */}
-          {selectedOrder.fulfillment ? (
-            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5 animate-fade-in">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60 flex items-center justify-between">
-                <span>Fulfillment Details</span>
-                <span className="px-2 py-0.5 bg-[#C5A880]/15 text-[#2A1E17] text-[10px] rounded-md font-bold uppercase tracking-wider">
-                  {selectedOrder.fulfillment.type}
-                </span>
-              </h4>
-
-              {selectedOrder.fulfillment.type === "pickup" && selectedOrder.fulfillment.pickupDetails && (
-                <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-amber-50/40 p-3 rounded-xl border border-amber-200/30 space-y-1">
-                  <p className="text-xs font-bold text-[#2A1E17]/60 uppercase tracking-wider">Pickup Branch:</p>
-                  <p className="font-semibold text-xs">{selectedOrder.fulfillment.pickupDetails.branch}</p>
-                  <div className="flex justify-between items-center text-xs mt-2 border-t border-[#2A1E17]/5 pt-2">
-                    <span>Date: <strong>{selectedOrder.fulfillment.pickupDetails.date}</strong></span>
-                    <span>Time: <strong>{selectedOrder.fulfillment.pickupDetails.time}</strong></span>
-                  </div>
-                </div>
-              )}
-
-              {selectedOrder.fulfillment.type === "delivery" && selectedOrder.fulfillment.deliveryDetails && (
-                <div className="text-sm text-[#2A1E17] font-medium leading-relaxed bg-[#EFEFEA]/30 p-3 rounded-xl border border-[#2A1E17]/5 space-y-1">
-                  <p className="font-bold">
-                    Recipient: {selectedOrder.fulfillment.deliveryDetails.firstName} {selectedOrder.fulfillment.deliveryDetails.lastName}
-                  </p>
-                  <p className="text-xs">{selectedOrder.fulfillment.deliveryDetails.address}</p>
-                  <p className="text-xs">City: {selectedOrder.fulfillment.deliveryDetails.city}</p>
-                  <div className="text-xs mt-1 space-y-0.5 border-t border-[#2A1E17]/5 pt-1.5">
-                    <p>Phone: {selectedOrder.fulfillment.deliveryDetails.phone}</p>
-                    <p>Recipient Phone: {selectedOrder.fulfillment.deliveryDetails.recipientPhone}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Fallback to original shippingAddress if fulfillment is not set (seeded orders) */
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Shipping Address</h4>
-              <div className="text-sm text-[#2A1E17] font-medium leading-relaxed">
-                <p className="font-bold">{selectedOrder.shippingAddress.street}</p>
-                <p>
-                  {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
-                </p>
-                <p>{selectedOrder.shippingAddress.country}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Order Note */}
-          {selectedOrder.orderNote && (
-            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order Note</h4>
-              <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3 rounded-xl border border-yellow-200/25 italic">
-                "{selectedOrder.orderNote}"
-              </div>
-            </div>
-          )}
-
-          {/* Payment Info */}
-          <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Payment</h4>
-            <div className="flex justify-between items-center text-sm">
-              <span className="font-medium text-[#3A2E2B]">
-                Method: <span className="font-bold text-[#2A1E17]">
-                  {selectedOrder.paymentDetails.method === "cod" ? "Cash on Delivery" :
-                   selectedOrder.paymentDetails.method === "card" ? "Card Payment" :
-                   selectedOrder.paymentDetails.method === "bank_deposit" ? "Bank Deposit" :
-                   selectedOrder.paymentDetails.method.toUpperCase()}
-                </span>
-              </span>
-              <span className={`inline-block rounded-md px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                selectedOrder.paymentDetails.status === "paid"
-                  ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                  : "bg-red-50 text-red-700 border border-red-200"
-              }`}>
-                {selectedOrder.paymentDetails.status}
+            <div className="flex flex-wrap items-center gap-3">
+              <h2 className="font-serif text-2xl font-bold text-[#2A1E17]">
+                Order #{selectedOrder.id}
+              </h2>
+              <span className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(selectedOrder.status)}`}>
+                {selectedOrder.status}
               </span>
             </div>
+            <p className="text-xs text-[#3A2E2B]/60">
+              Placed on {formattedDate}
+            </p>
           </div>
 
-          {/* Items Summary */}
-          <div className="space-y-3 pt-4 border-t border-[#2A1E17]/5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order Items</h4>
-            <div className="space-y-3">
-              {selectedOrder.items.map((item) => (
-                <div key={item.productId} className="flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-2">
-                    <div className="relative h-8 w-8 overflow-hidden rounded bg-[#2A1E17]/5 flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                    </div>
-                    <div>
-                      <span className="font-bold text-[#2A1E17] line-clamp-1">{item.name}</span>
-                      <span className="text-[#3A2E2B]/60">Qty: {item.quantity}</span>
-                    </div>
-                  </div>
-                  <span className="font-bold text-[#2A1E17]">Rs. {(item.price * item.quantity).toFixed(2)}</span>
-                </div>
+          {/* Action (Update Status) */}
+          <div className="flex items-center gap-3 bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-xl p-3.5 self-start sm:self-auto">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Update Status:</label>
+            <select
+              value={selectedOrder.status}
+              disabled={updatingId === selectedOrder.id}
+              onChange={(e) =>
+                handleStatusChange(selectedOrder.id, e.target.value as Order["status"])
+              }
+              className="bg-white border border-[#2A1E17]/10 rounded-lg py-1.5 pl-3 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer disabled:opacity-40"
+            >
+              {statusOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
               ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Main Grid Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* Left Column (Items & Pricing) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Items Card */}
+            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-4">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                Order Items
+              </h3>
+              <div className="divide-y divide-[#2A1E17]/5">
+                {selectedOrder.items.map((item) => (
+                  <div key={item.productId} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
+                    <div className="flex items-center space-x-4">
+                      <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-[#2A1E17]/5 flex-shrink-0">
+                        <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#2A1E17] text-sm">{item.name}</h4>
+                        <p className="text-xs text-[#3A2E2B]/60 mt-0.5">Quantity: {item.quantity}</p>
+                        <p className="text-xs text-[#3A2E2B]/60">Unit Price: Rs. {item.price.toFixed(2)}</p>
+                      </div>
+                    </div>
+                    <span className="font-bold text-[#2A1E17] text-sm">Rs. {(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Calculations Card */}
+            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-4">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                Payment Summary
+              </h3>
+              <div className="space-y-2.5 text-sm text-[#3A2E2B]/85">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-[#2A1E17]">Rs. {selectedOrder.subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax (8%)</span>
+                  <span className="font-medium text-[#2A1E17]">Rs. {selectedOrder.tax.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shipping Fee</span>
+                  <span className="font-medium text-[#2A1E17]">Rs. {selectedOrder.shippingFee.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-base font-bold text-[#2A1E17] pt-4 border-t border-dashed border-[#2A1E17]/10">
+                  <span>Total Amount</span>
+                  <span className="text-lg text-[#2E1D13]">Rs. {selectedOrder.total.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Price Calculations */}
-          <div className="pt-4 border-t border-[#2A1E17]/5 space-y-1.5 text-xs text-[#3A2E2B]/80">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>Rs. {selectedOrder.subtotal.toFixed(2)}</span>
+          {/* Right Column (Billing & Fulfillment) */}
+          <div className="space-y-6">
+            {/* Customer & Billing Card */}
+            {selectedOrder.billingDetails && (
+              <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                  Billing Details
+                </h3>
+                <div className="text-sm text-[#2A1E17] leading-relaxed space-y-1">
+                  <p className="font-bold text-base text-[#2E1D13]">
+                    {selectedOrder.billingDetails.firstName} {selectedOrder.billingDetails.lastName}
+                  </p>
+                  <p className="text-xs text-[#3A2E2B]/80">{selectedOrder.billingDetails.email}</p>
+                  <p className="text-xs text-[#3A2E2B]/80">{selectedOrder.billingDetails.phone}</p>
+                  <div className="text-xs text-[#3A2E2B]/60 uppercase tracking-wide font-semibold pt-2 border-t border-[#2A1E17]/5 mt-3">
+                    Country: {selectedOrder.billingDetails.country}
+                    {selectedOrder.billingDetails.zipCode ? ` | Zip: ${selectedOrder.billingDetails.zipCode}` : ""}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Delivery/Pickup Card */}
+            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                Fulfillment Info
+              </h3>
+              {selectedOrder.fulfillment ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Type</span>
+                    <span className="px-2.5 py-0.5 bg-[#C5A880]/15 text-[#2A1E17] text-[10px] rounded-md font-bold uppercase tracking-wider">
+                      {selectedOrder.fulfillment.type}
+                    </span>
+                  </div>
+
+                  {selectedOrder.fulfillment.type === "pickup" && selectedOrder.fulfillment.pickupDetails && (
+                    <div className="bg-amber-50/40 p-3.5 rounded-xl border border-amber-200/35 space-y-1.5 text-sm">
+                      <p className="text-xs font-bold text-[#2A1E17]/60 uppercase tracking-wider">Pickup Branch:</p>
+                      <p className="font-bold text-[#2A1E17]">{selectedOrder.fulfillment.pickupDetails.branch}</p>
+                      <div className="flex justify-between items-center text-xs mt-3 border-t border-[#2A1E17]/5 pt-2">
+                        <span>Date: <strong>{selectedOrder.fulfillment.pickupDetails.date}</strong></span>
+                        <span>Time: <strong>{selectedOrder.fulfillment.pickupDetails.time}</strong></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedOrder.fulfillment.type === "delivery" && selectedOrder.fulfillment.deliveryDetails && (
+                    <div className="bg-[#EFEFEA]/30 p-3.5 rounded-xl border border-[#2A1E17]/5 space-y-2 text-sm">
+                      <p className="font-bold">
+                        Recipient: {selectedOrder.fulfillment.deliveryDetails.firstName} {selectedOrder.fulfillment.deliveryDetails.lastName}
+                      </p>
+                      <p className="text-xs leading-relaxed">{selectedOrder.fulfillment.deliveryDetails.address}</p>
+                      <p className="text-xs">City: {selectedOrder.fulfillment.deliveryDetails.city}</p>
+                      <div className="text-xs mt-2 space-y-1 border-t border-[#2A1E17]/5 pt-2">
+                        <p>Phone: <strong>{selectedOrder.fulfillment.deliveryDetails.phone}</strong></p>
+                        <p>Recipient Phone: <strong>{selectedOrder.fulfillment.deliveryDetails.recipientPhone}</strong></p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Fallback to original shippingAddress if fulfillment is not set (seeded orders) */
+                <div className="text-sm text-[#2A1E17] leading-relaxed space-y-0.5">
+                  <p className="font-bold">{selectedOrder.shippingAddress.street}</p>
+                  <p>
+                    {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
+                  </p>
+                  <p className="text-xs text-[#3A2E2B]/70">{selectedOrder.shippingAddress.country}</p>
+                </div>
+              )}
             </div>
-            <div className="flex justify-between">
-              <span>Tax (8%)</span>
-              <span>Rs. {selectedOrder.tax.toFixed(2)}</span>
+
+            {/* Payment Card */}
+            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                Payment Info
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Method</span>
+                  <span className="font-bold text-[#2A1E17]">
+                    {selectedOrder.paymentDetails.method === "cod" ? "Cash on Delivery" :
+                     selectedOrder.paymentDetails.method === "card" ? "Card Payment" :
+                     selectedOrder.paymentDetails.method === "bank_deposit" ? "Bank Deposit" :
+                     selectedOrder.paymentDetails.method.toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</span>
+                  <span className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    selectedOrder.paymentDetails.status === "paid"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "bg-red-50 text-red-700 border border-red-200"
+                  }`}>
+                    {selectedOrder.paymentDetails.status}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>Rs. {selectedOrder.shippingFee.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm font-bold text-[#2A1E17] pt-2 border-t border-dashed border-[#2A1E17]/5">
-              <span>Total</span>
-              <span>Rs. {selectedOrder.total.toFixed(2)}</span>
-            </div>
+
+            {/* Order Note Card */}
+            {selectedOrder.orderNote && (
+              <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+                  Order Note
+                </h3>
+                <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3.5 rounded-xl border border-yellow-200/25 italic leading-relaxed">
+                  "{selectedOrder.orderNote}"
+                </div>
+              </div>
+            )}
           </div>
 
-        </aside>
-      )}
+        </div>
+      </div>
+    );
+  }
 
+  return (
+    <div className="w-full overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-[#2A1E17]/5">
+          <thead className="bg-[#EFEFEA]">
+            <tr>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Date</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</th>
+              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
+            {orders.map((order) => {
+              const formattedDate = order.createdAt
+                ? new Date(order.createdAt as any).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })
+                : new Date().toLocaleDateString();
+
+              return (
+                <tr
+                  key={order.id}
+                  className="hover:bg-[#EFEFEA]/30 transition-colors cursor-pointer"
+                  onClick={() => setSelectedOrder(order)}
+                >
+                  {/* Order ID */}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
+                    {order.id}
+                  </td>
+                  {/* Date */}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]/80">
+                    {formattedDate}
+                  </td>
+                  {/* Total Price */}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
+                    Rs. {order.total.toFixed(2)}
+                  </td>
+                  {/* Status Badge */}
+                  <td className="whitespace-nowrap px-6 py-4 text-sm">
+                    <span className={`inline-block rounded-md px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  {/* Actions Status Selector */}
+                  <td
+                    className="whitespace-nowrap px-6 py-4 text-right text-sm"
+                    onClick={(e) => e.stopPropagation()} // Stop row click trigger
+                  >
+                    <div className="relative inline-block text-left">
+                      <select
+                        value={order.status}
+                        disabled={updatingId === order.id}
+                        onChange={(e) =>
+                          handleStatusChange(order.id, e.target.value as Order["status"])
+                        }
+                        className="bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg py-1 pl-2.5 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer disabled:opacity-40"
+                      >
+                        {statusOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

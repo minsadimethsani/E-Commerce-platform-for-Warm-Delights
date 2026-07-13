@@ -116,7 +116,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
               <button
                 key={category}
                 onClick={() => handleCategoryChange(category)}
-                className={`px-4 py-2 text-xs font-bold tracking-wider uppercase rounded-full transition-all duration-300 ${
+                className={`px-4 py-2 text-xs font-bold tracking-wider uppercase rounded-none transition-all duration-300 ${
                   selectedCategory === category
                     ? "bg-[#2A1E17] text-white shadow-sm"
                     : "bg-[#EFEFEA] text-[#3A2E2B]/80 hover:bg-[#2A1E17]/5 hover:text-[#2A1E17]"
@@ -144,7 +144,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                 placeholder="Search treats..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full py-2 pl-10 pr-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
+                className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none py-2 pl-10 pr-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -155,8 +155,8 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                 className="absolute left-3.5 top-2.5 w-4.5 h-4.5 text-[#3A2E2B]/60"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
                   d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                 />
               </svg>
@@ -167,7 +167,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
               <select
                 value={sortBy}
                 onChange={handleSortChange}
-                className="appearance-none bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full py-2 pl-4 pr-10 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] cursor-pointer transition-all"
+                className="appearance-none bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none py-2 pl-4 pr-10 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] cursor-pointer transition-all"
               >
                 <option value="featured">Featured / Default</option>
                 <option value="price-asc">Price: Low to High</option>
@@ -182,7 +182,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                 stroke="currentColor"
                 className="absolute right-3.5 top-3 w-3 h-3 text-[#3A2E2B]/60 pointer-events-none"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                <path strokeLinecap="square" strokeLinejoin="miter" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
               </svg>
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
 
         {/* Empty State */}
         {paginatedProducts.length === 0 ? (
-          <div className="text-center py-20 bg-[#EFEFEA]/50 rounded-2xl border border-dashed border-[#2A1E17]/10">
+          <div className="text-center py-20 bg-[#EFEFEA]/50 rounded-none border border-dashed border-[#2A1E17]/10">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -205,8 +205,8 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
               className="mx-auto w-12 h-12 text-[#3A2E2B]/40 mb-4"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                strokeLinecap="square"
+                strokeLinejoin="miter"
                 d="M15.182 16.318A4.486 4.486 0 0 0 12.016 15a4.486 4.486 0 0 0-3.198 1.318M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM9.75 9.75c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z"
               />
             </svg>
@@ -232,7 +232,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   aria-label="Previous Page"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
+                  className="flex h-10 w-10 items-center justify-center rounded-none border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -242,7 +242,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                     stroke="currentColor"
                     className="w-4 h-4"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="M15.75 19.5 8.25 12l7.5-7.5" />
                   </svg>
                 </button>
 
@@ -253,7 +253,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold tracking-wider transition-all cursor-pointer ${
+                      className={`flex h-10 w-10 items-center justify-center rounded-none text-xs font-bold tracking-wider transition-all cursor-pointer ${
                         currentPage === pageNum
                           ? "bg-[#2A1E17] text-white shadow-sm"
                           : "border border-[#2A1E17]/10 bg-white text-[#2A1E17] hover:border-[#C5A880] hover:bg-[#EFEFEA]"
@@ -269,7 +269,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   aria-label="Next Page"
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
+                  className="flex h-10 w-10 items-center justify-center rounded-none border border-[#2A1E17]/10 bg-white text-[#2A1E17] transition-all hover:border-[#C5A880] hover:bg-[#EFEFEA] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#2A1E17]/10 disabled:cursor-not-allowed cursor-pointer"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -279,7 +279,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
                     stroke="currentColor"
                     className="w-4 h-4"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                   </svg>
                 </button>
               </div>

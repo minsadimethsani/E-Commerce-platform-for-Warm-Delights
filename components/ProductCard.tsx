@@ -56,7 +56,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-2xl bg-[#EFEFEA]/50 border border-[#2A1E17]/5 transition-all duration-300 hover:bg-[#EFEFEA] hover:-translate-y-1 hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-none bg-[#EFEFEA]/50 border border-[#2A1E17]/5 transition-all duration-300 hover:bg-[#EFEFEA] hover:-translate-y-1 hover:shadow-md">
       {/* Image Frame */}
       <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#2A1E17]/5 block cursor-pointer">
         <Image
@@ -70,7 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badge */}
         {product.badge && (
           <div className="absolute top-3 left-3">
-            <span className="inline-block rounded-md bg-[#C5A880] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
+            <span className="inline-block rounded-none bg-[#C5A880] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
               {product.badge}
             </span>
           </div>
@@ -120,7 +120,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             aria-label={product.variants && product.variants.length > 0 ? `View options for ${product.name}` : `Add ${product.name} to cart`}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2A1E17] text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17] cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-none bg-[#2A1E17] text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17] cursor-pointer"
           >
             {product.variants && product.variants.length > 0 ? (
               <svg
@@ -131,7 +131,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 stroke="currentColor"
                 className="w-4 h-4"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                <path strokeLinecap="square" strokeLinejoin="miter" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
               </svg>
             ) : (
               <svg
@@ -143,8 +143,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                 className="w-4.5 h-4.5"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
                   d="M12 4.5v15m7.5-7.5h-15"
                 />
               </svg>

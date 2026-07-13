@@ -525,9 +525,10 @@ export default function ProductsClient({
         {selectedProductIds.length > 0 && (
           <div className="flex items-center justify-between bg-rose-50 border border-rose-250 rounded-2xl px-6 py-4 transition-all duration-300 shadow-xs">
             <div className="flex items-center space-x-2 text-rose-800 text-xs font-bold uppercase tracking-wider">
-              <span>⚠️</span>
+              <span className="font-sans px-1.5 py-0.5 border border-rose-300 bg-white text-[9px] uppercase tracking-wider text-rose-700">Select</span>
               <span>{selectedProductIds.length} {selectedProductIds.length === 1 ? "Product" : "Products"} Selected</span>
             </div>
+
             <button
               onClick={handleBulkDelete}
               disabled={isUpdating}
@@ -602,7 +603,7 @@ export default function ProductsClient({
                     {/* Image & Title */}
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-[#2A1E17]/5">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-none bg-[#2A1E17]/5">
                           <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
                         </div>
                         <div>
@@ -610,7 +611,7 @@ export default function ProductsClient({
                             {p.name}
                           </Link>
                           {p.badge && (
-                            <span className="inline-block rounded bg-[#EFEFEA] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
+                            <span className="inline-block rounded-none bg-[#EFEFEA] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
                               {p.badge}
                             </span>
                           )}
@@ -634,7 +635,7 @@ export default function ProductsClient({
                             <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
                             {p.sizes.map((s: any, idx: number) => (
                               <span key={idx} className="inline-block bg-[#EFEFEA] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
-                                {s.name} {s.price > 0 ? `(+Rs.${s.price})` : ""}
+                                {s.name} {s.price > 0 ? `(+Rs.${s.price})` : s.price < 0 ? `(-Rs.${Math.abs(s.price)})` : ""}
                               </span>
                             ))}
                           </div>
@@ -648,7 +649,7 @@ export default function ProductsClient({
                               const fPrice = typeof f === "string" ? 0 : f.price;
                               return (
                                 <span key={idx} className="inline-block bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#C5A880]/10">
-                                  {fName} {fPrice > 0 ? `(+Rs.${fPrice})` : ""}
+                                  {fName} {fPrice > 0 ? `(+Rs.${fPrice})` : fPrice < 0 ? `(-Rs.${Math.abs(fPrice)})` : ""}
                                 </span>
                               );
                             })}
@@ -663,7 +664,7 @@ export default function ProductsClient({
                               const icPrice = typeof ic === "string" ? 0 : ic.price;
                               return (
                                 <span key={idx} className="inline-block bg-[#2A1E17]/10 text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
-                                  {icName} {icPrice > 0 ? `(+Rs.${icPrice})` : ""}
+                                  {icName} {icPrice > 0 ? `(+Rs.${icPrice})` : icPrice < 0 ? `(-Rs.${Math.abs(icPrice)})` : ""}
                                 </span>
                               );
                             })}
@@ -674,9 +675,8 @@ export default function ProductsClient({
                         )}
                       </div>
                     </td>
-                    {/* Rating */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-amber-500">
-                      ⭐ {p.rating.toFixed(1)} ({p.reviewsCount})
+                    <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-[#2A1E17]">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1 py-0.5">Rating: {p.rating.toFixed(1)}</span> ({p.reviewsCount})
                     </td>
                     {/* Action buttons */}
                     <td className="whitespace-nowrap px-6 py-4 text-right text-xs font-bold space-x-2">
@@ -777,6 +777,15 @@ export default function ProductsClient({
                       </option>
                     ))}
                   </select>
+                  <div className="flex justify-between items-center mt-1.5 px-0.5">
+                    <span className="text-[9px] text-[#3A2E2B]/60 font-sans">Need a different category?</span>
+                    <Link
+                      href="/admin/categories"
+                      className="text-[9px] font-bold text-[#C5A880] hover:text-[#2A1E17] hover:underline transition-colors font-sans"
+                    >
+                      Manage Categories & Subcategories →
+                    </Link>
+                  </div>
                 </div>
 
                 {/* 3. Subcategory Dropdown (if active category has subcategories) */}
@@ -888,7 +897,7 @@ export default function ProductsClient({
                             <span className="font-semibold">{s.name}</span>
                             <div className="flex items-center space-x-4">
                               <span className="text-[#3A2E2B]/85 font-medium">
-                                {s.price > 0 ? `+Rs. ${s.price.toFixed(2)}` : "Rs. 0.00"} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
+                                {s.price > 0 ? `+Rs. ${s.price.toFixed(2)}` : s.price < 0 ? `-Rs. ${Math.abs(s.price).toFixed(2)}` : "Rs. 0.00"} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
                               </span>
                               <button
                                 type="button"
@@ -934,7 +943,7 @@ export default function ProductsClient({
                             return;
                           }
                           const priceVal = newSizePrice ? parseFloat(newSizePrice) : 0;
-                          if (isNaN(priceVal) || priceVal < 0) {
+                          if (isNaN(priceVal)) {
                             alert("Invalid price.");
                             return;
                           }
@@ -970,7 +979,7 @@ export default function ProductsClient({
                           const fPrice = typeof f === "string" ? 0 : f.price;
                           return (
                             <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
-                              <span>{fName} {fPrice > 0 ? `(+Rs. ${fPrice})` : ""}</span>
+                              <span>{fName} {fPrice > 0 ? `(+Rs. ${fPrice})` : fPrice < 0 ? `(-Rs. ${Math.abs(fPrice)})` : ""}</span>
                               <button
                                 type="button"
                                 onClick={() => setFlavors((prev) => prev.filter((_, i) => i !== idx))}
@@ -1044,7 +1053,7 @@ export default function ProductsClient({
                           const icPrice = typeof ic === "string" ? 0 : ic.price;
                           return (
                             <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
-                              <span>{icName} {icPrice > 0 ? `(+Rs. ${icPrice})` : ""}</span>
+                              <span>{icName} {icPrice > 0 ? `(+Rs. ${icPrice})` : icPrice < 0 ? `(-Rs. ${Math.abs(icPrice)})` : ""}</span>
                               <button
                                 type="button"
                                 onClick={() => setIcings((prev) => prev.filter((_, i) => i !== idx))}
@@ -1160,7 +1169,7 @@ export default function ProductsClient({
                     </p>
                     {isCompressing && (
                       <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
-                        ⚡ Compressing and converting to WebP...
+                        [COMPRESSING] Compressing and converting to WebP...
                       </span>
                     )}
                   </div>
@@ -1171,11 +1180,11 @@ export default function ProductsClient({
                       <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
                         Uploaded Media ({uploadedImages.length + (videoUrl ? 1 : 0)})
                       </span>
-                      <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-xl max-h-36 overflow-y-auto">
+                      <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none max-h-36 overflow-y-auto">
                         {videoUrl && (
-                          <div className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group bg-black">
+                          <div className="relative h-14 w-14 rounded-none overflow-hidden border border-[#2A1E17]/10 group bg-black">
                             <video src={videoUrl} className="h-full w-full object-cover" muted playsInline />
-                            <span className="absolute top-0.5 right-0.5 bg-black/60 rounded px-1 text-[7px] text-white font-bold uppercase tracking-wider">
+                            <span className="absolute top-0.5 right-0.5 bg-black/60 rounded-none px-1 text-[7px] text-white font-bold uppercase tracking-wider">
                               Video
                             </span>
                             <button
@@ -1188,7 +1197,7 @@ export default function ProductsClient({
                           </div>
                         )}
                         {uploadedImages.map((imgUrl, idx) => (
-                          <div key={idx} className="relative h-14 w-14 rounded-lg overflow-hidden border border-[#2A1E17]/10 group">
+                          <div key={idx} className="relative h-14 w-14 rounded-none overflow-hidden border border-[#2A1E17]/10 group">
                             <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
                             <button
                               type="button"

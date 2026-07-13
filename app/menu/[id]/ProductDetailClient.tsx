@@ -53,28 +53,53 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
 
   // Dynamic Pricing Engine
   const basePrice = selectedVariant ? selectedVariant.price : product.price;
+
+  // Selected Premiums
   const selectedSizeObj = product.sizes?.find((s) => s.name === selectedSize);
-  const sizePremium = selectedSizeObj
+  const sizePremiumSelected = selectedSizeObj
     ? (selectedSizeObj.priceMultiplier 
         ? basePrice * (selectedSizeObj.priceMultiplier - 1) 
         : selectedSizeObj.price)
     : 0;
 
   const selectedFlavorObj = product.flavors?.find((f) => (typeof f === "string" ? f : f.name) === selectedFlavor);
-  const flavorPremium = selectedFlavorObj && typeof selectedFlavorObj !== "string"
+  const flavorPremiumSelected = selectedFlavorObj && typeof selectedFlavorObj !== "string"
     ? selectedFlavorObj.price
     : 0;
 
   const selectedIcingObj = product.icings?.find((ic) => (typeof ic === "string" ? ic : ic.name) === selectedIcing);
-  const icingPremium = selectedIcingObj && typeof selectedIcingObj !== "string"
+  const icingPremiumSelected = selectedIcingObj && typeof selectedIcingObj !== "string"
     ? selectedIcingObj.price
+    : 0;
+
+  // Default Premiums
+  const defaultSizeObj = product.sizes?.find((s) => s.name === defaultSizeVal);
+  const sizePremiumDefault = defaultSizeObj
+    ? (defaultSizeObj.priceMultiplier 
+        ? basePrice * (defaultSizeObj.priceMultiplier - 1) 
+        : defaultSizeObj.price)
+    : 0;
+
+  const defaultFlavorObj = product.flavors?.find((f) => (typeof f === "string" ? f : f.name) === defaultFlavorVal);
+  const flavorPremiumDefault = defaultFlavorObj && typeof defaultFlavorObj !== "string"
+    ? defaultFlavorObj.price
+    : 0;
+
+  const defaultIcingObj = product.icings?.find((ic) => (typeof ic === "string" ? ic : ic.name) === defaultIcingVal);
+  const icingPremiumDefault = defaultIcingObj && typeof defaultIcingObj !== "string"
+    ? defaultIcingObj.price
     : 0;
 
   const addOnsFee = selectedAddOns.reduce(
     (sum, addOn) => sum + (addOn === "Eggless" ? 5.00 : addOn === "Gift Box" ? 8.00 : 2.00),
     0
   );
-  const finalPrice = basePrice + sizePremium + flavorPremium + icingPremium + addOnsFee;
+
+  const finalPrice = basePrice + 
+                     (sizePremiumSelected - sizePremiumDefault) + 
+                     (flavorPremiumSelected - flavorPremiumDefault) + 
+                     (icingPremiumSelected - icingPremiumDefault) + 
+                     addOnsFee;
 
   const incrementQty = () => setQuantity((prev) => (prev < 20 ? prev + 1 : prev));
   const decrementQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
@@ -184,7 +209,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-8">
           
           {/* Left: Product Image Box */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-3xl bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm">
+          <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm">
             <Image
               src={product.image}
               alt={product.name}
@@ -195,7 +220,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             />
             {product.badge && (
               <div className="absolute top-6 left-6">
-                <span className="inline-block rounded-md bg-[#C5A880] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+                <span className="inline-block rounded-none bg-[#C5A880] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
                   {product.badge}
                 </span>
               </div>
@@ -207,7 +232,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             
             {/* Header info */}
             <div className="space-y-4">
-              <span className="inline-block px-3 py-1 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-full text-xs font-bold uppercase tracking-wider text-[#C5A880]">
+              <span className="inline-block px-3 py-1 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none text-xs font-bold uppercase tracking-wider text-[#C5A880]">
                 {product.category}
               </span>
               
@@ -243,14 +268,14 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               (product.defaultFlavor || (product.flavors && product.flavors.length > 0)) ||
               (product.defaultIcing || (product.icings && product.icings.length > 0)) ||
               (product.variants && product.variants.length > 0)) && (
-              <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-2xl p-5 space-y-3">
+              <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-none p-5 space-y-3">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
-                  <span className="mr-2">✨</span> Standard Configuration (Included in Base Price)
+                  <span className="inline-block border border-[#2A1E17]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Recipe</span> Standard Configuration (Included in Base Price)
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Default Size */}
                   {((product.sizes && product.sizes.length > 0) || product.defaultSize) && (
-                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
                       <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Size / Weight</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultSize || (product.sizes && product.sizes[0]?.name) || "Standard"}
@@ -259,7 +284,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                   )}
                   {/* Default Flavor */}
                   {((product.flavors && product.flavors.length > 0) || product.defaultFlavor) && (
-                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
                       <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Flavor</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultFlavor || (product.flavors && (typeof product.flavors[0] === "string" ? product.flavors[0] : (product.flavors[0] as any).name)) || "Standard"}
@@ -268,7 +293,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                   )}
                   {/* Default Coating / Icing */}
                   {((product.icings && product.icings.length > 0) || product.defaultIcing) && (
-                    <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5">
+                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
                       <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Coating / Icing</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultIcing || (product.icings && (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name)) || "Standard"}
@@ -280,7 +305,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                     (!product.flavors || product.flavors.length === 0) &&
                     (!product.icings || product.icings.length === 0) &&
                     product.variants && product.variants.length > 0 && (
-                      <div className="bg-white p-3 rounded-xl border border-[#2A1E17]/5 sm:col-span-3">
+                      <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5 sm:col-span-3">
                         <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Default Option</span>
                         <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                           {product.variants[0].name} (Rs. {product.variants[0].price.toFixed(2)})
@@ -299,7 +324,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               <div className="space-y-6 pt-6 border-t border-[#2A1E17]/10">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
-                    <span className="mr-2">🎨</span> Customize Options / Variations
+                    <span className="inline-block border border-[#2A1E17]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Options</span> Customize Options / Variations
                   </h3>
                   <span className="text-[9px] text-[#3A2E2B]/60 italic font-medium">* Selection updates pricing</span>
                 </div>
@@ -325,16 +350,16 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                 key={s.name}
                                 type="button"
                                 onClick={() => setSelectedSize(selectedSize === s.name ? defaultSizeVal : s.name)}
-                                className={`px-4 py-2.5 rounded-full border text-xs font-bold transition-all cursor-pointer ${
+                                className={`px-4 py-2.5 rounded-none border text-xs font-bold transition-all cursor-pointer ${
                                   isSelected
                                     ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
                                     : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
                                 }`}
                               >
                                 <span>{s.name}</span>
-                                {premium > 0 && (
+                                {premium !== 0 && (
                                   <span className={`ml-1 text-[9px] font-semibold ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
-                                    (+Rs. {premium.toFixed(0)})
+                                    ({premium > 0 ? "+" : "-"}Rs. {Math.abs(premium).toFixed(0)})
                                   </span>
                                 )}
                               </button>
@@ -360,16 +385,16 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                 key={idx}
                                 type="button"
                                 onClick={() => setSelectedFlavor(selectedFlavor === fName ? defaultFlavorVal : fName)}
-                                className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
+                                className={`p-3 rounded-none border text-xs font-semibold text-center transition-all cursor-pointer ${
                                   isSelected
                                     ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
                                     : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
                                 }`}
                               >
                                 <span>{fName}</span>
-                                {fPrice > 0 && (
+                                {fPrice !== 0 && (
                                   <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
-                                    (+Rs. {fPrice.toFixed(0)})
+                                    ({fPrice > 0 ? "+" : "-"}Rs. {Math.abs(fPrice).toFixed(0)})
                                   </span>
                                 )}
                               </button>
@@ -395,16 +420,16 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                                 key={idx}
                                 type="button"
                                 onClick={() => setSelectedIcing(selectedIcing === icName ? defaultIcingVal : icName)}
-                                className={`p-3 rounded-xl border text-xs font-semibold text-center transition-all cursor-pointer ${
+                                className={`p-3 rounded-none border text-xs font-semibold text-center transition-all cursor-pointer ${
                                   isSelected
                                     ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
                                     : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
                                 }`}
                               >
                                 <span>{icName}</span>
-                                {icPrice > 0 && (
+                                {icPrice !== 0 && (
                                   <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
-                                    (+Rs. {icPrice.toFixed(0)})
+                                    ({icPrice > 0 ? "+" : "-"}Rs. {Math.abs(icPrice).toFixed(0)})
                                   </span>
                                 )}
                               </button>
@@ -429,7 +454,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                           return (
                             <label
                               key={addon.name}
-                              className={`flex items-center justify-between p-3 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
+                              className={`flex items-center justify-between p-3 rounded-none border text-xs font-semibold transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-[#C5A880]/10 border-[#C5A880] text-[#2A1E17]"
                                   : "bg-white text-[#2A1E17]/70 border-[#2A1E17]/5 hover:border-[#C5A880]/40"
@@ -475,7 +500,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                               key={idx}
                               type="button"
                               onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? defaultVariantVal : v)}
-                              className={`px-4 py-2.5 rounded-xl border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
+                              className={`px-4 py-2.5 rounded-none border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                                 isSelected
                                   ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
                                   : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
@@ -500,15 +525,15 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
                 Quantity:
               </span>
-              <div className="flex items-center justify-between bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-full px-2 py-1 w-32">
+              <div className="flex items-center justify-between bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none px-2 py-1 w-32">
                 <button
                   onClick={decrementQty}
                   disabled={quantity === 1}
                   aria-label="Decrease quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="M19.5 12h-15" />
                   </svg>
                 </button>
                 <span className="font-semibold text-sm text-[#2A1E17] min-w-5 text-center select-none">
@@ -518,10 +543,10 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
                   onClick={incrementQty}
                   disabled={quantity === 20}
                   aria-label="Increase quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                 </button>
               </div>
@@ -532,7 +557,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               {/* Add to Cart CTA */}
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 rounded-full py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs ${
+                className={`flex-1 rounded-none py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs ${
                   isAdded
                     ? "bg-emerald-600 text-white shadow-md"
                     : "bg-[#2A1E17] text-white hover:bg-[#C5A880] hover:text-[#2A1E17]"
@@ -544,7 +569,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
               {/* Buy Now CTA */}
               <button
                 onClick={handleBuyNow}
-                className="flex-1 rounded-full py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs bg-[#C5A880] text-[#2A1E17] hover:bg-[#2A1E17] hover:text-white"
+                className="flex-1 rounded-none py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs bg-[#C5A880] text-[#2A1E17] hover:bg-[#2A1E17] hover:text-white"
               >
                 Buy Now
               </button>
@@ -570,7 +595,7 @@ export default function ProductDetailClient({ product, relatedProducts }: Produc
             >
               <span>View Full Menu</span>
               <svg className="ml-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                <path strokeLinecap="square" strokeLinejoin="miter" d="M9 5l7 7-7 7" />
               </svg>
             </Link>
           </div>

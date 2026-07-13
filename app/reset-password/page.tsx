@@ -94,16 +94,17 @@ function ResetPasswordForm() {
       </div>
 
       {!token && (
-        <div className="bg-red-50 border border-red-250 text-red-750 rounded-2xl p-4 text-xs font-semibold mb-6 flex items-center space-x-2">
-          <span>⚠️</span>
+        <div className="bg-red-50 border border-red-250 text-red-750 p-4 text-xs font-semibold mb-6 flex items-center space-x-2">
+          <span className="font-sans px-1 py-0.5 border border-red-300 bg-white text-[9px] uppercase tracking-wider text-red-700">Error</span>
           <span>Access Denied: Missing password reset token. Please check your email link or request a new reset link.</span>
         </div>
       )}
 
+
       {successMessage ? (
         <div className="space-y-6 text-center animate-fade-in py-6">
-          <div className="mx-auto h-16 w-16 bg-emerald-50 rounded-full flex items-center justify-center text-2xl shadow-xs border border-emerald-100">
-            ✓
+          <div className="mx-auto h-16 w-16 bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 text-2xl font-bold">
+            OK
           </div>
           <p className="text-sm text-[#3A2E2B]/85 leading-relaxed font-semibold">
             {successMessage}
@@ -118,8 +119,8 @@ function ResetPasswordForm() {
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
           {generalError && (
-            <div className="bg-red-50 border border-red-250 text-red-750 rounded-2xl p-4 text-xs font-semibold flex items-center space-x-2">
-              <span>⚠️</span>
+            <div className="bg-red-50 border border-red-250 text-red-750 p-4 text-xs font-semibold flex items-center space-x-2">
+              <span className="font-sans px-1 py-0.5 border border-red-300 bg-white text-[9px] uppercase tracking-wider text-red-700">Error</span>
               <span>{generalError}</span>
             </div>
           )}

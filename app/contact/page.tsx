@@ -43,7 +43,7 @@ export default function ContactPage() {
             </li>
             <li className="flex items-center space-x-2">
               <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
               <span className="text-[#2A1E17]">Contact Us</span>
             </li>
@@ -58,7 +58,7 @@ export default function ContactPage() {
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2A1E17]">
             Connect With Our Bakery
           </h1>
-          <div className="h-1 w-16 bg-[#C5A880] mx-auto rounded-full" />
+          <div className="h-1 w-16 bg-[#C5A880] mx-auto rounded-none" />
           <p className="text-sm sm:text-base md:text-lg text-[#3A2E2B]/80 leading-relaxed max-w-2xl mx-auto">
             Have a question about custom cakes, catering services, or our baking processes? Drop us a line—our ovens are warm, and we are always happy to listen.
           </p>
@@ -69,7 +69,7 @@ export default function ContactPage() {
           
           {/* Left Column: Contact Info */}
           <div className="lg:col-span-5 space-y-8">
-            <div className="bg-[#EFEFEA]/45 border border-[#2A1E17]/5 rounded-3xl p-8 sm:p-10 space-y-8">
+            <div className="bg-[#EFEFEA]/45 border border-[#2A1E17]/5 rounded-none p-8 sm:p-10 space-y-8">
               
               {/* Bakery Details */}
               <div className="space-y-6">
@@ -78,7 +78,12 @@ export default function ContactPage() {
                 <div className="space-y-4 text-[#3A2E2B]/90 text-sm">
                   {/* Address */}
                   <div className="flex items-start space-x-3">
-                    <span className="text-lg">📍</span>
+                    <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                        <polygon points="12,2 20,8 20,22 4,22 4,8" strokeLinecap="square" strokeLinejoin="miter" />
+                        <rect x="10" y="10" width="4" height="4" />
+                      </svg>
+                    </div>
                     <div>
                       <span className="block font-semibold text-[#2A1E17]">Address</span>
                       <span className="block mt-1">123 Sweetwater Lane, Suite 40</span>
@@ -88,7 +93,12 @@ export default function ContactPage() {
 
                   {/* Phone */}
                   <div className="flex items-start space-x-3">
-                    <span className="text-lg">📞</span>
+                    <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                        <rect x="5" y="3" width="14" height="18" strokeLinecap="square" strokeLinejoin="miter" />
+                        <rect x="10" y="17" width="4" height="2" />
+                      </svg>
+                    </div>
                     <div>
                       <span className="block font-semibold text-[#2A1E17]">Phone</span>
                       <span className="block mt-1 hover:text-[#C5A880] transition-colors">
@@ -99,7 +109,12 @@ export default function ContactPage() {
 
                   {/* Email */}
                   <div className="flex items-start space-x-3">
-                    <span className="text-lg">✉️</span>
+                    <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center shrink-0">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                        <rect x="3" y="5" width="18" height="14" strokeLinecap="square" strokeLinejoin="miter" />
+                        <polygon points="3,5 12,13 21,5" strokeLinecap="square" strokeLinejoin="miter" />
+                      </svg>
+                    </div>
                     <div>
                       <span className="block font-semibold text-[#2A1E17]">Email</span>
                       <span className="block mt-1 hover:text-[#C5A880] transition-colors">
@@ -107,6 +122,7 @@ export default function ContactPage() {
                       </span>
                     </div>
                   </div>
+
                 </div>
               </div>
 
@@ -125,9 +141,11 @@ export default function ContactPage() {
                 </ul>
               </div>
 
-              {/* Event booking callout */}
-              <div className="p-5 bg-[#FBFBF9] rounded-2xl border border-[#2A1E17]/5 space-y-2">
-                <span className="font-serif font-bold text-sm text-[#2A1E17] block">🎉 Custom & Event Orders</span>
+              <div className="p-5 bg-[#FBFBF9] rounded-none border border-[#2A1E17]/5 space-y-2">
+                <span className="font-serif font-bold text-sm text-[#2A1E17] flex items-center gap-2 block">
+                  <span className="inline-block border border-[#2A1E17]/10 bg-[#EFEFEA] px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-sans">Event</span>
+                  Custom & Event Orders
+                </span>
                 <p className="text-xs text-[#3A2E2B]/75 leading-relaxed">
                   Planning a wedding, birthday, or corporate gathering? We recommend ordering custom tiered cakes at least 2 weeks in advance.
                 </p>
@@ -138,20 +156,23 @@ export default function ContactPage() {
 
           {/* Right Column: Contact Form */}
           <div className="lg:col-span-7">
-            <div className="bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-3xl p-8 sm:p-10 shadow-xs">
+            <div className="bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-none p-8 sm:p-10 shadow-xs">
               <h3 className="font-serif text-2xl font-bold text-[#2A1E17] mb-6">Send A Message</h3>
               
               {status === "success" ? (
                 /* Success feedback UI */
-                <div className="text-center py-12 px-6 bg-emerald-50 rounded-2xl border border-emerald-100 text-emerald-800 space-y-4 animate-fade-in">
-                  <span className="text-4xl block">✨</span>
+                <div className="text-center py-12 px-6 bg-emerald-50 rounded-none border border-emerald-100 text-emerald-800 space-y-4 animate-fade-in">
+                  <div className="mx-auto w-12 h-12 border border-emerald-300 bg-white flex items-center justify-center font-bold text-emerald-800 text-lg">
+                    OK
+                  </div>
                   <h4 className="font-serif font-bold text-xl">Thank you for writing!</h4>
                   <p className="text-sm max-w-sm mx-auto opacity-90">
                     Your message has been whisked away to our culinary team. We will review your inquiry and get back to you within 24 hours.
                   </p>
+
                   <button
                     onClick={() => setStatus("idle")}
-                    className="mt-6 inline-block rounded-full bg-emerald-800 text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-all cursor-pointer"
+                    className="mt-6 inline-block rounded-none bg-emerald-800 text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-emerald-900 transition-all cursor-pointer"
                   >
                     Send Another Message
                   </button>
@@ -172,7 +193,7 @@ export default function ContactPage() {
                         required
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-xl py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
+                        className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-none py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
                         placeholder="e.g. Emily Watson"
                       />
                     </div>
@@ -189,7 +210,7 @@ export default function ContactPage() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-xl py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
+                        className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-none py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all"
                         placeholder="e.g. emily@example.com"
                       />
                     </div>
@@ -206,7 +227,7 @@ export default function ContactPage() {
                         id="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full appearance-none bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-xl py-3 pl-4 pr-10 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] cursor-pointer transition-all"
+                        className="w-full appearance-none bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-none py-3 pl-4 pr-10 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] cursor-pointer transition-all"
                       >
                         <option value="general">General Inquiry</option>
                         <option value="custom-cake">Custom Cake Order Inquiry</option>
@@ -221,7 +242,7 @@ export default function ContactPage() {
                         stroke="currentColor"
                         className="absolute right-4 top-3.5 w-4 h-4 text-[#3A2E2B]/60 pointer-events-none"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                        <path strokeLinecap="square" strokeLinejoin="miter" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                       </svg>
                     </div>
                   </div>
@@ -238,7 +259,7 @@ export default function ContactPage() {
                       rows={5}
                       value={formData.message}
                       onChange={handleChange}
-                      className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-xl py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all resize-none"
+                      className="w-full bg-[#EFEFEA]/50 border border-[#2A1E17]/10 rounded-none py-3 px-4 text-sm text-[#2A1E17] placeholder-[#3A2E2B]/50 focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] transition-all resize-none"
                       placeholder="Write your request details here..."
                     />
                   </div>
@@ -247,7 +268,7 @@ export default function ContactPage() {
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-xs hover:shadow-md"
+                    className="w-full rounded-none bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-xs hover:shadow-md"
                   >
                     {status === "submitting" ? "Sending inquiry..." : "Send Inquiry"}
                   </button>

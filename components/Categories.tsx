@@ -109,7 +109,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
           <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17] sm:text-5xl">
             Our Sweet & Savory Offerings
           </h2>
-          <div className="mt-4 h-1 w-12 bg-[#C5A880] mx-auto rounded-full" />
+          <div className="mt-4 h-1 w-12 bg-[#C5A880] mx-auto rounded-none" />
           <p className="mt-6 text-base sm:text-lg leading-relaxed text-[#3A2E2B]/80">
             Handcrafted with patience, baked to perfection. Explore our artisanal signature ranges.
           </p>
@@ -120,7 +120,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
           {categories.map((category) => (
             <div
               key={category.title}
-              className="group flex flex-col overflow-hidden rounded-2xl bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-none bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
               {/* Image Container */}
               <div className="relative aspect-4/3 overflow-hidden bg-[#2A1E17]/5">
@@ -133,7 +133,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
                 />
                 {/* Badge Overlay */}
                 <div className="absolute top-4 left-4">
-                  <span className="inline-block rounded-md bg-[#FBFBF9] px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#C5A880] uppercase shadow-sm">
+                  <span className="inline-block rounded-none bg-[#FBFBF9] px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#C5A880] uppercase shadow-sm">
                     {category.tag}
                   </span>
                 </div>
@@ -165,8 +165,8 @@ export default function Categories({ products = [] }: CategoriesProps) {
                       className="ml-2 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
                     >
                       <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        strokeLinecap="square"
+                        strokeLinejoin="miter"
                         d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                       />
                     </svg>

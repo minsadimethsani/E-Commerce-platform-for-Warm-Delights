@@ -9,7 +9,7 @@ const navigation = [
   { name: "Dashboard", href: "/admin", icon: DashboardIcon },
   { name: "Orders", href: "/admin/orders", icon: OrdersIcon },
   { name: "Products", href: "/admin/products", icon: ProductsIcon },
-  { name: "Categories & Tags", href: "/admin/categories", icon: CategoriesIcon },
+  { name: "Categories & Subcategories", href: "/admin/categories", icon: CategoriesIcon },
 ];
 
 export default function AdminLayout({
@@ -134,7 +134,7 @@ export default function AdminLayout({
           className="rounded-md p-1.5 text-[#FBFBF9]/90 hover:bg-white/10 hover:text-white focus:outline-none"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            <path strokeLinecap="square" strokeLinejoin="miter" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
         </button>
       </header>
@@ -159,7 +159,7 @@ export default function AdminLayout({
               >
                 <span className="sr-only">Close sidebar</span>
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="square" strokeLinejoin="miter" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
@@ -240,7 +240,7 @@ export default function AdminLayout({
 function DashboardIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21.75h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21.75h7.5" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21.75h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21.75h7.5" />
     </svg>
   );
 }
@@ -248,7 +248,7 @@ function DashboardIcon(props: React.SVGProps<SVGSVGElement>) {
 function OrdersIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
     </svg>
   );
 }
@@ -256,7 +256,7 @@ function OrdersIcon(props: React.SVGProps<SVGSVGElement>) {
 function ProductsIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l5.096-.813a18.976 18.976 0 0013.062-13.061L21 3m0 0a1.875 1.875 0 10-2.625 2.625L21 3m0 0l-1.875 1.875M9.75 9.75c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M9.813 15.904L9 21l5.096-.813a18.976 18.976 0 0013.062-13.061L21 3m0 0a1.875 1.875 0 10-2.625 2.625L21 3m0 0l-1.875 1.875M9.75 9.75c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75Zm-.375 0h.008v.015h-.008V9.75Z" />
     </svg>
   );
 }
@@ -264,7 +264,7 @@ function ProductsIcon(props: React.SVGProps<SVGSVGElement>) {
 function StorefrontIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 0 0 3.75-.615 3.001 3.001 0 0 0 3.75.615m-7.5 0h18m-18 0V4.024m18 5.325V4.024m0 0a3.001 3.001 0 0 0-3.75-.615 3.001 3.001 0 0 0-3.75.615m7.5 0h-18m0 0A3.001 3.001 0 0 0 7.5 2.76a3.001 3.001 0 0 0 3.75.65m-7.5 0V1.5h18v1.26" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 0 0 3.75-.615 3.001 3.001 0 0 0 3.75.615m-7.5 0h18m-18 0V4.024m18 5.325V4.024m0 0a3.001 3.001 0 0 0-3.75-.615 3.001 3.001 0 0 0-3.75.615m7.5 0h-18m0 0A3.001 3.001 0 0 0 7.5 2.76a3.001 3.001 0 0 0 3.75.65m-7.5 0V1.5h18v1.26" />
     </svg>
   );
 }
@@ -272,8 +272,8 @@ function StorefrontIcon(props: React.SVGProps<SVGSVGElement>) {
 function CategoriesIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.659A2.25 2.25 0 0 0 9.568 3Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.659A2.25 2.25 0 0 0 9.568 3Z" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M6 6h.008v.008H6V6Z" />
     </svg>
   );
 }
@@ -281,7 +281,7 @@ function CategoriesIcon(props: React.SVGProps<SVGSVGElement>) {
 function LogoutIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" {...props}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+      <path strokeLinecap="square" strokeLinejoin="miter" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
     </svg>
   );
 }

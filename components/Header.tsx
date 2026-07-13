@@ -62,6 +62,7 @@ export default function Header() {
 
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "card" | "bank_deposit">("cod");
+  const [agreeToPrivacy, setAgreeToPrivacy] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -265,6 +266,7 @@ export default function Header() {
   const handleCloseModal = () => {
     setIsCheckoutOpen(false);
     setIsOrderSuccess(false);
+    setAgreeToPrivacy(false);
   };
 
   // Hide public storefront header on admin portal pages
@@ -278,10 +280,47 @@ export default function Header() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between">
           
-          {/* Logo / Brand Name */}
-          <div className="flex items-center">
+          {/* Left: Mobile Hamburger & Logo */}
+          <div className="flex items-center space-x-3">
+            {/* Hamburger Button (Mobile Only, top left corner) */}
+            <div className="flex md:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                className="inline-flex items-center justify-center p-2 rounded-md text-[#0D1B2A] hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] focus:outline-none cursor-pointer"
+                aria-controls="mobile-menu"
+                aria-expanded={isOpen}
+              >
+                <span className="sr-only">Open main menu</span>
+                {isOpen ? (
+                  <svg
+                    className="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="square" strokeLinejoin="miter" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
+
+            {/* Logo / Brand Name */}
             <Link href="/" className="group flex items-center space-x-2">
-              <span className="font-serif text-2xl font-bold tracking-wide text-[#0D1B2A] transition-colors group-hover:text-[#E09F3E]">
+              <span className="font-serif text-xl sm:text-2xl font-bold tracking-wide text-[#0D1B2A] transition-colors group-hover:text-[#E09F3E]">
                 Warm Delights
               </span>
             </Link>
@@ -316,9 +355,9 @@ export default function Header() {
           </nav>
 
           {/* Action Icons */}
-          <div className="hidden md:flex items-center space-x-6 text-[#0D1B2A]/90">
-            {/* Search Container */}
-            <div className="relative flex items-center">
+          <div className="flex items-center space-x-4 md:space-x-6 text-[#0D1B2A]/90">
+            {/* Search Container (Desktop Only) */}
+            <div className="hidden md:flex items-center">
               {isSearchOpen ? (
                 <form
                   onSubmit={handleSearchSubmit}
@@ -330,7 +369,7 @@ export default function Header() {
                     value={searchValue}
                     onChange={(e) => setSearchValue(e.target.value)}
                     autoFocus
-                    className="w-full bg-transparent border-none text-xs text-[#0D1B2A] placeholder-[#0D1B2A]/50 focus:outline-none"
+                    className="w-full bg-transparent border-none text-sm text-[#0D1B2A] placeholder-[#0D1B2A]/50 focus:outline-none"
                   />
                   <button
                     type="button"
@@ -338,7 +377,7 @@ export default function Header() {
                     className="p-0.5 rounded-full hover:bg-[#0D1B2A]/10 text-[#0D1B2A]/60 cursor-pointer"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </form>
@@ -358,8 +397,8 @@ export default function Header() {
                     className="w-5.5 h-5.5"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                      strokeLinecap="square"
+                      strokeLinejoin="miter"
                       d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                     />
                   </svg>
@@ -367,44 +406,46 @@ export default function Header() {
               )}
             </div>
 
-            {/* Profile Button */}
-            <Link
-              href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
-              onClick={async (e) => {
-                if (user && userProfile?.role !== "admin") {
-                  e.preventDefault();
-                  if (confirm("Are you sure you want to log out?")) {
-                    await logout();
-                    router.push("/");
+            {/* Profile Button (Desktop Only) */}
+            <div className="hidden md:flex items-center">
+              <Link
+                href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
+                onClick={async (e) => {
+                  if (user && userProfile?.role !== "admin") {
+                    e.preventDefault();
+                    if (confirm("Are you sure you want to log out?")) {
+                      await logout();
+                      router.push("/");
+                    }
                   }
-                }
-              }}
-              title={user ? `Logged in as ${userProfile?.displayName || user.email} (Click to Logout)` : "Login / Sign Up"}
-              aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
-              className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer flex items-center space-x-1 text-[#0D1B2A]"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.8}
-                stroke="currentColor"
-                className="w-5.5 h-5.5"
+                }}
+                title={user ? `Logged in as ${userProfile?.displayName || user.email} (Click to Logout)` : "Login / Sign Up"}
+                aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
+                className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer flex items-center space-x-1 text-[#0D1B2A]"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                />
-              </svg>
-              {user && (
-                <span className="text-[10px] font-bold text-[#0D1B2A]/70 uppercase tracking-wider hidden lg:inline">
-                  {userProfile?.displayName?.split(" ")[0] || "User"}
-                </span>
-              )}
-            </Link>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                  stroke="currentColor"
+                  className="w-5.5 h-5.5"
+                >
+                  <path
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
+                    d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                  />
+                </svg>
+                {user && (
+                  <span className="text-[10px] font-bold text-[#0D1B2A]/70 uppercase tracking-wider hidden lg:inline">
+                    {userProfile?.displayName?.split(" ")[0] || "User"}
+                  </span>
+                )}
+              </Link>
+            </div>
 
-            {/* Cart Button */}
+            {/* Cart Button (Mobile & Desktop) */}
             <button
               onClick={() => setIsCartOpen(true)}
               aria-label="Shopping Cart"
@@ -419,8 +460,8 @@ export default function Header() {
                 className="w-5.5 h-5.5"
               >
                 <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
                   d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                 />
               </svg>
@@ -429,42 +470,6 @@ export default function Header() {
                 <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#E09F3E] text-[9.5px] font-bold text-white ring-2 ring-[#F9F9F8]">
                   {cartCount}
                 </span>
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-[#0D1B2A] hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] focus:outline-none cursor-pointer"
-              aria-controls="mobile-menu"
-              aria-expanded={isOpen}
-            >
-              <span className="sr-only">Open main menu</span>
-              {isOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
               )}
             </button>
           </div>
@@ -507,7 +512,12 @@ export default function Header() {
             {/* Mobile Search input inline */}
             <div className="mt-6 border-t border-[#0D1B2A]/5 pt-4 px-3">
               <form onSubmit={handleSearchSubmit} className="flex items-center bg-[#EAE8E4] border border-[#0D1B2A]/10 rounded-full px-3 py-2 w-full">
-                <span className="text-[#0D1B2A]/50 mr-2 text-sm">🔍</span>
+                <div className="mr-2 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#0D1B2A]/50">
+                    <rect x="3" y="3" width="12" height="12" strokeLinecap="square" strokeLinejoin="miter" />
+                    <line x1="13" y1="13" x2="20" y2="20" strokeLinecap="square" strokeLinejoin="miter" />
+                  </svg>
+                </div>
                 <input
                   type="text"
                   placeholder="Search treats..."
@@ -516,6 +526,7 @@ export default function Header() {
                   className="w-full bg-transparent border-none text-sm text-[#0D1B2A] placeholder-[#0D1B2A]/50 focus:outline-none"
                 />
               </form>
+
             </div>
 
             <div className="mt-4 border-t border-[#0D1B2A]/5 pt-4 flex items-center justify-around text-[#0D1B2A]">
@@ -634,7 +645,9 @@ export default function Header() {
                   {isOrderPlaced ? (
                     /* Checkout Success view */
                     <div className="text-center py-16 space-y-4">
-                      <span className="text-4xl block">🎉</span>
+                      <div className="mx-auto w-12 h-12 border border-emerald-300 bg-white flex items-center justify-center font-bold text-emerald-800 text-lg">
+                        OK
+                      </div>
                       <h3 className="font-serif font-bold text-xl text-emerald-800">Order Placed!</h3>
                       <p className="text-sm text-[#0D1B2A]/75 max-w-xs mx-auto">
                         Your fresh delights order has been received. Thank you for baking with Warm Delights!
@@ -644,7 +657,7 @@ export default function Header() {
                           setIsOrderPlaced(false);
                           setIsCartOpen(false);
                         }}
-                        className="rounded-full bg-emerald-700 text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-emerald-800 cursor-pointer"
+                        className="rounded-none bg-emerald-700 text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-emerald-800 cursor-pointer"
                       >
                         Keep Browsing
                       </button>
@@ -652,12 +665,17 @@ export default function Header() {
                   ) : cartItems.length === 0 ? (
                     /* Empty State */
                     <div className="text-center py-16 space-y-4">
-                      <span className="text-3xl block">👜</span>
+                      <div className="mx-auto w-10 h-10 border border-[#0D1B2A]/20 bg-white flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5 text-[#0D1B2A]/60">
+                          <rect x="5" y="8" width="14" height="12" strokeLinecap="square" strokeLinejoin="miter" />
+                          <path d="M9,8 V5 H15 V8" strokeLinecap="square" strokeLinejoin="miter" />
+                        </svg>
+                      </div>
                       <p className="text-sm text-[#0D1B2A]/60">Your shopping bag is empty.</p>
                       <Link
                         href="/menu"
                         onClick={() => setIsCartOpen(false)}
-                        className="inline-block rounded-full bg-[#0D1B2A] text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#E09F3E] hover:text-[#0D1B2A]"
+                        className="inline-block rounded-none bg-[#0D1B2A] text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#E09F3E] hover:text-[#0D1B2A]"
                       >
                         Explore Our Menu
                       </Link>
@@ -671,9 +689,9 @@ export default function Header() {
                           ? item.calculatedPrice
                           : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
                         return (
-                          <div key={itemKey} className="flex items-center space-x-4 p-3 bg-white rounded-xl border border-[#0D1B2A]/5">
+                          <div key={itemKey} className="flex items-center space-x-4 p-3 bg-white rounded-none border border-[#0D1B2A]/5">
                             {/* Image */}
-                            <div className="relative h-16 w-16 overflow-hidden rounded-lg bg-[#0D1B2A]/5 flex-shrink-0">
+                            <div className="relative h-16 w-16 overflow-hidden rounded-none bg-[#0D1B2A]/5 flex-shrink-0">
                               <Image
                                 src={item.product.image}
                                 alt={item.product.name}
@@ -690,27 +708,27 @@ export default function Header() {
                               {/* Display Custom Multi-variants */}
                               <div className="flex flex-wrap gap-1 mt-0.5 mb-1">
                                 {item.selectedVariant && (
-                                  <span className="inline-block px-1.5 py-0.5 bg-[#EAE8E4] rounded-md text-[9px] font-bold text-[#0D1B2A]/70 uppercase tracking-wide">
+                                  <span className="inline-block px-1.5 py-0.5 bg-[#EAE8E4] rounded-none text-[9px] font-bold text-[#0D1B2A]/70 uppercase tracking-wide">
                                     {item.selectedVariant.name}
                                   </span>
                                 )}
                                 {item.selectedSize && (
-                                  <span className="inline-block px-1.5 py-0.5 bg-[#C5A880]/15 rounded-md text-[9px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                  <span className="inline-block px-1.5 py-0.5 bg-[#C5A880]/15 rounded-none text-[9px] font-bold text-[#C5A880] uppercase tracking-wide">
                                     {item.selectedSize}
                                   </span>
                                 )}
                                 {item.selectedFlavor && (
-                                  <span className="inline-block px-1.5 py-0.5 bg-rose-50 rounded-md text-[9px] font-bold text-rose-700 uppercase tracking-wide border border-rose-100">
+                                  <span className="inline-block px-1.5 py-0.5 bg-rose-50 rounded-none text-[9px] font-bold text-rose-700 uppercase tracking-wide border border-rose-100">
                                     {item.selectedFlavor}
                                   </span>
                                 )}
                                 {item.selectedIcing && (
-                                  <span className="inline-block px-1.5 py-0.5 bg-sky-50 rounded-md text-[9px] font-bold text-sky-700 uppercase tracking-wide border border-sky-100">
+                                  <span className="inline-block px-1.5 py-0.5 bg-sky-50 rounded-none text-[9px] font-bold text-sky-700 uppercase tracking-wide border border-sky-100">
                                     {item.selectedIcing}
                                   </span>
                                 )}
                                 {item.selectedAddOns && item.selectedAddOns.map((addon) => (
-                                  <span key={addon} className="inline-block px-1.5 py-0.5 bg-emerald-50 rounded-md text-[9px] font-bold text-emerald-700 uppercase tracking-wide border border-emerald-100">
+                                  <span key={addon} className="inline-block px-1.5 py-0.5 bg-emerald-50 rounded-none text-[9px] font-bold text-emerald-700 uppercase tracking-wide border border-emerald-100">
                                     +{addon}
                                   </span>
                                 ))}
@@ -726,7 +744,7 @@ export default function Header() {
 
                             {/* Controls */}
                             <div className="flex flex-col items-end space-y-2">
-                              <div className="flex items-center space-x-2 bg-[#EAE8E4]/50 border border-[#0D1B2A]/10 rounded-full px-1.5 py-0.5 scale-90">
+                              <div className="flex items-center space-x-2 bg-[#EAE8E4]/50 border border-[#0D1B2A]/10 rounded-none px-1.5 py-0.5 scale-90">
                                 <button
                                   onClick={() => updateCartQuantity(item.product.id, item.selectedVariant?.name, item.quantity - 1, item.selectedSize, item.selectedFlavor, item.selectedIcing)}
                                   className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-[#0D1B2A]/5 font-bold cursor-pointer"
@@ -769,7 +787,7 @@ export default function Header() {
                     </p>
                     <button
                       onClick={handleCartNext}
-                      className="w-full rounded-full bg-[#0D1B2A] text-white py-3.5 text-xs font-bold uppercase tracking-wider text-center hover:bg-[#E09F3E] hover:text-[#0D1B2A] transition-all cursor-pointer"
+                      className="w-full rounded-none bg-[#0D1B2A] text-white py-3.5 text-xs font-bold uppercase tracking-wider text-center hover:bg-[#E09F3E] hover:text-[#0D1B2A] transition-all cursor-pointer"
                     >
                       Next
                     </button>
@@ -785,8 +803,8 @@ export default function Header() {
 
       {/* Buy Now / Cart Checkout Popup Modal */}
       {isCheckoutOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#2A1E17]/65 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
-          <div className="relative w-full max-w-4xl bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-3xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#2A1E17]/65 backdrop-blur-md flex items-start justify-center p-4 sm:p-6 md:p-10 animate-fade-in">
+          <div className="relative w-full max-w-4xl bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-none shadow-2xl flex flex-col my-4 sm:my-8">
             
             {/* Modal Header */}
             <div className="px-8 py-5 border-b border-[#2A1E17]/5 flex items-center justify-between bg-[#EFEFEA]/50">
@@ -796,19 +814,19 @@ export default function Header() {
               </div>
               <button
                 onClick={handleCloseModal}
-                className="h-8 w-8 rounded-full hover:bg-[#2A1E17]/5 text-[#2A1E17]/70 hover:text-[#2A1E17] flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
+                className="h-8 w-8 rounded-none hover:bg-[#2A1E17]/5 text-[#2A1E17]/70 hover:text-[#2A1E17] flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
               >
                 &times;
               </button>
             </div>
 
             {/* Modal Body / Form */}
-            <div className="flex-1 overflow-y-auto p-8">
+            <div className="p-6 sm:p-8 md:p-10">
               {isOrderSuccess ? (
                 /* Success View */
                 <div className="py-16 text-center space-y-6 max-w-md mx-auto animate-fade-in">
-                  <div className="mx-auto h-20 w-20 bg-emerald-50 rounded-full flex items-center justify-center text-3xl shadow-xs border border-emerald-100">
-                    🎉
+                  <div className="mx-auto h-20 w-20 bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                    <span className="font-sans px-2 py-1 border border-emerald-300 bg-white text-xs uppercase tracking-wider text-emerald-700 font-bold">Success</span>
                   </div>
                   <div className="space-y-2">
                     <h4 className="font-serif text-2xl font-bold text-emerald-800">Order Placed!</h4>
@@ -821,7 +839,7 @@ export default function Header() {
                   </div>
                   <button
                     onClick={handleCloseModal}
-                    className="w-full rounded-full bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
+                    className="w-full rounded-none bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
                   >
                     Back to Shop
                   </button>
@@ -932,7 +950,12 @@ export default function Header() {
                               : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
                           }`}
                         >
-                          <span>🏬</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
+                            <rect x="3" y="3" width="18" height="18" strokeLinecap="square" strokeLinejoin="miter" />
+                            <line x1="3" y1="9" x2="21" y2="9" strokeLinecap="square" strokeLinejoin="miter" />
+                            <line x1="9" y1="9" x2="9" y2="21" strokeLinecap="square" strokeLinejoin="miter" />
+                            <line x1="15" y1="9" x2="15" y2="21" strokeLinecap="square" strokeLinejoin="miter" />
+                          </svg>
                           <span>Store Pickup</span>
                         </button>
                         <button
@@ -944,7 +967,12 @@ export default function Header() {
                               : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
                           }`}
                         >
-                          <span>🚚</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
+                            <rect x="2" y="7" width="12" height="11" strokeLinecap="square" strokeLinejoin="miter" />
+                            <polygon points="14,9 20,9 22,12 22,18 14,18" strokeLinecap="square" strokeLinejoin="miter" />
+                            <rect x="4" y="16" width="2" height="2" />
+                            <rect x="16" y="16" width="2" height="2" />
+                          </svg>
                           <span>Home Delivery</span>
                         </button>
                       </div>
@@ -1050,7 +1078,7 @@ export default function Header() {
                               placeholder="No. / Street Address"
                               value={deliveryDetails.address}
                               onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
-                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              className="w-full bg-white border border-[#2A1E17]/10 rounded-none px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
                             />
                           </div>
 
@@ -1101,7 +1129,7 @@ export default function Header() {
                     {/* Order Details Summary */}
                     <div className="space-y-3">
                       <h4 className="font-serif text-base font-bold text-[#2A1E17]">Order Summary</h4>
-                      <div className="bg-[#EFEFEA]/50 rounded-2xl p-5 border border-[#2A1E17]/5 space-y-3">
+                      <div className="bg-[#EFEFEA]/50 rounded-none p-5 border border-[#2A1E17]/5 space-y-3">
                         <div className="max-h-48 overflow-y-auto pr-2 space-y-3">
                           {cartItems.map((item) => {
                             const itemPrice = item.calculatedPrice !== undefined
@@ -1111,7 +1139,7 @@ export default function Header() {
                             return (
                               <div key={itemKey} className="flex items-center justify-between text-sm">
                                 <div className="flex items-center space-x-3">
-                                  <div className="relative h-10 w-10 overflow-hidden rounded-lg bg-white border border-[#2A1E17]/5 flex-shrink-0">
+                                  <div className="relative h-10 w-10 overflow-hidden rounded-none bg-white border border-[#2A1E17]/5 flex-shrink-0">
                                     <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" />
                                   </div>
                                   <div>
@@ -1120,27 +1148,27 @@ export default function Header() {
                                     {/* Display custom variations */}
                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                       {item.selectedVariant && (
-                                        <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded-none text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
                                           {item.selectedVariant.name}
                                         </span>
                                       )}
                                       {item.selectedSize && (
-                                        <span className="inline-block px-1 py-0.5 bg-[#C5A880]/10 rounded text-[8px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-[#C5A880]/10 rounded-none text-[8px] font-bold text-[#C5A880] uppercase tracking-wide">
                                           {item.selectedSize}
                                         </span>
                                       )}
                                       {item.selectedFlavor && (
-                                        <span className="inline-block px-1 py-0.5 bg-rose-50 rounded text-[8px] font-bold text-rose-700 uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-rose-50 rounded-none text-[8px] font-bold text-rose-700 uppercase tracking-wide">
                                           {item.selectedFlavor}
                                         </span>
                                       )}
                                       {item.selectedIcing && (
-                                        <span className="inline-block px-1 py-0.5 bg-sky-50 rounded text-[8px] font-bold text-sky-700 uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-sky-50 rounded-none text-[8px] font-bold text-sky-700 uppercase tracking-wide">
                                           {item.selectedIcing}
                                         </span>
                                       )}
                                       {item.selectedAddOns && item.selectedAddOns.map((addon) => (
-                                        <span key={addon} className="inline-block px-1 py-0.5 bg-emerald-50 rounded text-[8px] font-bold text-emerald-700 uppercase tracking-wide">
+                                        <span key={addon} className="inline-block px-1 py-0.5 bg-emerald-50 rounded-none text-[8px] font-bold text-emerald-700 uppercase tracking-wide">
                                           +{addon}
                                         </span>
                                       ))}
@@ -1180,13 +1208,18 @@ export default function Header() {
                     <div className="space-y-3">
                       <h4 className="font-serif text-base font-bold text-[#2A1E17]">Payment Method</h4>
                       <div className="space-y-3">
-                        <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
+                        <label className={`flex items-center p-3.5 rounded-none border cursor-pointer transition-all duration-200 bg-white ${
                           paymentMethod === "cod"
                             ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
                             : "border-[#2A1E17]/10 hover:border-[#C5A880]"
                         }`}>
                           <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="sr-only" />
-                          <span className="text-xl mr-3">💵</span>
+                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                              <rect x="3" y="6" width="18" height="12" strokeLinecap="square" strokeLinejoin="miter" />
+                              <rect x="9" y="10" width="6" height="4" strokeLinecap="square" strokeLinejoin="miter" />
+                            </svg>
+                          </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Cash on Delivery</span>
                             <span className="block text-[10px] text-[#3A2E2B]/60">Pay cash when you pick up or receive delivery</span>
@@ -1199,7 +1232,13 @@ export default function Header() {
                             : "border-[#2A1E17]/10 hover:border-[#C5A880]"
                         }`}>
                           <input type="radio" name="payment" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} className="sr-only" />
-                          <span className="text-xl mr-3">💳</span>
+                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                              <rect x="3" y="5" width="18" height="14" strokeLinecap="square" strokeLinejoin="miter" />
+                              <line x1="3" y1="9" x2="21" y2="9" strokeLinecap="square" strokeLinejoin="miter" />
+                              <rect x="6" y="13" width="4" height="2" strokeLinecap="square" strokeLinejoin="miter" />
+                            </svg>
+                          </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Card Payment</span>
                             <span className="block text-[10px] text-[#3A2E2B]/60">Pay online with Visa / MasterCard / Amex</span>
@@ -1212,15 +1251,72 @@ export default function Header() {
                             : "border-[#2A1E17]/10 hover:border-[#C5A880]"
                         }`}>
                           <input type="radio" name="payment" value="bank_deposit" checked={paymentMethod === "bank_deposit"} onChange={() => setPaymentMethod("bank_deposit")} className="sr-only" />
-                          <span className="text-xl mr-3">🏦</span>
+                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
+                              <polygon points="12,3 3,9 21,9" strokeLinecap="square" strokeLinejoin="miter" />
+                              <rect x="5" y="10" width="2" height="8" strokeLinecap="square" strokeLinejoin="miter" />
+                              <rect x="11" y="10" width="2" height="8" strokeLinecap="square" strokeLinejoin="miter" />
+                              <rect x="17" y="10" width="2" height="8" strokeLinecap="square" strokeLinejoin="miter" />
+                              <line x1="3" y1="18" x2="21" y2="18" strokeLinecap="square" strokeLinejoin="miter" />
+                            </svg>
+                          </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Bank Deposit</span>
                             <span className="block text-[10px] text-[#3A2E2B]/60">Direct bank transfer to our corporate account</span>
                           </div>
                         </label>
                       </div>
+
+                      {/* Payment Method Specific Instructions */}
+                      {paymentMethod === "cod" && (
+                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
+                          <span className="font-bold uppercase tracking-wider block text-[10px]">COD Instructions</span>
+                          <p className="leading-relaxed">
+                            Please prepare the exact amount of <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to pay our dispatch rider upon delivery, or to pay the cashier at our branch counter when picking up. We accept cash and major local mobile wallets.
+                          </p>
+                        </div>
+                      )}
+
+                      {paymentMethod === "card" && (
+                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
+                          <span className="font-bold uppercase tracking-wider block text-[10px]">Card Payment Instructions</span>
+                          <p className="leading-relaxed">
+                            You will be redirected to our secure payment gateway to complete your card transaction. Please ensure your card has online payments enabled. Your order status will automatically update to <strong>Paid</strong> upon successful authorization.
+                          </p>
+                        </div>
+                      )}
+
+                      {paymentMethod === "bank_deposit" && (
+                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2.5 animate-fade-in">
+                          <span className="font-bold uppercase tracking-wider block text-[10px]">Bank Deposit Instructions</span>
+                          <div className="space-y-1 bg-white p-3 border border-[#2A1E17]/5 font-mono text-[10.5px]">
+                            <p><strong>Bank:</strong> Warm Delights Bank PLC</p>
+                            <p><strong>Account Name:</strong> Warm Delights (Pvt) Ltd</p>
+                            <p><strong>Account Number:</strong> 0987-6543-2101</p>
+                            <p><strong>Branch:</strong> Colombo Corporate Branch</p>
+                          </div>
+                          <p className="leading-relaxed text-[11px]">
+                            Please transfer <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to the account above. Write your phone number as reference, and email the deposit receipt to <strong>billing@warmdelights.com</strong> or WhatsApp it to <strong>+94 77 123 4567</strong>. Baking will commence once the deposit is confirmed.
+                          </p>
+                        </div>
+                      )}
                     </div>
 
+                  </div>
+
+                  {/* Privacy Policy Checkbox */}
+                  <div className="flex items-start space-x-2.5 pt-2 pb-2">
+                    <input
+                      type="checkbox"
+                      id="privacyAgreement"
+                      required
+                      checked={agreeToPrivacy}
+                      onChange={(e) => setAgreeToPrivacy(e.target.checked)}
+                      className="h-4 w-4 rounded-none border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] cursor-pointer accent-[#C5A880] mt-0.5 shrink-0"
+                    />
+                    <label htmlFor="privacyAgreement" className="text-xs text-[#3A2E2B]/85 cursor-pointer select-none leading-relaxed">
+                      I agree to the <Link href="/privacy-policy" className="text-[#C5A880] font-bold hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> and data processing terms. *
+                    </label>
                   </div>
 
                   {/* Submit Button */}
@@ -1228,14 +1324,14 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={handleCloseModal}
-                      className="px-6 py-3 rounded-full text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#EFEFEA]/50 transition-colors cursor-pointer"
+                      className="px-6 py-3 rounded-none text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#EFEFEA]/50 transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isOrderSubmitting}
-                      className="rounded-full bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer min-w-40 flex items-center justify-center"
+                      className="rounded-none bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer min-w-40 flex items-center justify-center"
                     >
                       {isOrderSubmitting ? (
                         <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

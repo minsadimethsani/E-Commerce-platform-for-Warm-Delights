@@ -142,8 +142,8 @@ function SignupForm() {
       </div>
 
       {generalError && (
-        <div className="bg-red-50 border border-red-250 text-red-750 rounded-2xl p-4 text-xs font-semibold mb-6 flex items-center space-x-2">
-          <span>⚠️</span>
+        <div className="bg-red-50 border border-red-250 text-red-750 p-4 text-xs font-semibold mb-6 flex items-center space-x-2">
+          <span className="font-sans px-1 py-0.5 border border-red-300 bg-white text-[9px] uppercase tracking-wider text-red-700">Error</span>
           <span>{generalError}</span>
         </div>
       )}

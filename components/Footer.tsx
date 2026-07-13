@@ -162,12 +162,12 @@ export default function Footer() {
                 name="email"
                 id="email-address"
                 required
-                className="w-full min-w-0 rounded-md border border-[#FBFBF9]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FBFBF9]/40 focus:border-[#C5A880] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
+                className="w-full min-w-0 rounded-none border border-[#FBFBF9]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FBFBF9]/40 focus:border-[#C5A880] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
                 placeholder="Enter your email"
               />
               <button
                 type="submit"
-                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-md bg-[#C5A880] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#EFEFEA] hover:text-white"
+                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-none bg-[#C5A880] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#EFEFEA] hover:text-white"
               >
                 Join
               </button>
@@ -179,10 +179,10 @@ export default function Footer() {
         <div className="mt-16 border-t border-[#FBFBF9]/8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FBFBF9]/50 font-sans">
           <p>&copy; {new Date().getFullYear()} Warm Delights Bakery. All rights reserved.</p>
           <div className="mt-4 sm:mt-0 space-x-6">
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-white transition-colors">
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">
               Terms of Service
             </Link>
           </div>

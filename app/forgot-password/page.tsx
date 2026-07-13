@@ -69,8 +69,11 @@ export default function ForgotPasswordPage() {
 
         {successMessage ? (
           <div className="space-y-6 text-center animate-fade-in py-6">
-            <div className="mx-auto h-16 w-16 bg-emerald-50 rounded-full flex items-center justify-center text-2xl shadow-xs border border-emerald-100">
-              ✉️
+            <div className="mx-auto h-16 w-16 bg-emerald-50 flex items-center justify-center border border-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-8 h-8 text-emerald-800">
+                <rect x="3" y="5" width="18" height="14" strokeLinecap="square" strokeLinejoin="miter" />
+                <polygon points="3,5 12,13 21,5" strokeLinecap="square" strokeLinejoin="miter" />
+              </svg>
             </div>
             <p className="text-sm text-[#3A2E2B]/85 leading-relaxed">
               {successMessage}
@@ -85,10 +88,11 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             {generalError && (
-              <div className="bg-red-50 border border-red-250 text-red-750 rounded-2xl p-4 text-xs font-semibold flex items-center space-x-2">
-                <span>⚠️</span>
+              <div className="bg-red-50 border border-red-250 text-red-750 p-4 text-xs font-semibold flex items-center space-x-2">
+                <span className="font-sans px-1 py-0.5 border border-red-300 bg-white text-[9px] uppercase tracking-wider text-red-700">Error</span>
                 <span>{generalError}</span>
               </div>
+
             )}
 
             <p className="text-xs leading-relaxed text-[#3A2E2B]/75 font-semibold">
