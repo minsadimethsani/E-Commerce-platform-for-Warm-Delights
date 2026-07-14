@@ -86,11 +86,11 @@ function ResetPasswordForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-[#2A1E17]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
+    <div className="w-full max-w-md bg-white border border-[#A47251]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
       <div className="text-center space-y-2 mb-8">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">Security Update</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">Security Update</span>
         <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17]">New Password</h2>
-        <p className="text-xs text-[#3A2E2B]/60 font-semibold uppercase tracking-wider">Update your account credentials</p>
+        <p className="text-xs text-[#2A1E17]/60 font-semibold uppercase tracking-wider">Update your account credentials</p>
       </div>
 
       {!token && (
@@ -103,15 +103,15 @@ function ResetPasswordForm() {
 
       {successMessage ? (
         <div className="space-y-6 text-center animate-fade-in py-6">
-          <div className="mx-auto h-16 w-16 bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 text-2xl font-bold">
+          <div className="mx-auto h-16 w-16 bg-[#DCF0C3] border border-[#DCF0C3] flex items-center justify-center text-[#2A1E17] text-2xl font-bold">
             OK
           </div>
-          <p className="text-sm text-[#3A2E2B]/85 leading-relaxed font-semibold">
+          <p className="text-sm text-[#2A1E17]/85 leading-relaxed font-semibold">
             {successMessage}
           </p>
           <Link
             href="/login"
-            className="inline-block w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all text-center cursor-pointer"
+            className="inline-block w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all text-center cursor-pointer"
           >
             Go to Login
           </Link>
@@ -127,7 +127,7 @@ function ResetPasswordForm() {
 
           {/* New Password */}
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
               New Password
             </label>
             <input
@@ -139,10 +139,10 @@ function ResetPasswordForm() {
               }}
               placeholder="••••••••"
               disabled={!token}
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
                 passwordError
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                  : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+                  : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {passwordError && <p className="text-[10.5px] font-semibold text-red-500 leading-tight">{passwordError}</p>}
@@ -150,7 +150,7 @@ function ResetPasswordForm() {
 
           {/* Confirm Password */}
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
               Confirm New Password
             </label>
             <input
@@ -162,17 +162,17 @@ function ResetPasswordForm() {
               }}
               placeholder="••••••••"
               disabled={!token}
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
                 confirmPasswordError
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                  : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+                  : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {confirmPasswordError && <p className="text-[10.5px] font-semibold text-red-500">{confirmPasswordError}</p>}
           </div>
 
           {/* Password Requirements hint */}
-          <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-xl p-3.5 text-[9.5px] leading-relaxed text-[#3A2E2B]/70 font-semibold space-y-1">
+          <div className="bg-[#F0D8A1]/50 border border-[#A47251]/5 rounded-xl p-3.5 text-[9.5px] leading-relaxed text-[#2A1E17]/70 font-semibold space-y-1">
             <p className="uppercase tracking-wider text-[10px] text-[#2A1E17] font-bold mb-1">Password Requirements:</p>
             <p>• At least 8 characters in length</p>
             <p>• At least 1 uppercase & 1 lowercase letter</p>
@@ -183,7 +183,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={isSubmitting || !token}
-            className="w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
+            className="w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
           >
             {isSubmitting ? (
               <span className="inline-block h-4.5 w-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -199,11 +199,11 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="bg-[#FBFBF9] min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#FDF9F0] min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Suspense fallback={
-        <div className="w-full max-w-md bg-white border border-[#2A1E17]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
-          <span className="inline-block h-8 w-8 border-4 border-[#C5A880] border-t-transparent rounded-full animate-spin"></span>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#3A2E2B]/50 animate-pulse">Loading form...</p>
+        <div className="w-full max-w-md bg-white border border-[#A47251]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
+          <span className="inline-block h-8 w-8 border-4 border-[#DD9E59] border-t-transparent rounded-full animate-spin"></span>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#2A1E17]/50 animate-pulse">Loading form...</p>
         </div>
       }>
         <ResetPasswordForm />

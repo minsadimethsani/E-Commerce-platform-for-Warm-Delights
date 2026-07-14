@@ -160,35 +160,35 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* List Column */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="bg-white border border-[#2A1E17]/10 p-6 rounded-none shadow-xs">
-          <h2 className="font-serif text-xl font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-4 mb-4">
+        <div className="bg-white border border-[#A47251]/10 p-6 rounded-none shadow-xs">
+          <h2 className="font-serif text-xl font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-4 mb-4">
             Active Optional Add-Ons
           </h2>
 
           {addons.length === 0 ? (
-            <div className="py-12 text-center text-sm text-[#3A2E2B]/55">
+            <div className="py-12 text-center text-sm text-[#2A1E17]/55">
               No optional add-ons configured. Add new options using the form on the right.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-[#2A1E17]/10 text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/60">
+                  <tr className="border-b border-[#A47251]/10 text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/60">
                     <th className="pb-3 pr-4">Name / ID</th>
                     <th className="pb-3 px-4">Description</th>
                     <th className="pb-3 px-4 text-right">Fee (Rs.)</th>
                     <th className="pb-3 pl-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2A1E17]/5">
+                <tbody className="divide-y divide-[#A47251]/5">
                   {addons.map((addon) => (
-                    <tr key={addon.id} className="hover:bg-[#EFEFEA]/30 transition-colors">
+                    <tr key={addon.id} className="hover:bg-[#F0D8A1]/30 transition-colors">
                       <td className="py-3.5 pr-4 font-bold text-[#2A1E17]">
                         <div>{addon.name}</div>
-                        <div className="font-mono text-[9px] text-[#3A2E2B]/50 font-normal mt-0.5">ID: {addon.id}</div>
+                        <div className="font-mono text-[9px] text-[#2A1E17]/50 font-normal mt-0.5">ID: {addon.id}</div>
                       </td>
-                      <td className="py-3.5 px-4 text-[#3A2E2B]/80 max-w-[200px] truncate" title={addon.desc}>
-                        {addon.desc || <span className="text-[#3A2E2B]/40 italic">No description</span>}
+                      <td className="py-3.5 px-4 text-[#2A1E17]/80 max-w-[200px] truncate" title={addon.desc}>
+                        {addon.desc || <span className="text-[#2A1E17]/40 italic">No description</span>}
                       </td>
                       <td className="py-3.5 px-4 text-right font-bold text-[#2A1E17] font-mono">
                         Rs. {addon.fee.toFixed(2)}
@@ -197,7 +197,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
                         <button
                           type="button"
                           onClick={() => handleEditClick(addon)}
-                          className="text-[#C5A880] hover:text-[#2A1E17] font-bold transition-colors cursor-pointer"
+                          className="text-[#DD9E59] hover:text-[#2A1E17] font-bold transition-colors cursor-pointer"
                         >
                           Edit
                         </button>
@@ -220,14 +220,14 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
 
       {/* Form Column */}
       <div className="space-y-6">
-        <div className="bg-white border border-[#2A1E17]/10 p-6 rounded-none shadow-xs">
-          <h2 className="font-serif text-xl font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-4 mb-4">
+        <div className="bg-white border border-[#A47251]/10 p-6 rounded-none shadow-xs">
+          <h2 className="font-serif text-xl font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-4 mb-4">
             {editingAddOn ? "Edit Option Details" : "Create New Option"}
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label htmlFor="addon-name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+              <label htmlFor="addon-name" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                 Add-On Name *
               </label>
               <input
@@ -237,12 +237,12 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Gift Box"
-                className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="addon-fee" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+              <label htmlFor="addon-fee" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                 Additional Fee (Rs.) *
               </label>
               <input
@@ -253,12 +253,12 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
                 value={fee}
                 onChange={(e) => setFee(e.target.value)}
                 placeholder="e.g. 8.00"
-                className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="addon-desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+              <label htmlFor="addon-desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                 Description / Label
               </label>
               <textarea
@@ -267,7 +267,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
                 placeholder="Brief description showing on storefront checkout options..."
-                className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
+                className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-none p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] resize-none"
               />
             </div>
 
@@ -276,7 +276,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
                 <button
                   type="button"
                   onClick={handleCancelEdit}
-                  className="flex-1 bg-[#EFEFEA] hover:bg-[#2A1E17]/5 text-[#2A1E17] font-bold py-2.5 text-xs uppercase tracking-wider transition-colors cursor-pointer rounded-none border border-[#2A1E17]/10"
+                  className="flex-1 bg-[#F0D8A1] hover:bg-[#A47251]/5 text-[#2A1E17] font-bold py-2.5 text-xs uppercase tracking-wider transition-colors cursor-pointer rounded-none border border-[#A47251]/10"
                 >
                   Cancel
                 </button>
@@ -284,7 +284,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white font-bold py-2.5 text-xs uppercase tracking-wider transition-all cursor-pointer rounded-none disabled:opacity-50"
+                className="flex-1 bg-[#A47251] hover:bg-[#DD9E59] hover:text-[#2A1E17] text-white font-bold py-2.5 text-xs uppercase tracking-wider transition-all cursor-pointer rounded-none disabled:opacity-50"
               >
                 {isSubmitting ? "Saving..." : editingAddOn ? "Save Changes" : "Create Option"}
               </button>

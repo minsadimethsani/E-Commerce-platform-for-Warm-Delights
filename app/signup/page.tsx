@@ -134,11 +134,11 @@ function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-lg bg-white border border-[#2A1E17]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
+    <div className="w-full max-w-lg bg-white border border-[#A47251]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
       <div className="text-center space-y-2 mb-8">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">Join Warm Delights</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">Join Warm Delights</span>
         <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17]">Create Account</h2>
-        <p className="text-xs text-[#3A2E2B]/60 font-semibold uppercase tracking-wider">Start ordering freshly baked goods</p>
+        <p className="text-xs text-[#2A1E17]/60 font-semibold uppercase tracking-wider">Start ordering freshly baked goods</p>
       </div>
 
       {generalError && (
@@ -153,28 +153,28 @@ function SignupForm() {
         {/* Name Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">First Name *</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">First Name *</label>
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="John"
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-                errors.firstName ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+                errors.firstName ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {errors.firstName && <p className="text-[10px] font-semibold text-red-500">{errors.firstName}</p>}
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">Last Name *</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">Last Name *</label>
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Doe"
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-                errors.lastName ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+                errors.lastName ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {errors.lastName && <p className="text-[10px] font-semibold text-red-500">{errors.lastName}</p>}
@@ -183,14 +183,14 @@ function SignupForm() {
 
         {/* Email Address */}
         <div className="space-y-1">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">Email Address *</label>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">Email Address *</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="john@example.com"
-            className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-              errors.email ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+            className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+              errors.email ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
             }`}
           />
           {errors.email && <p className="text-[10px] font-semibold text-red-500">{errors.email}</p>}
@@ -198,14 +198,14 @@ function SignupForm() {
 
         {/* Phone Number */}
         <div className="space-y-1">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">Phone Number *</label>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">Phone Number *</label>
           <input
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="e.g. +94 77 123 4567"
-            className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-              errors.phone ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+            className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+              errors.phone ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
             }`}
           />
           {errors.phone && <p className="text-[10px] font-semibold text-red-500">{errors.phone}</p>}
@@ -214,28 +214,28 @@ function SignupForm() {
         {/* Password Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">Password *</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">Password *</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-                errors.password ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+                errors.password ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {errors.password && <p className="text-[10px] font-semibold text-red-500 leading-tight">{errors.password}</p>}
           </div>
 
           <div className="space-y-1">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">Confirm Password *</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">Confirm Password *</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="••••••••"
-              className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-                errors.confirmPassword ? "border-red-500" : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+              className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+                errors.confirmPassword ? "border-red-500" : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             {errors.confirmPassword && <p className="text-[10px] font-semibold text-red-500">{errors.confirmPassword}</p>}
@@ -243,7 +243,7 @@ function SignupForm() {
         </div>
 
         {/* Password Requirements hint */}
-        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-xl p-3.5 text-[9.5px] leading-relaxed text-[#3A2E2B]/70 font-semibold space-y-1">
+        <div className="bg-[#F0D8A1]/50 border border-[#A47251]/5 rounded-xl p-3.5 text-[9.5px] leading-relaxed text-[#2A1E17]/70 font-semibold space-y-1">
           <p className="uppercase tracking-wider text-[10px] text-[#2A1E17] font-bold mb-1">Password Requirements:</p>
           <p>• At least 8 characters in length</p>
           <p>• At least 1 uppercase & 1 lowercase letter</p>
@@ -257,10 +257,10 @@ function SignupForm() {
             id="terms"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-[#2A1E17]/10 text-[#C5A880] focus:ring-[#C5A880]"
+            className="mt-1 h-4 w-4 rounded border-[#A47251]/10 text-[#DD9E59] focus:ring-[#DD9E59]"
           />
-          <label htmlFor="terms" className="text-xs text-[#3A2E2B]/85 font-semibold cursor-pointer">
-            I agree to the <span className="text-[#C5A880] hover:underline font-bold">Terms &amp; Conditions</span> and privacy policy.
+          <label htmlFor="terms" className="text-xs text-[#2A1E17]/85 font-semibold cursor-pointer">
+            I agree to the <span className="text-[#DD9E59] hover:underline font-bold">Terms &amp; Conditions</span> and privacy policy.
           </label>
         </div>
         {errors.terms && <p className="text-[10px] font-semibold text-red-500">{errors.terms}</p>}
@@ -269,7 +269,7 @@ function SignupForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-4"
+          className="w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-4"
         >
           {isSubmitting ? (
             <span className="inline-block h-4.5 w-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -279,12 +279,12 @@ function SignupForm() {
         </button>
       </form>
 
-      <div className="text-center mt-6 pt-6 border-t border-[#2A1E17]/5">
-        <p className="text-xs text-[#3A2E2B]/70 font-semibold">
+      <div className="text-center mt-6 pt-6 border-t border-[#A47251]/5">
+        <p className="text-xs text-[#2A1E17]/70 font-semibold">
           Already have an account?{" "}
           <Link
             href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login"}
-            className="text-[#C5A880] hover:underline font-bold"
+            className="text-[#DD9E59] hover:underline font-bold"
           >
             Log In
           </Link>
@@ -296,11 +296,11 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <div className="bg-[#FBFBF9] min-h-[85vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#FDF9F0] min-h-[85vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Suspense fallback={
-        <div className="w-full max-w-lg bg-white border border-[#2A1E17]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
-          <span className="inline-block h-8 w-8 border-4 border-[#C5A880] border-t-transparent rounded-full animate-spin"></span>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#3A2E2B]/50 animate-pulse">Loading form...</p>
+        <div className="w-full max-w-lg bg-white border border-[#A47251]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
+          <span className="inline-block h-8 w-8 border-4 border-[#DD9E59] border-t-transparent rounded-full animate-spin"></span>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#2A1E17]/50 animate-pulse">Loading form...</p>
         </div>
       }>
         <SignupForm />

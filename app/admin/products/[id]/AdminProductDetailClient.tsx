@@ -92,13 +92,13 @@ export default function AdminProductDetailClient({
       <div className="flex-1 w-full space-y-6">
         
         {/* Profile Card */}
-        <div className="rounded-none border border-[#2A1E17]/5 bg-white p-6 sm:p-8 shadow-xs flex flex-col md:flex-row gap-8 items-start">
+        <div className="rounded-none border border-[#A47251]/5 bg-white p-6 sm:p-8 shadow-xs flex flex-col md:flex-row gap-8 items-start">
           {/* Image */}
           <div className="flex flex-col space-y-3 flex-shrink-0 w-full md:w-48">
-            <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#2A1E17]/5 shadow-xs">
+            <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#A47251]/5 shadow-xs">
               <img src={selectedImage} alt={product.name} className="h-full w-full object-cover" />
               {product.badge && (
-                <span className="absolute top-3 left-3 inline-block rounded-none bg-[#EFEFEA] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
+                <span className="absolute top-3 left-3 inline-block rounded-none bg-[#F0D8A1] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
                   {product.badge}
                 </span>
               )}
@@ -111,7 +111,7 @@ export default function AdminProductDetailClient({
                     key={i}
                     onClick={() => setSelectedImage(imgUrl)}
                     className={`relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-none border transition-all ${
-                      selectedImage === imgUrl ? "border-[#C5A880] ring-2 ring-[#C5A880]/20" : "border-[#2A1E17]/5 hover:border-[#C5A880]/40"
+                      selectedImage === imgUrl ? "border-[#DD9E59] ring-2 ring-[#DD9E59]/20" : "border-[#A47251]/5 hover:border-[#DD9E59]/40"
                     }`}
                   >
                     <img src={imgUrl} alt={`${product.name} thumbnail ${i + 1}`} className="h-full w-full object-cover" />
@@ -124,7 +124,7 @@ export default function AdminProductDetailClient({
           {/* Details list */}
           <div className="space-y-4 flex-1">
             <div className="space-y-2">
-              <span className="inline-block px-3 py-1 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none text-[10px] font-bold uppercase tracking-wider text-[#C5A880]">
+              <span className="inline-block px-3 py-1 bg-[#F0D8A1] border border-[#A47251]/5 rounded-none text-[10px] font-bold uppercase tracking-wider text-[#DD9E59]">
                 {product.category}
               </span>
               <h2 className="font-serif text-2xl font-bold text-[#2A1E17]">{product.name}</h2>
@@ -141,15 +141,15 @@ export default function AdminProductDetailClient({
             </div>
 
             {/* Availability Status Toggle */}
-            <div className="flex items-center space-x-3 pt-3 border-t border-[#2A1E17]/5">
-              <span className="text-xs font-bold text-[#3A2E2B]/80 uppercase tracking-wide">
+            <div className="flex items-center space-x-3 pt-3 border-t border-[#A47251]/5">
+              <span className="text-xs font-bold text-[#2A1E17]/80 uppercase tracking-wide">
                 Available in Store:
               </span>
               <button
                 onClick={handleToggleAvailability}
                 disabled={isUpdating}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  isAvailable ? "bg-[#C5A880]" : "bg-gray-200"
+                  isAvailable ? "bg-[#DD9E59]" : "bg-gray-200"
                 } disabled:opacity-50`}
               >
                 <span className="sr-only">Toggle availability</span>
@@ -162,7 +162,7 @@ export default function AdminProductDetailClient({
               </button>
               <span
                 className={`text-xs font-bold ${
-                  isAvailable ? "text-emerald-600" : "text-rose-500"
+                  isAvailable ? "text-[#2A1E17]" : "text-rose-500"
                 }`}
               >
                 {isAvailable ? "Active" : "Hidden"}
@@ -172,18 +172,18 @@ export default function AdminProductDetailClient({
         </div>
 
         {/* Ingredients & Care Details */}
-        <div className="rounded-none border border-[#2A1E17]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="rounded-none border border-[#A47251]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
           {/* Description */}
           <div className="space-y-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Description</h4>
-            <p className="text-sm text-[#3A2E2B] leading-relaxed">{product.description}</p>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Description</h4>
+            <p className="text-sm text-[#2A1E17] leading-relaxed">{product.description}</p>
           </div>
 
           {/* Video Reel Preview */}
           {product.videoUrl && (
-            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Product Reel Video</h4>
-              <div className="relative aspect-[9/16] w-36 overflow-hidden rounded-none bg-black border border-[#2A1E17]/10 shadow-sm">
+            <div className="space-y-2 pt-4 border-t border-[#A47251]/5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Product Reel Video</h4>
+              <div className="relative aspect-[9/16] w-36 overflow-hidden rounded-none bg-black border border-[#A47251]/10 shadow-sm">
                 <video
                   src={product.videoUrl}
                   autoPlay
@@ -198,12 +198,12 @@ export default function AdminProductDetailClient({
 
           {/* Ingredients list */}
           {product.ingredients && product.ingredients.length > 0 && (
-            <div className="space-y-3 pt-4 border-t border-[#2A1E17]/5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Key Ingredients</h4>
-              <ul className="grid grid-cols-2 gap-2 text-xs text-[#3A2E2B] font-semibold">
+            <div className="space-y-3 pt-4 border-t border-[#A47251]/5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Key Ingredients</h4>
+              <ul className="grid grid-cols-2 gap-2 text-xs text-[#2A1E17] font-semibold">
                 {product.ingredients.map((ing, index) => (
                   <li key={index} className="flex items-center space-x-2">
-                    <span className="text-[#C5A880]">✓</span>
+                    <span className="text-[#DD9E59]">✓</span>
                     <span>{ing}</span>
                   </li>
                 ))}
@@ -213,9 +213,9 @@ export default function AdminProductDetailClient({
 
           {/* Care details */}
           {product.careInstructions && (
-            <div className="space-y-2 pt-4 border-t border-[#2A1E17]/5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Storage & Reheating Guide</h4>
-              <p className="text-xs text-[#3A2E2B] leading-relaxed bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none p-3.5">
+            <div className="space-y-2 pt-4 border-t border-[#A47251]/5">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Storage & Reheating Guide</h4>
+              <p className="text-xs text-[#2A1E17] leading-relaxed bg-[#F0D8A1] border border-[#A47251]/5 rounded-none p-3.5">
                 {product.careInstructions}
               </p>
             </div>
@@ -229,7 +229,7 @@ export default function AdminProductDetailClient({
         <h2 className="font-serif text-xl font-bold text-[#2A1E17]">Customer Reviews</h2>
         
         {initialReviews.length === 0 ? (
-          <div className="rounded-none border border-dashed border-[#2A1E17]/10 p-12 text-center text-[#3A2E2B]/60 bg-[#EFEFEA]/30 text-sm">
+          <div className="rounded-none border border-dashed border-[#A47251]/10 p-12 text-center text-[#2A1E17]/60 bg-[#F0D8A1]/30 text-sm">
             No reviews yet. When customers leave feedback on the storefront, it will appear here.
           </div>
         ) : (
@@ -244,15 +244,15 @@ export default function AdminProductDetailClient({
                 : new Date().toLocaleDateString();
 
               return (
-                <div key={r.id} className="rounded-none border border-[#2A1E17]/5 bg-white p-5 shadow-xs space-y-3">
+                <div key={r.id} className="rounded-none border border-[#A47251]/5 bg-white p-5 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-xs text-[#2A1E17]">{r.userName}</span>
-                    <span className="text-[10px] text-[#3A2E2B]/50 font-semibold">{reviewDate}</span>
+                    <span className="text-[10px] text-[#2A1E17]/50 font-semibold">{reviewDate}</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     {renderStars(r.rating)}
                   </div>
-                  <p className="text-xs text-[#3A2E2B]/95 leading-relaxed italic">
+                  <p className="text-xs text-[#2A1E17]/95 leading-relaxed italic">
                     "{r.comment}"
                   </p>
                 </div>

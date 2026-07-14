@@ -59,28 +59,28 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="bg-[#FBFBF9] min-h-[75vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md bg-white border border-[#2A1E17]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
+    <div className="bg-[#FDF9F0] min-h-[75vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md bg-white border border-[#A47251]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
         <div className="text-center space-y-2 mb-8">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">Trouble Logging In?</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">Trouble Logging In?</span>
           <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17]">Reset Password</h2>
-          <p className="text-xs text-[#3A2E2B]/60 font-semibold uppercase tracking-wider">Recover your account details</p>
+          <p className="text-xs text-[#2A1E17]/60 font-semibold uppercase tracking-wider">Recover your account details</p>
         </div>
 
         {successMessage ? (
           <div className="space-y-6 text-center animate-fade-in py-6">
-            <div className="mx-auto h-16 w-16 bg-emerald-50 flex items-center justify-center border border-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-8 h-8 text-emerald-800">
+            <div className="mx-auto h-16 w-16 bg-[#DCF0C3] flex items-center justify-center border border-[#DCF0C3]">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-8 h-8 text-[#2A1E17]">
                 <rect x="3" y="5" width="18" height="14" strokeLinecap="square" strokeLinejoin="miter" />
                 <polygon points="3,5 12,13 21,5" strokeLinecap="square" strokeLinejoin="miter" />
               </svg>
             </div>
-            <p className="text-sm text-[#3A2E2B]/85 leading-relaxed">
+            <p className="text-sm text-[#2A1E17]/85 leading-relaxed">
               {successMessage}
             </p>
             <Link
               href="/login"
-              className="inline-block w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all text-center cursor-pointer"
+              className="inline-block w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all text-center cursor-pointer"
             >
               Back to Login
             </Link>
@@ -95,13 +95,13 @@ export default function ForgotPasswordPage() {
 
             )}
 
-            <p className="text-xs leading-relaxed text-[#3A2E2B]/75 font-semibold">
+            <p className="text-xs leading-relaxed text-[#2A1E17]/75 font-semibold">
               Enter your registered email address and we will mail you a link to reset your account credentials.
             </p>
 
             {/* Email Field */}
             <div className="space-y-1">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                 Email Address
               </label>
               <input
@@ -112,10 +112,10 @@ export default function ForgotPasswordPage() {
                   setEmailError("");
                 }}
                 placeholder="john@example.com"
-                className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+                className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
                   emailError
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                    : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+                    : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
                 }`}
               />
               {emailError && <p className="text-[10.5px] font-semibold text-red-500">{emailError}</p>}
@@ -125,7 +125,7 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
+              className="w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
             >
               {isSubmitting ? (
                 <span className="inline-block h-4.5 w-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -134,10 +134,10 @@ export default function ForgotPasswordPage() {
               )}
             </button>
 
-            <div className="text-center mt-6 pt-4 border-t border-[#2A1E17]/5">
+            <div className="text-center mt-6 pt-4 border-t border-[#A47251]/5">
               <Link
                 href="/login"
-                className="text-xs text-[#C5A880] hover:underline font-bold uppercase tracking-wider"
+                className="text-xs text-[#DD9E59] hover:underline font-bold uppercase tracking-wider"
               >
                 Back to Login
               </Link>

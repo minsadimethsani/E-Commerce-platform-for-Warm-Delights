@@ -180,27 +180,27 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
   };
 
   return (
-    <div className="bg-[#FBFBF9] min-h-screen py-10">
+    <div className="bg-[#FDF9F0] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#3A2E2B]/60">
+          <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#2A1E17]/60">
             <li>
-              <Link href="/" className="hover:text-[#C5A880] transition-colors">
+              <Link href="/" className="hover:text-[#DD9E59] transition-colors">
                 Home
               </Link>
             </li>
             <li className="flex items-center space-x-2">
-              <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-3 w-3 text-[#2A1E17]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
-              <Link href="/menu" className="hover:text-[#C5A880] transition-colors">
+              <Link href="/menu" className="hover:text-[#DD9E59] transition-colors">
                 Menu
               </Link>
             </li>
             <li className="flex items-center space-x-2">
-              <svg className="h-3 w-3 text-[#3A2E2B]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-3 w-3 text-[#2A1E17]/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
               <span className="text-[#2A1E17] truncate max-w-[150px] sm:max-w-none">{product.name}</span>
@@ -212,7 +212,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-8">
           
           {/* Left: Product Image Box */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm">
+          <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm">
             <Image
               src={product.image}
               alt={product.name}
@@ -223,7 +223,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
             />
             {product.badge && (
               <div className="absolute top-6 left-6">
-                <span className="inline-block rounded-none bg-[#C5A880] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+                <span className="inline-block rounded-none bg-[#DD9E59] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
                   {product.badge}
                 </span>
               </div>
@@ -235,7 +235,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
             
             {/* Header info */}
             <div className="space-y-4">
-              <span className="inline-block px-3 py-1 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none text-xs font-bold uppercase tracking-wider text-[#C5A880]">
+              <span className="inline-block px-3 py-1 bg-[#F0D8A1] border border-[#A47251]/5 rounded-none text-xs font-bold uppercase tracking-wider text-[#DD9E59]">
                 {product.category}
               </span>
               
@@ -249,8 +249,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                 <span className="text-xs font-bold text-[#2A1E17]/70">
                   {product.rating.toFixed(1)} Rating
                 </span>
-                <span className="text-xs text-[#3A2E2B]/40 font-semibold">•</span>
-                <span className="text-xs font-semibold text-[#3A2E2B]/60">
+                <span className="text-xs text-[#2A1E17]/40 font-semibold">•</span>
+                <span className="text-xs font-semibold text-[#2A1E17]/60">
                   {product.reviewsCount} customer reviews
                 </span>
               </div>
@@ -262,7 +262,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
             </div>
 
             {/* Quick Description */}
-            <p className="text-sm sm:text-base text-[#3A2E2B]/85 leading-relaxed font-sans">
+            <p className="text-sm sm:text-base text-[#2A1E17]/85 leading-relaxed font-sans">
               {product.description}
             </p>
 
@@ -271,15 +271,15 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
               (product.defaultFlavor || (product.flavors && product.flavors.length > 0)) ||
               (product.defaultIcing || (product.icings && product.icings.length > 0)) ||
               (product.variants && product.variants.length > 0)) && (
-              <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-none p-5 space-y-3">
+              <div className="bg-[#F0D8A1]/60 border border-[#A47251]/5 rounded-none p-5 space-y-3">
                 <h3 className="text-[10px] font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
-                  <span className="inline-block border border-[#2A1E17]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Recipe</span> Standard Configuration (Included in Base Price)
+                  <span className="inline-block border border-[#A47251]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Recipe</span> Standard Configuration (Included in Base Price)
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {/* Default Size */}
                   {((product.sizes && product.sizes.length > 0) || product.defaultSize) && (
-                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
-                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Size / Weight</span>
+                    <div className="bg-white p-3 rounded-none border border-[#A47251]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#2A1E17]/50">Size / Weight</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultSize || (product.sizes && product.sizes[0]?.name) || "Standard"}
                       </span>
@@ -287,8 +287,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                   )}
                   {/* Default Flavor */}
                   {((product.flavors && product.flavors.length > 0) || product.defaultFlavor) && (
-                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
-                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Flavor</span>
+                    <div className="bg-white p-3 rounded-none border border-[#A47251]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#2A1E17]/50">Flavor</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultFlavor || (product.flavors && (typeof product.flavors[0] === "string" ? product.flavors[0] : (product.flavors[0] as any).name)) || "Standard"}
                       </span>
@@ -296,8 +296,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                   )}
                   {/* Default Coating / Icing */}
                   {((product.icings && product.icings.length > 0) || product.defaultIcing) && (
-                    <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5">
-                      <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Coating / Icing</span>
+                    <div className="bg-white p-3 rounded-none border border-[#A47251]/5">
+                      <span className="block text-[8px] font-bold uppercase text-[#2A1E17]/50">Coating / Icing</span>
                       <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                         {product.defaultIcing || (product.icings && (typeof product.icings[0] === "string" ? product.icings[0] : (product.icings[0] as any).name)) || "Standard"}
                       </span>
@@ -308,8 +308,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                     (!product.flavors || product.flavors.length === 0) &&
                     (!product.icings || product.icings.length === 0) &&
                     product.variants && product.variants.length > 0 && (
-                      <div className="bg-white p-3 rounded-none border border-[#2A1E17]/5 sm:col-span-3">
-                        <span className="block text-[8px] font-bold uppercase text-[#3A2E2B]/50">Default Option</span>
+                      <div className="bg-white p-3 rounded-none border border-[#A47251]/5 sm:col-span-3">
+                        <span className="block text-[8px] font-bold uppercase text-[#2A1E17]/50">Default Option</span>
                         <span className="font-bold text-[#2A1E17] text-xs mt-0.5 block">
                           {product.variants[0].name} (Rs. {product.variants[0].price.toFixed(2)})
                         </span>
@@ -324,12 +324,12 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
               (availableFlavors.length > 0) || 
               (availableIcings.length > 0) ||
               (availableVariants.length > 0)) && (
-              <div className="space-y-6 pt-6 border-t border-[#2A1E17]/10">
+              <div className="space-y-6 pt-6 border-t border-[#A47251]/10">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17] flex items-center">
-                    <span className="inline-block border border-[#2A1E17]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Options</span> Customize Options / Variations
+                    <span className="inline-block border border-[#A47251]/10 bg-white px-1.5 py-0.5 text-[8px] uppercase tracking-wider font-sans mr-2">Options</span> Customize Options / Variations
                   </h3>
-                  <span className="text-[9px] text-[#3A2E2B]/60 italic font-medium">* Selection updates pricing</span>
+                  <span className="text-[9px] text-[#2A1E17]/60 italic font-medium">* Selection updates pricing</span>
                 </div>
 
                 {((availableSizes.length > 0) || 
@@ -339,7 +339,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                     {/* 1. Sizes (Capsule Button Chips) */}
                     {availableSizes.length > 0 && (
                       <div className="space-y-3">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                           Select Size / Weight *
                         </span>
                         <div className="flex flex-wrap gap-3">
@@ -355,13 +355,13 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                                 onClick={() => setSelectedSize(selectedSize === s.name ? defaultSizeVal : s.name)}
                                 className={`px-4 py-2.5 rounded-none border text-xs font-bold transition-all cursor-pointer ${
                                   isSelected
-                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                    ? "bg-[#A47251] text-white border-[#A47251] shadow-sm"
+                                    : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                                 }`}
                               >
                                 <span>{s.name}</span>
                                 {premium !== 0 && (
-                                  <span className={`ml-1 text-[9px] font-semibold ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                  <span className={`ml-1 text-[9px] font-semibold ${isSelected ? "text-[#DD9E59]" : "text-[#2A1E17]/60"}`}>
                                     ({premium > 0 ? "+" : "-"}Rs. {Math.abs(premium).toFixed(0)})
                                   </span>
                                 )}
@@ -375,7 +375,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                     {/* 2. Flavors (Radio Grid/Tile Selectors) */}
                     {availableFlavors.length > 0 && (
                       <div className="space-y-3">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                           Select Flavor *
                         </span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -390,13 +390,13 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                                 onClick={() => setSelectedFlavor(selectedFlavor === fName ? defaultFlavorVal : fName)}
                                 className={`p-3 rounded-none border text-xs font-semibold text-center transition-all cursor-pointer ${
                                   isSelected
-                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
-                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                    ? "bg-[#A47251] text-white border-[#A47251] shadow-sm ring-2 ring-[#DD9E59]/30"
+                                    : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                                 }`}
                               >
                                 <span>{fName}</span>
                                 {fPrice !== 0 && (
-                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#DD9E59]" : "text-[#2A1E17]/60"}`}>
                                     ({fPrice > 0 ? "+" : "-"}Rs. {Math.abs(fPrice).toFixed(0)})
                                   </span>
                                 )}
@@ -410,7 +410,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                     {/* 3. Icings (Radio Grid/Tile Selectors) */}
                     {availableIcings.length > 0 && (
                       <div className="space-y-3">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                           Select Coating / Icing *
                         </span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -425,13 +425,13 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                                 onClick={() => setSelectedIcing(selectedIcing === icName ? defaultIcingVal : icName)}
                                 className={`p-3 rounded-none border text-xs font-semibold text-center transition-all cursor-pointer ${
                                   isSelected
-                                    ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm ring-2 ring-[#C5A880]/30"
-                                    : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                    ? "bg-[#A47251] text-white border-[#A47251] shadow-sm ring-2 ring-[#DD9E59]/30"
+                                    : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                                 }`}
                               >
                                 <span>{icName}</span>
                                 {icPrice !== 0 && (
-                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                                  <span className={`block text-[9px] font-semibold mt-0.5 ${isSelected ? "text-[#DD9E59]" : "text-[#2A1E17]/60"}`}>
                                     ({icPrice > 0 ? "+" : "-"}Rs. {Math.abs(icPrice).toFixed(0)})
                                   </span>
                                 )}
@@ -443,8 +443,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                     )}
 
                     {/* 4. Add-Ons / Modifiers */}
-                    <div className="space-y-3 pt-3 border-t border-[#2A1E17]/5">
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    <div className="space-y-3 pt-3 border-t border-[#A47251]/5">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                         Optional Add-Ons
                       </span>
                       <div className="flex flex-col space-y-2">
@@ -455,8 +455,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                               key={addon.id}
                               className={`flex items-center justify-between p-3 rounded-none border text-xs font-semibold transition-all cursor-pointer ${
                                 isSelected
-                                  ? "bg-[#C5A880]/10 border-[#C5A880] text-[#2A1E17]"
-                                  : "bg-white text-[#2A1E17]/70 border-[#2A1E17]/5 hover:border-[#C5A880]/40"
+                                  ? "bg-[#DD9E59]/10 border-[#DD9E59] text-[#2A1E17]"
+                                  : "bg-white text-[#2A1E17]/70 border-[#A47251]/5 hover:border-[#DD9E59]/40"
                               }`}
                             >
                               <div className="flex items-center space-x-3">
@@ -470,11 +470,11 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                                       setSelectedAddOns((prev) => prev.filter((a) => a !== addon.name));
                                     }
                                   }}
-                                  className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                                  className="rounded border-[#A47251]/20 text-[#DD9E59] focus:ring-[#DD9E59] h-4 w-4 cursor-pointer accent-[#DD9E59]"
                                 />
                                 <div>
                                   <span className="font-bold block text-[#2A1E17]">{addon.name}</span>
-                                  <span className="text-[10px] text-[#3A2E2B]/60 font-medium">{addon.desc}</span>
+                                  <span className="text-[10px] text-[#2A1E17]/60 font-medium">{addon.desc}</span>
                                 </div>
                               </div>
                               <span className="font-bold text-[#2A1E17]">Rs. {addon.fee.toFixed(2)}</span>
@@ -487,7 +487,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                         <button
                           type="button"
                           onClick={() => setShowAllAddOns(!showAllAddOns)}
-                          className="inline-flex items-center text-xs font-bold text-[#C5A880] hover:text-[#2A1E17] transition-colors mt-2 focus:outline-none cursor-pointer"
+                          className="inline-flex items-center text-xs font-bold text-[#DD9E59] hover:text-[#2A1E17] transition-colors mt-2 focus:outline-none cursor-pointer"
                         >
                           <span>{showAllAddOns ? "See less options" : "See more options"}</span>
                           <svg
@@ -507,7 +507,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                   /* Fallback Variant Selector */
                   availableVariants.length > 0 && (
                     <div className="space-y-3">
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                         Select Option / Weight:
                       </span>
                       <div className="flex flex-wrap gap-3">
@@ -520,12 +520,12 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                               onClick={() => setSelectedVariant(selectedVariant?.name === v.name ? defaultVariantVal : v)}
                               className={`px-4 py-2.5 rounded-none border text-xs font-semibold tracking-wide transition-all cursor-pointer ${
                                 isSelected
-                                  ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                                  : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                                  ? "bg-[#A47251] text-white border-[#A47251] shadow-sm"
+                                  : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                               }`}
                             >
                               <span className="block font-bold">{v.name}</span>
-                              <span className={`block text-[10px] mt-0.5 ${isSelected ? "text-[#C5A880]" : "text-[#3A2E2B]/60"}`}>
+                              <span className={`block text-[10px] mt-0.5 ${isSelected ? "text-[#DD9E59]" : "text-[#2A1E17]/60"}`}>
                                 Rs. {v.price.toFixed(2)}
                               </span>
                             </button>
@@ -539,16 +539,16 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
             )}
 
             {/* Quantity Selector */}
-            <div className="space-y-2 pt-6 border-t border-[#2A1E17]/5">
-              <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+            <div className="space-y-2 pt-6 border-t border-[#A47251]/5">
+              <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                 Quantity:
               </span>
-              <div className="flex items-center justify-between bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-none px-2 py-1 w-32">
+              <div className="flex items-center justify-between bg-[#F0D8A1] border border-[#A47251]/10 rounded-none px-2 py-1 w-32">
                 <button
                   onClick={decrementQty}
                   disabled={quantity === 1}
                   aria-label="Decrease quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#A47251]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                     <path strokeLinecap="square" strokeLinejoin="miter" d="M19.5 12h-15" />
@@ -561,7 +561,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                   onClick={incrementQty}
                   disabled={quantity === 20}
                   aria-label="Increase quantity"
-                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#2A1E17]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-none text-[#2A1E17] hover:bg-[#A47251]/5 disabled:opacity-30 disabled:hover:bg-transparent cursor-pointer"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                     <path strokeLinecap="square" strokeLinejoin="miter" d="M12 4.5v15m7.5-7.5h-15" />
@@ -577,8 +577,8 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                 onClick={handleAddToCart}
                 className={`flex-1 rounded-none py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs ${
                   isAdded
-                    ? "bg-emerald-600 text-white shadow-md"
-                    : "bg-[#2A1E17] text-white hover:bg-[#C5A880] hover:text-[#2A1E17]"
+                    ? "bg-[#DCF0C3] text-[#2A1E17] shadow-md"
+                    : "bg-[#A47251] text-white hover:bg-[#DD9E59] hover:text-[#2A1E17]"
                 }`}
               >
                 {isAdded ? "Added to Cart ✓" : "Add to Cart"}
@@ -587,7 +587,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
               {/* Buy Now CTA */}
               <button
                 onClick={handleBuyNow}
-                className="flex-1 rounded-none py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs bg-[#C5A880] text-[#2A1E17] hover:bg-[#2A1E17] hover:text-white"
+                className="flex-1 rounded-none py-3 px-8 text-xs font-bold uppercase tracking-wider text-center transition-all duration-300 cursor-pointer shadow-xs bg-[#DD9E59] text-[#2A1E17] hover:bg-[#A47251] hover:text-white"
               >
                 Buy Now
               </button>
@@ -597,10 +597,10 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
         </div>
 
         {/* Recommendations / Related Products */}
-        <section className="border-t border-[#2A1E17]/10 pt-8 mb-16">
+        <section className="border-t border-[#A47251]/10 pt-8 mb-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">
                 Recommendations
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#2A1E17]">
@@ -609,7 +609,7 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
             </div>
             <Link
               href="/menu"
-              className="mt-4 md:mt-0 text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:text-[#C5A880] flex items-center transition-colors cursor-pointer"
+              className="mt-4 md:mt-0 text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:text-[#DD9E59] flex items-center transition-colors cursor-pointer"
             >
               <span>View Full Menu</span>
               <svg className="ml-1 h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

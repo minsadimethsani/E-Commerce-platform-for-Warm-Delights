@@ -102,15 +102,15 @@ export default function Categories({ products = [] }: CategoriesProps) {
     },
   ];
   return (
-    <section className="bg-[#FBFBF9] py-24 sm:py-32">
+    <section className="bg-[#FDF9F0] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">
           <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17] sm:text-5xl">
             Our Sweet & Savory Offerings
           </h2>
-          <div className="mt-4 h-1 w-12 bg-[#C5A880] mx-auto rounded-none" />
-          <p className="mt-6 text-base sm:text-lg leading-relaxed text-[#3A2E2B]/80">
+          <div className="mt-4 h-1 w-12 bg-[#DD9E59] mx-auto rounded-none" />
+          <p className="mt-6 text-base sm:text-lg leading-relaxed text-[#2A1E17]/80">
             Handcrafted with patience, baked to perfection. Explore our artisanal signature ranges.
           </p>
         </div>
@@ -120,10 +120,10 @@ export default function Categories({ products = [] }: CategoriesProps) {
           {categories.map((category) => (
             <div
               key={category.title}
-              className="group flex flex-col overflow-hidden rounded-none bg-[#EFEFEA] border border-[#2A1E17]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
               {/* Image Container */}
-              <div className="relative aspect-4/3 overflow-hidden bg-[#2A1E17]/5">
+              <div className="relative aspect-4/3 overflow-hidden bg-[#A47251]/5">
                 <Image
                   src={category.image}
                   alt={category.title}
@@ -133,7 +133,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
                 />
                 {/* Badge Overlay */}
                 <div className="absolute top-4 left-4">
-                  <span className="inline-block rounded-none bg-[#FBFBF9] px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#C5A880] uppercase shadow-sm">
+                  <span className="inline-block rounded-none bg-[#FDF9F0] px-2.5 py-1 text-[11px] font-bold tracking-wider text-[#DD9E59] uppercase shadow-sm">
                     {category.tag}
                   </span>
                 </div>
@@ -142,18 +142,18 @@ export default function Categories({ products = [] }: CategoriesProps) {
               {/* Text Content */}
               <div className="flex flex-1 flex-col justify-between p-8">
                 <div className="space-y-3">
-                  <h3 className="font-serif text-2xl font-bold text-[#2A1E17] group-hover:text-[#C5A880] transition-colors">
+                  <h3 className="font-serif text-2xl font-bold text-[#2A1E17] group-hover:text-[#DD9E59] transition-colors">
                     {category.title}
                   </h3>
-                  <p className="font-sans text-sm leading-relaxed text-[#3A2E2B]/85">
+                  <p className="font-sans text-sm leading-relaxed text-[#2A1E17]/85">
                     {category.description}
                   </p>
                 </div>
                 
-                <div className="mt-8 pt-4 border-t border-[#2A1E17]/5">
+                <div className="mt-8 pt-4 border-t border-[#A47251]/5">
                   <Link
                     href={category.linkHref}
-                    className="inline-flex items-center text-sm font-semibold tracking-wide text-[#2A1E17] hover:text-[#C5A880] transition-colors"
+                    className="inline-flex items-center text-sm font-semibold tracking-wide text-[#2A1E17] hover:text-[#DD9E59] transition-colors"
                   >
                     <span>{category.linkText}</span>
                     <svg

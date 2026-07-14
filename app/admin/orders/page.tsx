@@ -9,7 +9,7 @@ export default async function AdminOrdersPage() {
     <div className="space-y-8">
       <div>
         <h1 className="font-serif text-3xl font-bold text-[#2A1E17] tracking-tight">Order Management</h1>
-        <p className="mt-1 text-sm text-[#3A2E2B]/70">
+        <p className="mt-1 text-sm text-[#2A1E17]/70">
           Track customer purchases, manage baking queues, and dispatch deliveries.
         </p>
       </div>

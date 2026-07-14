@@ -4,23 +4,23 @@
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
 
-  --color-brand-brown: #2A1E17;
-  --color-brand-gold: #C5A880;
-  --color-brand-apricot: #EFEFEA;
-  --color-brand-cream: #FBFBF9;
-  --color-brand-almond: #EFEFEA;
-  --color-brand-espresso: #3A2E2B;
+  --color-brand-brown: #A47251;
+  --color-brand-gold: #DD9E59;
+  --color-brand-apricot: #F0D8A1;
+  --color-brand-cream: #FDF9F0;
+  --color-brand-almond: #F0D8A1;
+  --color-brand-espresso: #2A1E17;
 }
 
 :root {
-  background-color: #FBFBF9;
-  color: #3A2E2B;
+  background-color: #FDF9F0;
+  color: #2A1E17;
 }
 
 body {
   font-family: var(--font-jakarta), system-ui, sans-serif;
-  background-color: #FBFBF9;
-  color: #3A2E2B;
+  background-color: #FDF9F0;
+  color: #2A1E17;
 }
 
 /* Disable native browser password reveal icons */

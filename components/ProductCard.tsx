@@ -56,9 +56,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-none bg-[#EFEFEA]/50 border border-[#2A1E17]/5 transition-all duration-300 hover:bg-[#EFEFEA] hover:-translate-y-1 hover:shadow-md">
+    <div className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1]/50 border border-[#A47251]/5 transition-all duration-300 hover:bg-[#F0D8A1] hover:-translate-y-1 hover:shadow-md">
       {/* Image Frame */}
-      <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#2A1E17]/5 block cursor-pointer">
+      <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#A47251]/5 block cursor-pointer">
         <Image
           src={product.image}
           alt={product.name}
@@ -70,7 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Badge */}
         {product.badge && (
           <div className="absolute top-3 left-3">
-            <span className="inline-block rounded-none bg-[#C5A880] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
+            <span className="inline-block rounded-none bg-[#DD9E59] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
               {product.badge}
             </span>
           </div>
@@ -81,35 +81,35 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="flex flex-1 flex-col justify-between p-6">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C5A880]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#DD9E59]">
               {product.category}
             </span>
             
             {/* Rating block */}
             <div className="flex items-center space-x-1">
               <div className="flex items-center">{renderStars(product.rating)}</div>
-              <span className="text-[10px] font-semibold text-[#3A2E2B]/60">
+              <span className="text-[10px] font-semibold text-[#2A1E17]/60">
                 ({product.reviewsCount})
               </span>
             </div>
           </div>
 
           <Link href={`/menu/${product.id}`} className="block cursor-pointer">
-            <h3 className="font-serif text-lg font-bold text-[#2A1E17] leading-snug group-hover:text-[#C5A880] transition-colors line-clamp-1">
+            <h3 className="font-serif text-lg font-bold text-[#2A1E17] leading-snug group-hover:text-[#DD9E59] transition-colors line-clamp-1">
               {product.name}
             </h3>
           </Link>
-          <p className="font-sans text-xs leading-relaxed text-[#3A2E2B]/75 line-clamp-2">
+          <p className="font-sans text-xs leading-relaxed text-[#2A1E17]/75 line-clamp-2">
             {product.description}
           </p>
         </div>
 
         {/* Price and Add Button */}
-        <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#2A1E17]/5">
+        <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#A47251]/5">
           <span className="font-serif text-lg font-bold text-[#2A1E17]">
             {product.variants && product.variants.length > 0 ? (
               <>
-                <span className="text-[10px] uppercase font-bold text-[#3A2E2B]/50 block leading-none mb-0.5">From</span>
+                <span className="text-[10px] uppercase font-bold text-[#2A1E17]/50 block leading-none mb-0.5">From</span>
                 Rs. {Math.min(...product.variants.map((v) => v.price)).toFixed(2)}
               </>
             ) : (
@@ -120,7 +120,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleAddToCart}
             aria-label={product.variants && product.variants.length > 0 ? `View options for ${product.name}` : `Add ${product.name} to cart`}
-            className="flex h-9 w-9 items-center justify-center rounded-none bg-[#2A1E17] text-white transition-all hover:bg-[#C5A880] hover:text-[#2A1E17] cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-none bg-[#A47251] text-white transition-all hover:bg-[#DD9E59] hover:text-[#2A1E17] cursor-pointer"
           >
             {product.variants && product.variants.length > 0 ? (
               <svg

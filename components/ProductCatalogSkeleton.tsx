@@ -2,7 +2,7 @@ import ProductCardSkeleton from "./ProductCardSkeleton";
 
 export default function ProductCatalogSkeleton() {
   return (
-    <section className="bg-[#FBFBF9] py-24 sm:py-32">
+    <section className="bg-[#FDF9F0] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Title & Header shimmers */}
@@ -21,7 +21,7 @@ export default function ProductCatalogSkeleton() {
         </div>
 
         {/* Filters, Search & Sort Panel shimmers */}
-        <div className="flex flex-col space-y-6 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between border-b border-[#2A1E17]/10 pb-8 mb-10">
+        <div className="flex flex-col space-y-6 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between border-b border-[#A47251]/10 pb-8 mb-10">
           {/* Category Tabs list shimmers */}
           <div className="flex flex-wrap gap-2 pb-2 lg:pb-0">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -49,7 +49,7 @@ export default function ProductCatalogSkeleton() {
         </div>
 
         {/* Pagination Controls shimmers */}
-        <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#2A1E17]/5">
+        <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#A47251]/5">
           {/* Prev Button */}
           <div className="h-10 w-10 bg-gray-200/60 rounded-none animate-pulse" />
           {/* Page numbers */}

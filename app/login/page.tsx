@@ -142,11 +142,11 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-[#2A1E17]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
+    <div className="w-full max-w-md bg-white border border-[#A47251]/10 rounded-3xl shadow-2xl p-8 sm:p-10">
       <div className="text-center space-y-2 mb-8">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#C5A880]">Welcome Back</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">Welcome Back</span>
         <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17]">Log In</h2>
-        <p className="text-xs text-[#3A2E2B]/60 font-semibold uppercase tracking-wider">Indulge in artisanal delicacies</p>
+        <p className="text-xs text-[#2A1E17]/60 font-semibold uppercase tracking-wider">Indulge in artisanal delicacies</p>
       </div>
 
       {generalError && (
@@ -159,7 +159,7 @@ function LoginForm() {
       <form onSubmit={handleLogin} className="space-y-6">
         {/* Email Address */}
         <div className="space-y-1">
-          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
             Email Address
           </label>
           <input
@@ -170,10 +170,10 @@ function LoginForm() {
               setEmailError("");
             }}
             placeholder="customer@example.com"
-            className={`w-full bg-[#FBFBF9] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+            className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
               emailError
                 ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+                : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
             }`}
           />
           {emailError && <p className="text-[10.5px] font-semibold text-red-500">{emailError}</p>}
@@ -182,12 +182,12 @@ function LoginForm() {
         {/* Password */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
               Password
             </label>
             <Link
               href="/forgot-password"
-              className="text-[10px] font-bold uppercase tracking-wider text-[#C5A880] hover:underline"
+              className="text-[10px] font-bold uppercase tracking-wider text-[#DD9E59] hover:underline"
             >
               Forgot Password?
             </Link>
@@ -201,10 +201,10 @@ function LoginForm() {
                 setPasswordError("");
               }}
               placeholder="••••••••"
-              className={`w-full bg-[#FBFBF9] border rounded-xl pl-4 pr-10 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
+              className={`w-full bg-[#FDF9F0] border rounded-xl pl-4 pr-10 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
                 passwordError
                   ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                  : "border-[#2A1E17]/10 focus:border-[#C5A880] focus:ring-[#C5A880]"
+                  : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
               }`}
             />
             <button
@@ -232,7 +232,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full rounded-full bg-[#2A1E17] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
+          className="w-full rounded-full bg-[#A47251] text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all flex items-center justify-center cursor-pointer mt-8"
         >
           {isSubmitting ? (
             <span className="inline-block h-4.5 w-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -242,12 +242,12 @@ function LoginForm() {
         </button>
       </form>
 
-      <div className="text-center mt-6 pt-6 border-t border-[#2A1E17]/5">
-        <p className="text-xs text-[#3A2E2B]/70 font-semibold">
+      <div className="text-center mt-6 pt-6 border-t border-[#A47251]/5">
+        <p className="text-xs text-[#2A1E17]/70 font-semibold">
           Don&apos;t have an account?{" "}
           <Link
             href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"}
-            className="text-[#C5A880] hover:underline font-bold"
+            className="text-[#DD9E59] hover:underline font-bold"
           >
             Sign Up
           </Link>
@@ -259,11 +259,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="bg-[#FBFBF9] min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="bg-[#FDF9F0] min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Suspense fallback={
-        <div className="w-full max-w-md bg-white border border-[#2A1E17]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
-          <span className="inline-block h-8 w-8 border-4 border-[#C5A880] border-t-transparent rounded-full animate-spin"></span>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#3A2E2B]/50 animate-pulse">Loading form...</p>
+        <div className="w-full max-w-md bg-white border border-[#A47251]/10 rounded-3xl p-10 flex flex-col items-center justify-center space-y-4">
+          <span className="inline-block h-8 w-8 border-4 border-[#DD9E59] border-t-transparent rounded-full animate-spin"></span>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#2A1E17]/50 animate-pulse">Loading form...</p>
         </div>
       }>
         <LoginForm />

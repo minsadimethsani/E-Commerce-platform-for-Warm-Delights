@@ -671,10 +671,10 @@ export default function Header() {
                   {isOrderPlaced ? (
                     /* Checkout Success view */
                     <div className="text-center py-16 space-y-4">
-                      <div className="mx-auto w-12 h-12 border border-emerald-300 bg-white flex items-center justify-center font-bold text-emerald-800 text-lg">
+                      <div className="mx-auto w-12 h-12 border border-[#DCF0C3] bg-white flex items-center justify-center font-bold text-[#2A1E17] text-lg">
                         OK
                       </div>
-                      <h3 className="font-serif font-bold text-xl text-emerald-800">Order Placed!</h3>
+                      <h3 className="font-serif font-bold text-xl text-[#2A1E17]">Order Placed!</h3>
                       <p className="text-sm text-[#0D1B2A]/75 max-w-xs mx-auto">
                         Your fresh delights order has been received. Thank you for baking with Warm Delights!
                       </p>
@@ -683,7 +683,7 @@ export default function Header() {
                           setIsOrderPlaced(false);
                           setIsCartOpen(false);
                         }}
-                        className="rounded-none bg-emerald-700 text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-emerald-800 cursor-pointer"
+                        className="rounded-none bg-[#A47251] text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#A47251] cursor-pointer"
                       >
                         Keep Browsing
                       </button>
@@ -739,7 +739,7 @@ export default function Header() {
                                   </span>
                                 )}
                                 {item.selectedSize && (
-                                  <span className="inline-block px-1.5 py-0.5 bg-[#C5A880]/15 rounded-none text-[9px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                  <span className="inline-block px-1.5 py-0.5 bg-[#DD9E59]/15 rounded-none text-[9px] font-bold text-[#DD9E59] uppercase tracking-wide">
                                     {item.selectedSize}
                                   </span>
                                 )}
@@ -754,7 +754,7 @@ export default function Header() {
                                   </span>
                                 )}
                                 {item.selectedAddOns && item.selectedAddOns.map((addon) => (
-                                  <span key={addon} className="inline-block px-1.5 py-0.5 bg-emerald-50 rounded-none text-[9px] font-bold text-emerald-700 uppercase tracking-wide border border-emerald-100">
+                                  <span key={addon} className="inline-block px-1.5 py-0.5 bg-[#DCF0C3] rounded-none text-[9px] font-bold text-[#2A1E17] uppercase tracking-wide border border-[#DCF0C3]">
                                     +{addon}
                                   </span>
                                 ))}
@@ -829,18 +829,18 @@ export default function Header() {
 
       {/* Buy Now / Cart Checkout Popup Modal */}
       {isCheckoutOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#2A1E17]/65 backdrop-blur-md flex items-start justify-center p-4 sm:p-6 md:p-10 animate-fade-in">
-          <div className="relative w-full max-w-4xl bg-[#FBFBF9] border border-[#2A1E17]/10 rounded-none shadow-2xl flex flex-col my-4 sm:my-8">
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#A47251]/65 backdrop-blur-md flex items-start justify-center p-4 sm:p-6 md:p-10 animate-fade-in">
+          <div className="relative w-full max-w-4xl bg-[#FDF9F0] border border-[#A47251]/10 rounded-none shadow-2xl flex flex-col my-4 sm:my-8">
             
             {/* Modal Header */}
-            <div className="px-8 py-5 border-b border-[#2A1E17]/5 flex items-center justify-between bg-[#EFEFEA]/50">
+            <div className="px-8 py-5 border-b border-[#A47251]/5 flex items-center justify-between bg-[#F0D8A1]/50">
               <div>
                 <h3 className="font-serif text-xl font-bold text-[#2A1E17]">Checkout details</h3>
-                <p className="text-[10px] text-[#3A2E2B]/60 uppercase tracking-widest font-semibold mt-0.5">Place your artisanal treats order</p>
+                <p className="text-[10px] text-[#2A1E17]/60 uppercase tracking-widest font-semibold mt-0.5">Place your artisanal treats order</p>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="h-8 w-8 rounded-none hover:bg-[#2A1E17]/5 text-[#2A1E17]/70 hover:text-[#2A1E17] flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
+                className="h-8 w-8 rounded-none hover:bg-[#A47251]/5 text-[#2A1E17]/70 hover:text-[#2A1E17] flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
               >
                 &times;
               </button>
@@ -851,21 +851,21 @@ export default function Header() {
               {isOrderSuccess ? (
                 /* Success View */
                 <div className="py-16 text-center space-y-6 max-w-md mx-auto animate-fade-in">
-                  <div className="mx-auto h-20 w-20 bg-emerald-50 border border-emerald-100 flex items-center justify-center">
-                    <span className="font-sans px-2 py-1 border border-emerald-300 bg-white text-xs uppercase tracking-wider text-emerald-700 font-bold">Success</span>
+                  <div className="mx-auto h-20 w-20 bg-[#DCF0C3] border border-[#DCF0C3] flex items-center justify-center">
+                    <span className="font-sans px-2 py-1 border border-[#DCF0C3] bg-white text-xs uppercase tracking-wider text-[#2A1E17] font-bold">Success</span>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-serif text-2xl font-bold text-emerald-800">Order Placed!</h4>
-                    <p className="text-sm text-[#3A2E2B]/85">
+                    <h4 className="font-serif text-2xl font-bold text-[#2A1E17]">Order Placed!</h4>
+                    <p className="text-sm text-[#2A1E17]/85">
                       Your bakery order has been successfully sent to the kitchen.
                     </p>
-                    <div className="bg-[#EFEFEA]/60 border border-[#2A1E17]/5 rounded-2xl p-4 text-xs font-mono text-[#2A1E17] tracking-wider mt-4">
+                    <div className="bg-[#F0D8A1]/60 border border-[#A47251]/5 rounded-2xl p-4 text-xs font-mono text-[#2A1E17] tracking-wider mt-4">
                       Order ID: {createdOrderId}
                     </div>
                   </div>
                   <button
                     onClick={handleCloseModal}
-                    className="w-full rounded-none bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer"
+                    className="w-full rounded-none bg-[#A47251] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer"
                   >
                     Back to Shop
                   </button>
@@ -877,41 +877,41 @@ export default function Header() {
                     
                     {/* Left Column: Billing Details */}
                     <div className="space-y-4">
-                      <div className="border-b border-[#2A1E17]/10 pb-2 mb-2">
+                      <div className="border-b border-[#A47251]/10 pb-2 mb-2">
                         <h4 className="font-serif text-base font-bold text-[#2A1E17]">Billing Details</h4>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1">
-                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">First Name *</label>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">First Name *</label>
                           <input
                             type="text"
                             required
                             placeholder="John"
                             value={billingFirstName}
                             onChange={(e) => setBillingFirstName(e.target.value)}
-                            className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                            className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                           />
                         </div>
                         <div className="space-y-1">
-                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Last Name *</label>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Last Name *</label>
                           <input
                             type="text"
                             required
                             placeholder="Doe"
                             value={billingLastName}
                             onChange={(e) => setBillingLastName(e.target.value)}
-                            className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                            className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                           />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Country *</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Country *</label>
                         <select
                           value={billingCountry}
                           onChange={(e) => setBillingCountry(e.target.value)}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                         >
                           <option value="Sri Lanka">Sri Lanka</option>
                           <option value="India">India</option>
@@ -924,44 +924,44 @@ export default function Header() {
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Zip / Postal Code (Optional)</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Zip / Postal Code (Optional)</label>
                         <input
                           type="text"
                           placeholder="e.g. 10115"
                           value={billingZipCode}
                           onChange={(e) => setBillingZipCode(e.target.value)}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Phone *</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Phone *</label>
                         <input
                           type="tel"
                           required
                           placeholder="e.g. 077 123 4567"
                           value={billingPhone}
                           onChange={(e) => setBillingPhone(e.target.value)}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Email Address *</label>
+                        <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Email Address *</label>
                         <input
                           type="email"
                           required
                           placeholder="john@example.com"
                           value={billingEmail}
                           onChange={(e) => setBillingEmail(e.target.value)}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                         />
                       </div>
                     </div>
 
                     {/* Right Column: Fulfillment Details */}
                     <div className="space-y-6">
-                      <div className="border-b border-[#2A1E17]/10 pb-2 flex items-center justify-between">
+                      <div className="border-b border-[#A47251]/10 pb-2 flex items-center justify-between">
                         <h4 className="font-serif text-base font-bold text-[#2A1E17]">Fulfillment Details</h4>
                       </div>
 
@@ -972,8 +972,8 @@ export default function Header() {
                           onClick={() => setDeliveryType("pickup")}
                           className={`py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 border cursor-pointer flex items-center justify-center space-x-2 ${
                             deliveryType === "pickup"
-                              ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                              : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                              ? "bg-[#A47251] text-white border-[#A47251] shadow-sm"
+                              : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                           }`}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
@@ -989,8 +989,8 @@ export default function Header() {
                           onClick={() => setDeliveryType("delivery")}
                           className={`py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 border cursor-pointer flex items-center justify-center space-x-2 ${
                             deliveryType === "delivery"
-                              ? "bg-[#2A1E17] text-white border-[#2A1E17] shadow-sm"
-                              : "bg-white text-[#2A1E17] border-[#2A1E17]/10 hover:border-[#C5A880]"
+                              ? "bg-[#A47251] text-white border-[#A47251] shadow-sm"
+                              : "bg-white text-[#2A1E17] border-[#A47251]/10 hover:border-[#DD9E59]"
                           }`}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
@@ -1007,11 +1007,11 @@ export default function Header() {
                       {deliveryType === "pickup" && (
                         <div className="space-y-4 animate-fade-in">
                           <div className="space-y-1">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Location Branch *</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Pickup Location Branch *</label>
                             <select
                               value={pickupBranch}
                               onChange={(e) => setPickupBranch(e.target.value)}
-                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                             >
                               <option value="Colombo Downtown Branch (No. 45, Galle Road, Colombo 03)">Colombo Downtown Branch (No. 45, Galle Road, Colombo 03)</option>
                               <option value="Kandy Lake Round Bakery (No. 12, Temple Road, Kandy)">Kandy Lake Round Bakery (No. 12, Temple Road, Kandy)</option>
@@ -1022,36 +1022,36 @@ export default function Header() {
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Date *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Pickup Date *</label>
                               <input
                                 type="date"
                                 required
                                 min={new Date().toISOString().split("T")[0]}
                                 value={pickupDate}
                                 onChange={(e) => setPickupDate(e.target.value)}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Pickup Time *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Pickup Time *</label>
                               <input
                                 type="time"
                                 required
                                 value={pickupTime}
                                 onChange={(e) => setPickupTime(e.target.value)}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Order Note (Optional)</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Order Note (Optional)</label>
                             <textarea
                               rows={3}
                               placeholder="e.g. Please pack carefully, write 'Happy Birthday John' on it..."
                               value={pickupNote}
                               onChange={(e) => setPickupNote(e.target.value)}
-                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880] resize-none"
+                              className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59] resize-none"
                             />
                           </div>
                         </div>
@@ -1061,11 +1061,11 @@ export default function Header() {
                       {deliveryType === "delivery" && (
                         <div className="space-y-4 animate-fade-in">
                           <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/70">Recipient Details *</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/70">Recipient Details *</span>
                             <button
                               type="button"
                               onClick={copyBillingToDelivery}
-                              className="text-[10px] font-bold uppercase tracking-wide text-[#C5A880] hover:underline cursor-pointer"
+                              className="text-[10px] font-bold uppercase tracking-wide text-[#DD9E59] hover:underline cursor-pointer"
                             >
                               Same as Billing Details
                             </button>
@@ -1073,74 +1073,74 @@ export default function Header() {
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">First Name *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">First Name *</label>
                               <input
                                 type="text"
                                 required
                                 placeholder="First Name"
                                 value={deliveryDetails.firstName}
                                 onChange={(e) => setDeliveryDetails({ ...deliveryDetails, firstName: e.target.value })}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Last Name *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">Last Name *</label>
                               <input
                                 type="text"
                                 required
                                 placeholder="Last Name"
                                 value={deliveryDetails.lastName}
                                 onChange={(e) => setDeliveryDetails({ ...deliveryDetails, lastName: e.target.value })}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Delivery Address *</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">Delivery Address *</label>
                             <input
                               type="text"
                               required
                               placeholder="No. / Street Address"
                               value={deliveryDetails.address}
                               onChange={(e) => setDeliveryDetails({ ...deliveryDetails, address: e.target.value })}
-                              className="w-full bg-white border border-[#2A1E17]/10 rounded-none px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              className="w-full bg-white border border-[#A47251]/10 rounded-none px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                             />
                           </div>
 
                           <div className="space-y-1">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">City *</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">City *</label>
                             <input
                               type="text"
                               required
                               placeholder="City"
                               value={deliveryDetails.city}
                               onChange={(e) => setDeliveryDetails({ ...deliveryDetails, city: e.target.value })}
-                              className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                              className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                             />
                           </div>
 
                           <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Phone *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">Phone *</label>
                               <input
                                 type="tel"
                                 required
                                 placeholder="Your Phone"
                                 value={deliveryDetails.phone}
                                 onChange={(e) => setDeliveryDetails({ ...deliveryDetails, phone: e.target.value })}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                             <div className="space-y-1">
-                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">Recipient Phone *</label>
+                              <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/50">Recipient Phone *</label>
                               <input
                                 type="tel"
                                 required
                                 placeholder="Recipient's Phone"
                                 value={deliveryDetails.recipientPhone}
                                 onChange={(e) => setDeliveryDetails({ ...deliveryDetails, recipientPhone: e.target.value })}
-                                className="w-full bg-white border border-[#2A1E17]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#C5A880] focus:ring-1 focus:ring-[#C5A880]"
+                                className="w-full bg-white border border-[#A47251]/10 rounded-xl px-4 py-2.5 text-sm text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59]"
                               />
                             </div>
                           </div>
@@ -1150,12 +1150,12 @@ export default function Header() {
                   </div>
 
                   {/* Section: Order Summary & Payment */}
-                  <div className="border-t border-[#2A1E17]/10 pt-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                  <div className="border-t border-[#A47251]/10 pt-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                     
                     {/* Order Details Summary */}
                     <div className="space-y-3">
                       <h4 className="font-serif text-base font-bold text-[#2A1E17]">Order Summary</h4>
-                      <div className="bg-[#EFEFEA]/50 rounded-none p-5 border border-[#2A1E17]/5 space-y-3">
+                      <div className="bg-[#F0D8A1]/50 rounded-none p-5 border border-[#A47251]/5 space-y-3">
                         <div className="max-h-48 overflow-y-auto pr-2 space-y-3">
                           {cartItems.map((item) => {
                             const itemPrice = item.calculatedPrice !== undefined
@@ -1165,7 +1165,7 @@ export default function Header() {
                             return (
                               <div key={itemKey} className="flex items-center justify-between text-sm">
                                 <div className="flex items-center space-x-3">
-                                  <div className="relative h-10 w-10 overflow-hidden rounded-none bg-white border border-[#2A1E17]/5 flex-shrink-0">
+                                  <div className="relative h-10 w-10 overflow-hidden rounded-none bg-white border border-[#A47251]/5 flex-shrink-0">
                                     <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" />
                                   </div>
                                   <div>
@@ -1174,12 +1174,12 @@ export default function Header() {
                                     {/* Display custom variations */}
                                     <div className="flex flex-wrap gap-1 mt-0.5">
                                       {item.selectedVariant && (
-                                        <span className="inline-block px-1 py-0.5 bg-[#2A1E17]/5 rounded-none text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-[#A47251]/5 rounded-none text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
                                           {item.selectedVariant.name}
                                         </span>
                                       )}
                                       {item.selectedSize && (
-                                        <span className="inline-block px-1 py-0.5 bg-[#C5A880]/10 rounded-none text-[8px] font-bold text-[#C5A880] uppercase tracking-wide">
+                                        <span className="inline-block px-1 py-0.5 bg-[#DD9E59]/10 rounded-none text-[8px] font-bold text-[#DD9E59] uppercase tracking-wide">
                                           {item.selectedSize}
                                         </span>
                                       )}
@@ -1194,13 +1194,13 @@ export default function Header() {
                                         </span>
                                       )}
                                       {item.selectedAddOns && item.selectedAddOns.map((addon) => (
-                                        <span key={addon} className="inline-block px-1 py-0.5 bg-emerald-50 rounded-none text-[8px] font-bold text-emerald-700 uppercase tracking-wide">
+                                        <span key={addon} className="inline-block px-1 py-0.5 bg-[#DCF0C3] rounded-none text-[8px] font-bold text-[#2A1E17] uppercase tracking-wide">
                                           +{addon}
                                         </span>
                                       ))}
                                     </div>
                                     
-                                    <p className="text-[10px] text-[#3A2E2B]/60 mt-1">Qty: {item.quantity}</p>
+                                    <p className="text-[10px] text-[#2A1E17]/60 mt-1">Qty: {item.quantity}</p>
                                   </div>
                                 </div>
                                 <span className="font-bold text-[#2A1E17] text-xs">Rs. {(itemPrice * item.quantity).toFixed(2)}</span>
@@ -1209,7 +1209,7 @@ export default function Header() {
                           })}
                         </div>
 
-                        <div className="border-t border-[#2A1E17]/5 pt-3 space-y-1.5 text-xs text-[#3A2E2B]/80 font-sans">
+                        <div className="border-t border-[#A47251]/5 pt-3 space-y-1.5 text-xs text-[#2A1E17]/80 font-sans">
                           <div className="flex justify-between">
                             <span>Subtotal</span>
                             <span>Rs. {totalAmount.toFixed(2)}</span>
@@ -1222,7 +1222,7 @@ export default function Header() {
                             <span>Fulfillment ({deliveryType === "pickup" ? "Pickup" : "Delivery"})</span>
                             <span>{deliveryType === "pickup" ? "Free" : `Rs. ${(350).toFixed(2)}`}</span>
                           </div>
-                          <div className="flex justify-between text-sm font-bold text-[#2A1E17] pt-2 border-t border-dashed border-[#2A1E17]/5">
+                          <div className="flex justify-between text-sm font-bold text-[#2A1E17] pt-2 border-t border-dashed border-[#A47251]/5">
                             <span>Total</span>
                             <span>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</span>
                           </div>
@@ -1236,11 +1236,11 @@ export default function Header() {
                       <div className="space-y-3">
                         <label className={`flex items-center p-3.5 rounded-none border cursor-pointer transition-all duration-200 bg-white ${
                           paymentMethod === "cod"
-                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
-                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                            ? "border-[#A47251] ring-1 ring-[#2A1E17]"
+                            : "border-[#A47251]/10 hover:border-[#DD9E59]"
                         }`}>
                           <input type="radio" name="payment" value="cod" checked={paymentMethod === "cod"} onChange={() => setPaymentMethod("cod")} className="sr-only" />
-                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                          <div className="border border-[#A47251]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
                               <rect x="3" y="6" width="18" height="12" strokeLinecap="square" strokeLinejoin="miter" />
                               <rect x="9" y="10" width="6" height="4" strokeLinecap="square" strokeLinejoin="miter" />
@@ -1248,17 +1248,17 @@ export default function Header() {
                           </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Cash on Delivery</span>
-                            <span className="block text-[10px] text-[#3A2E2B]/60">Pay cash when you pick up or receive delivery</span>
+                            <span className="block text-[10px] text-[#2A1E17]/60">Pay cash when you pick up or receive delivery</span>
                           </div>
                         </label>
 
                         <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
                           paymentMethod === "card"
-                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
-                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                            ? "border-[#A47251] ring-1 ring-[#2A1E17]"
+                            : "border-[#A47251]/10 hover:border-[#DD9E59]"
                         }`}>
                           <input type="radio" name="payment" value="card" checked={paymentMethod === "card"} onChange={() => setPaymentMethod("card")} className="sr-only" />
-                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                          <div className="border border-[#A47251]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
                               <rect x="3" y="5" width="18" height="14" strokeLinecap="square" strokeLinejoin="miter" />
                               <line x1="3" y1="9" x2="21" y2="9" strokeLinecap="square" strokeLinejoin="miter" />
@@ -1267,17 +1267,17 @@ export default function Header() {
                           </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Card Payment</span>
-                            <span className="block text-[10px] text-[#3A2E2B]/60">Pay online with Visa / MasterCard / Amex</span>
+                            <span className="block text-[10px] text-[#2A1E17]/60">Pay online with Visa / MasterCard / Amex</span>
                           </div>
                         </label>
 
                         <label className={`flex items-center p-3.5 rounded-xl border cursor-pointer transition-all duration-200 bg-white ${
                           paymentMethod === "bank_deposit"
-                            ? "border-[#2A1E17] ring-1 ring-[#2A1E17]"
-                            : "border-[#2A1E17]/10 hover:border-[#C5A880]"
+                            ? "border-[#A47251] ring-1 ring-[#2A1E17]"
+                            : "border-[#A47251]/10 hover:border-[#DD9E59]"
                         }`}>
                           <input type="radio" name="payment" value="bank_deposit" checked={paymentMethod === "bank_deposit"} onChange={() => setPaymentMethod("bank_deposit")} className="sr-only" />
-                          <div className="border border-[#2A1E17]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
+                          <div className="border border-[#A47251]/10 p-1.5 bg-white flex items-center justify-center mr-3 shrink-0">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4 text-[#2A1E17]">
                               <polygon points="12,3 3,9 21,9" strokeLinecap="square" strokeLinejoin="miter" />
                               <rect x="5" y="10" width="2" height="8" strokeLinecap="square" strokeLinejoin="miter" />
@@ -1288,7 +1288,7 @@ export default function Header() {
                           </div>
                           <div>
                             <span className="block font-bold text-xs text-[#2A1E17]">Bank Deposit</span>
-                            <span className="block text-[10px] text-[#3A2E2B]/60">Direct bank transfer to our corporate account</span>
+                            <span className="block text-[10px] text-[#2A1E17]/60">Direct bank transfer to our corporate account</span>
                           </div>
                         </label>
                       </div>
@@ -1301,7 +1301,7 @@ export default function Header() {
                         const remainingCodAmount = totalAmount + taxAmount; // Total minus delivery fee
 
                         return (
-                          <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-4 animate-fade-in">
+                          <div className="bg-[#F0D8A1]/50 border border-[#A47251]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-4 animate-fade-in">
                             <div className="space-y-2">
                               <span className="font-bold uppercase tracking-wider block text-[10px]">COD Instructions</span>
                               {deliveryType === "delivery" ? (
@@ -1316,8 +1316,8 @@ export default function Header() {
                             </div>
 
                             {deliveryType === "delivery" && (
-                              <div className="space-y-2 pt-2 border-t border-[#2A1E17]/5">
-                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                              <div className="space-y-2 pt-2 border-t border-[#A47251]/5">
+                                <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                                   Upload Delivery Fee Slip *
                                 </label>
                                 <input
@@ -1325,10 +1325,10 @@ export default function Header() {
                                   required
                                   accept="image/*"
                                   onChange={handleDeliverySlipUpload}
-                                  className="w-full text-[11px] text-[#3A2E2B]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#2A1E17]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                                  className="w-full text-[11px] text-[#2A1E17]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#A47251]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#DD9E59] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                                 />
                                 {deliverySlipUrl && (
-                                  <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#2A1E17]/10 bg-white mt-2">
+                                  <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#A47251]/10 bg-white mt-2">
                                     <img src={deliverySlipUrl} alt="Delivery fee slip preview" className="h-full w-full object-cover" />
                                   </div>
                                 )}
@@ -1339,7 +1339,7 @@ export default function Header() {
                       })()}
 
                       {paymentMethod === "card" && (
-                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
+                        <div className="bg-[#F0D8A1]/50 border border-[#A47251]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-2 animate-fade-in">
                           <span className="font-bold uppercase tracking-wider block text-[10px]">Card Payment Instructions</span>
                           <p className="leading-relaxed">
                             You will be redirected to our secure payment gateway to complete your card transaction. Please ensure your card has online payments enabled. Your order status will automatically update to <strong>Paid</strong> upon successful authorization.
@@ -1348,9 +1348,9 @@ export default function Header() {
                       )}
 
                       {paymentMethod === "bank_deposit" && (
-                        <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-3.5 animate-fade-in">
+                        <div className="bg-[#F0D8A1]/50 border border-[#A47251]/10 p-4 rounded-none text-xs text-[#2A1E17]/90 space-y-3.5 animate-fade-in">
                           <span className="font-bold uppercase tracking-wider block text-[10px]">Bank Deposit Instructions</span>
-                          <div className="space-y-1 bg-white p-3 border border-[#2A1E17]/5 font-mono text-[10.5px]">
+                          <div className="space-y-1 bg-white p-3 border border-[#A47251]/5 font-mono text-[10.5px]">
                             <p><strong>Bank:</strong> Warm Delights Bank PLC</p>
                             <p><strong>Account Name:</strong> Warm Delights (Pvt) Ltd</p>
                             <p><strong>Account Number:</strong> 0987-6543-2101</p>
@@ -1359,8 +1359,8 @@ export default function Header() {
                           <p className="leading-relaxed text-[11px]">
                             Please transfer the total amount of <strong>Rs. {(totalAmount + (totalAmount * 0.08) + (deliveryType === "delivery" ? 350 : 0)).toFixed(2)}</strong> to the account above, and upload your deposit slip below. Baking will commence once the deposit slip is uploaded and verified.
                           </p>
-                          <div className="space-y-2 pt-2 border-t border-[#2A1E17]/5">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                          <div className="space-y-2 pt-2 border-t border-[#A47251]/5">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                               Upload Bank Deposit Slip *
                             </label>
                             <input
@@ -1368,10 +1368,10 @@ export default function Header() {
                               required
                               accept="image/*"
                               onChange={handleBankSlipUpload}
-                              className="w-full text-[11px] text-[#3A2E2B]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#2A1E17]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                              className="w-full text-[11px] text-[#2A1E17]/70 file:mr-4 file:py-1.5 file:px-3.5 file:rounded-none file:border file:border-[#A47251]/10 file:text-[10px] file:font-bold file:bg-white file:text-[#2A1E17] file:hover:bg-[#DD9E59] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                             />
                             {bankSlipUrl && (
-                              <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#2A1E17]/10 bg-white mt-2">
+                              <div className="relative h-16 w-16 rounded-none overflow-hidden border border-[#A47251]/10 bg-white mt-2">
                                 <img src={bankSlipUrl} alt="Bank deposit slip preview" className="h-full w-full object-cover" />
                               </div>
                             )}
@@ -1390,26 +1390,26 @@ export default function Header() {
                       required
                       checked={agreeToPrivacy}
                       onChange={(e) => setAgreeToPrivacy(e.target.checked)}
-                      className="h-4 w-4 rounded-none border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] cursor-pointer accent-[#C5A880] mt-0.5 shrink-0"
+                      className="h-4 w-4 rounded-none border-[#A47251]/20 text-[#DD9E59] focus:ring-[#DD9E59] cursor-pointer accent-[#DD9E59] mt-0.5 shrink-0"
                     />
-                    <label htmlFor="privacyAgreement" className="text-xs text-[#3A2E2B]/85 cursor-pointer select-none leading-relaxed">
-                      I agree to the <Link href="/privacy-policy" className="text-[#C5A880] font-bold hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> and data processing terms. *
+                    <label htmlFor="privacyAgreement" className="text-xs text-[#2A1E17]/85 cursor-pointer select-none leading-relaxed">
+                      I agree to the <Link href="/privacy-policy" className="text-[#DD9E59] font-bold hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link> and data processing terms. *
                     </label>
                   </div>
 
                   {/* Submit Button */}
-                  <div className="pt-4 border-t border-[#2A1E17]/5 flex items-center justify-end space-x-4">
+                  <div className="pt-4 border-t border-[#A47251]/5 flex items-center justify-end space-x-4">
                     <button
                       type="button"
                       onClick={handleCloseModal}
-                      className="px-6 py-3 rounded-none text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#EFEFEA]/50 transition-colors cursor-pointer"
+                      className="px-6 py-3 rounded-none text-xs font-bold uppercase tracking-wider text-[#2A1E17] hover:bg-[#F0D8A1]/50 transition-colors cursor-pointer"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isOrderSubmitting}
-                      className="rounded-none bg-[#2A1E17] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer min-w-40 flex items-center justify-center"
+                      className="rounded-none bg-[#A47251] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer min-w-40 flex items-center justify-center"
                     >
                       {isOrderSubmitting ? (
                         <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

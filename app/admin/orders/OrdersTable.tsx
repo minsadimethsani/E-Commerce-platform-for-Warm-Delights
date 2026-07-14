@@ -98,7 +98,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
   const getStatusBadgeClass = (status: Order["status"]) => {
     switch (status) {
       case "delivered":
-        return "bg-emerald-50 text-emerald-700 border border-emerald-200";
+        return "bg-[#DCF0C3] text-[#2A1E17] border border-[#DCF0C3]";
       case "cancelled":
         return "bg-red-50 text-red-700 border border-red-200";
       case "pending":
@@ -128,11 +128,11 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
     return (
       <div className="space-y-6 animate-fade-in">
         {/* Navigation & Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#2A1E17]/10 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#A47251]/10 pb-6">
           <div className="space-y-1.5">
             <button
               onClick={() => setSelectedOrder(null)}
-              className="group flex items-center text-xs font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors mb-2 cursor-pointer"
+              className="group flex items-center text-xs font-bold uppercase tracking-wider text-[#DD9E59] hover:text-[#2A1E17] transition-colors mb-2 cursor-pointer"
             >
               <span className="mr-1.5 transition-transform group-hover:-translate-x-1">&larr;</span> Back to Orders
             </button>
@@ -144,21 +144,21 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                 {selectedOrder.status}
               </span>
             </div>
-            <p className="text-xs text-[#3A2E2B]/60">
+            <p className="text-xs text-[#2A1E17]/60">
               Placed on {formattedDate}
             </p>
           </div>
 
           {/* Action (Update Status) */}
-          <div className="flex items-center gap-3 bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-xl p-3.5 self-start sm:self-auto">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Update Status:</label>
+          <div className="flex items-center gap-3 bg-[#F0D8A1]/50 border border-[#A47251]/5 rounded-xl p-3.5 self-start sm:self-auto">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Update Status:</label>
             <select
               value={selectedOrder.status}
               disabled={updatingId === selectedOrder.id}
               onChange={(e) =>
                 handleStatusChange(selectedOrder.id, e.target.value as Order["status"])
               }
-              className="bg-white border border-[#2A1E17]/10 rounded-lg py-1.5 pl-3 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer disabled:opacity-40"
+              className="bg-white border border-[#A47251]/10 rounded-lg py-1.5 pl-3 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer disabled:opacity-40"
             >
               {statusOptions.map((opt) => (
                 <option key={opt} value={opt}>
@@ -175,21 +175,21 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
           {/* Left Column (Items & Pricing) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Items Card */}
-            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-4">
-              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+            <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-4">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                 Order Items
               </h3>
-              <div className="divide-y divide-[#2A1E17]/5">
+              <div className="divide-y divide-[#A47251]/5">
                 {selectedOrder.items.map((item) => (
                   <div key={item.productId} className="flex items-center justify-between py-4 first:pt-0 last:pb-0">
                     <div className="flex items-center space-x-4">
-                      <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-[#2A1E17]/5 flex-shrink-0">
+                      <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-[#A47251]/5 flex-shrink-0">
                         <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                       </div>
                       <div>
                         <h4 className="font-bold text-[#2A1E17] text-sm">{item.name}</h4>
-                        <p className="text-xs text-[#3A2E2B]/60 mt-0.5">Quantity: {item.quantity}</p>
-                        <p className="text-xs text-[#3A2E2B]/60">Unit Price: Rs. {item.price.toFixed(2)}</p>
+                        <p className="text-xs text-[#2A1E17]/60 mt-0.5">Quantity: {item.quantity}</p>
+                        <p className="text-xs text-[#2A1E17]/60">Unit Price: Rs. {item.price.toFixed(2)}</p>
                       </div>
                     </div>
                     <span className="font-bold text-[#2A1E17] text-sm">Rs. {(item.price * item.quantity).toFixed(2)}</span>
@@ -199,11 +199,11 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
             </div>
 
             {/* Calculations Card */}
-            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-4">
-              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+            <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-4">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                 Payment Summary
               </h3>
-              <div className="space-y-2.5 text-sm text-[#3A2E2B]/85">
+              <div className="space-y-2.5 text-sm text-[#2A1E17]/85">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span className="font-medium text-[#2A1E17]">Rs. {selectedOrder.subtotal.toFixed(2)}</span>
@@ -216,7 +216,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                   <span>Shipping Fee</span>
                   <span className="font-medium text-[#2A1E17]">Rs. {selectedOrder.shippingFee.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-base font-bold text-[#2A1E17] pt-4 border-t border-dashed border-[#2A1E17]/10">
+                <div className="flex justify-between text-base font-bold text-[#2A1E17] pt-4 border-t border-dashed border-[#A47251]/10">
                   <span>Total Amount</span>
                   <span className="text-lg text-[#2E1D13]">Rs. {selectedOrder.total.toFixed(2)}</span>
                 </div>
@@ -228,17 +228,17 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
           <div className="space-y-6">
             {/* Customer & Billing Card */}
             {selectedOrder.billingDetails && (
-              <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
-                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+              <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-3">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                   Billing Details
                 </h3>
                 <div className="text-sm text-[#2A1E17] leading-relaxed space-y-1">
                   <p className="font-bold text-base text-[#2E1D13]">
                     {selectedOrder.billingDetails.firstName} {selectedOrder.billingDetails.lastName}
                   </p>
-                  <p className="text-xs text-[#3A2E2B]/80">{selectedOrder.billingDetails.email}</p>
-                  <p className="text-xs text-[#3A2E2B]/80">{selectedOrder.billingDetails.phone}</p>
-                  <div className="text-xs text-[#3A2E2B]/60 uppercase tracking-wide font-semibold pt-2 border-t border-[#2A1E17]/5 mt-3">
+                  <p className="text-xs text-[#2A1E17]/80">{selectedOrder.billingDetails.email}</p>
+                  <p className="text-xs text-[#2A1E17]/80">{selectedOrder.billingDetails.phone}</p>
+                  <div className="text-xs text-[#2A1E17]/60 uppercase tracking-wide font-semibold pt-2 border-t border-[#A47251]/5 mt-3">
                     Country: {selectedOrder.billingDetails.country}
                     {selectedOrder.billingDetails.zipCode ? ` | Zip: ${selectedOrder.billingDetails.zipCode}` : ""}
                   </div>
@@ -247,15 +247,15 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
             )}
 
             {/* Delivery/Pickup Card */}
-            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
-              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+            <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-3">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                 Fulfillment Info
               </h3>
               {selectedOrder.fulfillment ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Type</span>
-                    <span className="px-2.5 py-0.5 bg-[#C5A880]/15 text-[#2A1E17] text-[10px] rounded-md font-bold uppercase tracking-wider">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Type</span>
+                    <span className="px-2.5 py-0.5 bg-[#DD9E59]/15 text-[#2A1E17] text-[10px] rounded-md font-bold uppercase tracking-wider">
                       {selectedOrder.fulfillment.type}
                     </span>
                   </div>
@@ -264,7 +264,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                     <div className="bg-amber-50/40 p-3.5 rounded-xl border border-amber-200/35 space-y-1.5 text-sm">
                       <p className="text-xs font-bold text-[#2A1E17]/60 uppercase tracking-wider">Pickup Branch:</p>
                       <p className="font-bold text-[#2A1E17]">{selectedOrder.fulfillment.pickupDetails.branch}</p>
-                      <div className="flex justify-between items-center text-xs mt-3 border-t border-[#2A1E17]/5 pt-2">
+                      <div className="flex justify-between items-center text-xs mt-3 border-t border-[#A47251]/5 pt-2">
                         <span>Date: <strong>{selectedOrder.fulfillment.pickupDetails.date}</strong></span>
                         <span>Time: <strong>{selectedOrder.fulfillment.pickupDetails.time}</strong></span>
                       </div>
@@ -272,13 +272,13 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                   )}
 
                   {selectedOrder.fulfillment.type === "delivery" && selectedOrder.fulfillment.deliveryDetails && (
-                    <div className="bg-[#EFEFEA]/30 p-3.5 rounded-xl border border-[#2A1E17]/5 space-y-2 text-sm">
+                    <div className="bg-[#F0D8A1]/30 p-3.5 rounded-xl border border-[#A47251]/5 space-y-2 text-sm">
                       <p className="font-bold">
                         Recipient: {selectedOrder.fulfillment.deliveryDetails.firstName} {selectedOrder.fulfillment.deliveryDetails.lastName}
                       </p>
                       <p className="text-xs leading-relaxed">{selectedOrder.fulfillment.deliveryDetails.address}</p>
                       <p className="text-xs">City: {selectedOrder.fulfillment.deliveryDetails.city}</p>
-                      <div className="text-xs mt-2 space-y-1 border-t border-[#2A1E17]/5 pt-2">
+                      <div className="text-xs mt-2 space-y-1 border-t border-[#A47251]/5 pt-2">
                         <p>Phone: <strong>{selectedOrder.fulfillment.deliveryDetails.phone}</strong></p>
                         <p>Recipient Phone: <strong>{selectedOrder.fulfillment.deliveryDetails.recipientPhone}</strong></p>
                       </div>
@@ -292,19 +292,19 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                   <p>
                     {selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.postalCode}
                   </p>
-                  <p className="text-xs text-[#3A2E2B]/70">{selectedOrder.shippingAddress.country}</p>
+                  <p className="text-xs text-[#2A1E17]/70">{selectedOrder.shippingAddress.country}</p>
                 </div>
               )}
             </div>
 
             {/* Payment Card */}
-            <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-3">
-              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+            <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-3">
+              <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                 Payment Info
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Method</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Method</span>
                   <span className="font-bold text-[#2A1E17]">
                     {selectedOrder.paymentDetails.method === "cod" ? "Cash on Delivery" :
                      selectedOrder.paymentDetails.method === "card" ? "Card Payment" :
@@ -313,23 +313,23 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Status</span>
                   <span className={`inline-block rounded-md px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                     selectedOrder.paymentDetails.status === "paid"
-                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      ? "bg-[#DCF0C3] text-[#2A1E17] border border-[#DCF0C3]"
                       : "bg-red-50 text-red-700 border border-red-200"
                   }`}>
                     {selectedOrder.paymentDetails.status}
                   </span>
                 </div>
                 {selectedOrder.paymentDetails.deliverySlipUrl && (
-                  <div className="pt-3 border-t border-[#2A1E17]/5 space-y-1.5">
-                    <span className="block text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Delivery Fee Slip</span>
+                  <div className="pt-3 border-t border-[#A47251]/5 space-y-1.5">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Delivery Fee Slip</span>
                     <a
                       href={selectedOrder.paymentDetails.deliverySlipUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#2A1E17]/10 bg-white hover:opacity-90 transition-opacity"
+                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#A47251]/10 bg-white hover:opacity-90 transition-opacity"
                     >
                       <img
                         src={selectedOrder.paymentDetails.deliverySlipUrl}
@@ -340,13 +340,13 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                   </div>
                 )}
                 {selectedOrder.paymentDetails.bankSlipUrl && (
-                  <div className="pt-3 border-t border-[#2A1E17]/5 space-y-1.5">
-                    <span className="block text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Bank Deposit Slip</span>
+                  <div className="pt-3 border-t border-[#A47251]/5 space-y-1.5">
+                    <span className="block text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Bank Deposit Slip</span>
                     <a
                       href={selectedOrder.paymentDetails.bankSlipUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#2A1E17]/10 bg-white hover:opacity-90 transition-opacity"
+                      className="block relative h-36 w-full overflow-hidden rounded-none border border-[#A47251]/10 bg-white hover:opacity-90 transition-opacity"
                     >
                       <img
                         src={selectedOrder.paymentDetails.bankSlipUrl}
@@ -361,8 +361,8 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
 
             {/* Order Note Card */}
             {selectedOrder.orderNote && (
-              <div className="rounded-2xl border border-[#2A1E17]/5 bg-white p-6 shadow-xs space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#2A1E17]/5 pb-3">
+              <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                   Order Note
                 </h3>
                 <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3.5 rounded-xl border border-yellow-200/25 italic leading-relaxed">
@@ -378,19 +378,19 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
+    <div className="w-full overflow-hidden rounded-2xl border border-[#A47251]/5 bg-white shadow-xs">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-[#2A1E17]/5">
-          <thead className="bg-[#EFEFEA]">
+        <table className="min-w-full divide-y divide-[#A47251]/5">
+          <thead className="bg-[#F0D8A1]">
             <tr>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Order</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Date</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Total</th>
-              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Status</th>
-              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Order</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Date</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Total</th>
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Status</th>
+              <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
+          <tbody className="divide-y divide-[#A47251]/5 bg-white">
             {orders.map((order) => {
               const formattedDate = order.createdAt
                 ? new Date(order.createdAt as any).toLocaleDateString("en-US", {
@@ -403,7 +403,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
               return (
                 <tr
                   key={order.id}
-                  className="hover:bg-[#EFEFEA]/30 transition-colors cursor-pointer"
+                  className="hover:bg-[#F0D8A1]/30 transition-colors cursor-pointer"
                   onClick={() => setSelectedOrder(order)}
                 >
                   {/* Order ID */}
@@ -411,7 +411,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                     {order.id}
                   </td>
                   {/* Date */}
-                  <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]/80">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-[#2A1E17]/80">
                     {formattedDate}
                   </td>
                   {/* Total Price */}
@@ -436,7 +436,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                         onChange={(e) =>
                           handleStatusChange(order.id, e.target.value as Order["status"])
                         }
-                        className="bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg py-1 pl-2.5 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer disabled:opacity-40"
+                        className="bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg py-1 pl-2.5 pr-8 text-xs font-semibold text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer disabled:opacity-40"
                       >
                         {statusOptions.map((opt) => (
                           <option key={opt} value={opt}>

@@ -40,22 +40,22 @@ export default function AdminLayout({
 
   if (loading || !user || userProfile?.role !== "admin") {
     return (
-      <div className="min-h-screen bg-[#FBFBF9] flex flex-col items-center justify-center space-y-4">
-        <span className="inline-block h-10 w-10 border-4 border-[#C5A880] border-t-transparent rounded-full animate-spin"></span>
+      <div className="min-h-screen bg-[#FDF9F0] flex flex-col items-center justify-center space-y-4">
+        <span className="inline-block h-10 w-10 border-4 border-[#DD9E59] border-t-transparent rounded-full animate-spin"></span>
         <p className="text-xs font-bold uppercase tracking-widest text-[#2A1E17]/60 animate-pulse">Verifying credentials...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FBFBF9] flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-[#FDF9F0] flex flex-col lg:flex-row">
       
       {/* Desktop Sidebar (Fixed Left) */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-[#2A1E17] text-[#FBFBF9]/90 border-r border-[#2A1E17]/10 z-30">
-        <div className="flex h-20 items-center px-6 border-b border-[#FBFBF9]/10">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 bg-[#A47251] text-[#FDF9F0]/90 border-r border-[#A47251]/10 z-30">
+        <div className="flex h-20 items-center px-6 border-b border-[#FDF9F0]/10">
           <Link href="/admin" className="flex items-center space-x-2">
             <span className="font-serif text-xl font-bold tracking-wide text-white">
-              Warm Delights <span className="text-[#C5A880] text-xs uppercase tracking-wider block font-sans font-semibold mt-0.5">Admin Portal</span>
+              Warm Delights <span className="text-[#DD9E59] text-xs uppercase tracking-wider block font-sans font-semibold mt-0.5">Admin Portal</span>
             </span>
           </Link>
         </div>
@@ -70,11 +70,11 @@ export default function AdminLayout({
                 href={item.href}
                 className={`group flex items-center space-x-3 rounded-xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
                   isActive
-                    ? "bg-[#C5A880] text-[#2A1E17] shadow-sm"
-                    : "hover:bg-white/5 hover:text-white text-[#FBFBF9]/75"
+                    ? "bg-[#DD9E59] text-[#2A1E17] shadow-sm"
+                    : "hover:bg-white/5 hover:text-white text-[#FDF9F0]/75"
                 }`}
               >
-                <item.icon className={`h-5 w-5 ${isActive ? "text-[#2A1E17]" : "text-[#FBFBF9]/50 group-hover:text-white"}`} />
+                <item.icon className={`h-5 w-5 ${isActive ? "text-[#2A1E17]" : "text-[#FDF9F0]/50 group-hover:text-white"}`} />
                 <span>{item.name}</span>
               </Link>
             );
@@ -82,12 +82,12 @@ export default function AdminLayout({
         </nav>
 
         {/* Footer actions in sidebar */}
-        <div className="p-4 border-t border-[#FBFBF9]/10 space-y-3">
+        <div className="p-4 border-t border-[#FDF9F0]/10 space-y-3">
           <Link
             href="/"
-            className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold tracking-wide text-[#FBFBF9]/70 hover:bg-white/5 hover:text-white transition-all"
+            className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold tracking-wide text-[#FDF9F0]/70 hover:bg-white/5 hover:text-white transition-all"
           >
-            <StorefrontIcon className="h-5 w-5 text-[#FBFBF9]/50" />
+            <StorefrontIcon className="h-5 w-5 text-[#FDF9F0]/50" />
             <span>Storefront</span>
           </Link>
 
@@ -95,14 +95,14 @@ export default function AdminLayout({
           {user && (
             <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3 mt-2">
               <div className="flex items-center space-x-2.5 min-w-0">
-                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#C5A880] text-[#2A1E17] font-bold text-sm">
+                <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#DD9E59] text-[#2A1E17] font-bold text-sm">
                   {userProfile?.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "A"}
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xs font-bold text-white truncate">
                     {userProfile?.displayName || "Admin User"}
                   </span>
-                  <span className="text-[10px] text-[#FBFBF9]/50 truncate">
+                  <span className="text-[10px] text-[#FDF9F0]/50 truncate">
                     {user.email}
                   </span>
                 </div>
@@ -110,7 +110,7 @@ export default function AdminLayout({
               <button
                 onClick={logout}
                 title="Sign Out"
-                className="p-1.5 text-[#FBFBF9]/50 hover:text-rose-400 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
+                className="p-1.5 text-[#FDF9F0]/50 hover:text-rose-400 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
               >
                 <LogoutIcon className="h-4.5 w-4.5" />
               </button>
@@ -120,10 +120,10 @@ export default function AdminLayout({
       </aside>
 
       {/* Mobile Sticky Header */}
-      <header className="lg:hidden sticky top-0 z-40 flex h-16 items-center justify-between bg-[#2A1E17] text-[#FBFBF9] px-4 sm:px-6 shadow-sm">
+      <header className="lg:hidden sticky top-0 z-40 flex h-16 items-center justify-between bg-[#A47251] text-[#FDF9F0] px-4 sm:px-6 shadow-sm">
         <div className="flex items-center">
           <span className="font-serif text-lg font-bold tracking-wide text-white">
-            Warm Delights <span className="text-[#C5A880] text-[10px] font-sans font-bold uppercase ml-1">Admin</span>
+            Warm Delights <span className="text-[#DD9E59] text-[10px] font-sans font-bold uppercase ml-1">Admin</span>
           </span>
         </div>
 
@@ -132,7 +132,7 @@ export default function AdminLayout({
           onClick={() => setMobileMenuOpen(true)}
           type="button"
           aria-label="Open sidebar"
-          className="rounded-md p-1.5 text-[#FBFBF9]/90 hover:bg-white/10 hover:text-white focus:outline-none"
+          className="rounded-md p-1.5 text-[#FDF9F0]/90 hover:bg-white/10 hover:text-white focus:outline-none"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.8" stroke="currentColor">
             <path strokeLinecap="square" strokeLinejoin="miter" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
@@ -145,18 +145,18 @@ export default function AdminLayout({
         <div className="fixed inset-0 z-50 flex lg:hidden" role="dialog" aria-modal="true">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-[#2A1E17]/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-[#A47251]/60 backdrop-blur-xs transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Drawer content */}
-          <div className="relative flex w-full max-w-xs flex-col bg-[#2A1E17] py-6 px-6 shadow-xl transition-all h-full text-[#FBFBF9]/90">
+          <div className="relative flex w-full max-w-xs flex-col bg-[#A47251] py-6 px-6 shadow-xl transition-all h-full text-[#FDF9F0]/90">
             <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
               <span className="font-serif text-lg font-bold text-white">Warm Delights</span>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 type="button"
-                className="rounded-md p-1 text-[#FBFBF9]/80 hover:bg-white/10 hover:text-white transition-colors"
+                className="rounded-md p-1 text-[#FDF9F0]/80 hover:bg-white/10 hover:text-white transition-colors"
               >
                 <span className="sr-only">Close sidebar</span>
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
@@ -175,8 +175,8 @@ export default function AdminLayout({
                     onClick={() => setMobileMenuOpen(false)}
                     className={`group flex items-center space-x-3 rounded-xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
                       isActive
-                        ? "bg-[#C5A880] text-[#2A1E17]"
-                        : "hover:bg-white/5 hover:text-white text-[#FBFBF9]/75"
+                        ? "bg-[#DD9E59] text-[#2A1E17]"
+                        : "hover:bg-white/5 hover:text-white text-[#FDF9F0]/75"
                     }`}
                   >
                     <item.icon className="h-5 w-5" />
@@ -190,7 +190,7 @@ export default function AdminLayout({
               <Link
                 href="/"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold text-[#FBFBF9]/70 hover:bg-white/5 hover:text-white"
+                className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold text-[#FDF9F0]/70 hover:bg-white/5 hover:text-white"
               >
                 <StorefrontIcon className="h-5 w-5" />
                 <span>Storefront</span>
@@ -199,14 +199,14 @@ export default function AdminLayout({
               {user && (
                 <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
                   <div className="flex items-center space-x-2.5 min-w-0">
-                    <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#C5A880] text-[#2A1E17] font-bold text-sm">
+                    <div className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#DD9E59] text-[#2A1E17] font-bold text-sm">
                       {userProfile?.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "A"}
                     </div>
                     <div className="flex flex-col min-w-0">
                       <span className="text-xs font-bold text-white truncate">
                         {userProfile?.displayName || "Admin User"}
                       </span>
-                      <span className="text-[10px] text-[#FBFBF9]/50 truncate font-mono">
+                      <span className="text-[10px] text-[#FDF9F0]/50 truncate font-mono">
                         {user.email}
                       </span>
                     </div>
@@ -217,7 +217,7 @@ export default function AdminLayout({
                       await logout();
                     }}
                     title="Sign Out"
-                    className="p-1.5 text-[#FBFBF9]/50 hover:text-rose-450 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
+                    className="p-1.5 text-[#FDF9F0]/50 hover:text-rose-450 hover:bg-white/5 rounded-lg transition-all cursor-pointer shrink-0"
                   >
                     <LogoutIcon className="h-4.5 w-4.5" />
                   </button>

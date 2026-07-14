@@ -27,7 +27,7 @@ export default async function AdminProductDetailPage({ params }: PageProps) {
         <h1 className="font-serif text-3xl font-bold text-[#2A1E17] tracking-tight">
           Product Details: {product.name}
         </h1>
-        <p className="text-sm text-[#3A2E2B]/70">
+        <p className="text-sm text-[#2A1E17]/70">
           Review details, monitor ingredients and care instructions, and check customer reviews.
         </p>
       </div>
@@ -43,7 +43,7 @@ function LinkBack({ href }: { href: string }) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-[#C5A880] hover:text-[#2A1E17] transition-colors"
+      className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-[#DD9E59] hover:text-[#2A1E17] transition-colors"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

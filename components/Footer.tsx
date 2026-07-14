@@ -12,7 +12,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-[#2A1E17] text-[#FBFBF9]/90">
+    <footer className="bg-[#A47251] text-[#FDF9F0]/90">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4 lg:gap-12">
           {/* Column 1: Brand Info */}
@@ -20,14 +20,14 @@ export default function Footer() {
             <h2 className="font-serif text-2xl font-bold tracking-wide text-white">
               Warm Delights
             </h2>
-            <p className="text-sm leading-relaxed text-[#FBFBF9]/75 font-sans">
+            <p className="text-sm leading-relaxed text-[#FDF9F0]/75 font-sans">
               Handcrafting sweet moments and savory pleasures daily.
             </p>
             {/* Social Icons */}
             <div className="flex space-x-5">
               <Link
                 href="#"
-                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
+                className="text-[#FDF9F0]/60 hover:text-[#DD9E59] transition-colors"
                 aria-label="Instagram"
               >
                 <svg
@@ -45,7 +45,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="#"
-                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
+                className="text-[#FDF9F0]/60 hover:text-[#DD9E59] transition-colors"
                 aria-label="Facebook"
               >
                 <svg
@@ -63,7 +63,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="#"
-                className="text-[#FBFBF9]/60 hover:text-[#C5A880] transition-colors"
+                className="text-[#FDF9F0]/60 hover:text-[#DD9E59] transition-colors"
                 aria-label="Pinterest"
               >
                 <svg
@@ -91,7 +91,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
+                  className="text-[#FDF9F0]/75 hover:text-[#DD9E59] transition-colors"
                 >
                   Home
                 </Link>
@@ -99,7 +99,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/menu"
-                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
+                  className="text-[#FDF9F0]/75 hover:text-[#DD9E59] transition-colors"
                 >
                   Menu
                 </Link>
@@ -107,7 +107,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/menu?category=Custom"
-                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
+                  className="text-[#FDF9F0]/75 hover:text-[#DD9E59] transition-colors"
                 >
                   Custom Cakes
                 </Link>
@@ -115,7 +115,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/about"
-                  className="text-[#FBFBF9]/75 hover:text-[#C5A880] transition-colors"
+                  className="text-[#FDF9F0]/75 hover:text-[#DD9E59] transition-colors"
                 >
                   Our Story
                 </Link>
@@ -128,16 +128,16 @@ export default function Footer() {
             <h3 className="font-serif text-lg font-semibold tracking-wide text-white">
               Opening Hours
             </h3>
-            <ul className="space-y-2.5 text-sm font-sans text-[#FBFBF9]/75">
+            <ul className="space-y-2.5 text-sm font-sans text-[#FDF9F0]/75">
               <li className="flex justify-between">
                 <span>Mon - Sat:</span>
                 <span>8:00 AM - 8:00 PM</span>
               </li>
-              <li className="flex justify-between text-[#C5A880]">
+              <li className="flex justify-between text-[#DD9E59]">
                 <span>Sunday:</span>
                 <span>9:00 AM - 6:00 PM</span>
               </li>
-              <li className="pt-2 border-t border-[#FBFBF9]/10">
+              <li className="pt-2 border-t border-[#FDF9F0]/10">
                 <span className="block font-medium text-white">Warm Delights </span>
                 <span className="block mt-1">Boralesgamuwa, Nugegoda,Sri Lanka</span>
                 <span className="block mt-0.5">Tel: +94 75 552 4468</span>
@@ -150,7 +150,7 @@ export default function Footer() {
             <h3 className="font-serif text-lg font-semibold tracking-wide text-white">
               Newsletter
             </h3>
-            <p className="text-sm leading-relaxed text-[#FBFBF9]/75 font-sans">
+            <p className="text-sm leading-relaxed text-[#FDF9F0]/75 font-sans">
               Subscribe to receive updates on seasonal specials, New Arrivals and exclusive offers.
             </p>
             <form className="mt-4 sm:flex sm:max-w-md gap-2" onSubmit={(e) => e.preventDefault()}>
@@ -162,12 +162,12 @@ export default function Footer() {
                 name="email"
                 id="email-address"
                 required
-                className="w-full min-w-0 rounded-none border border-[#FBFBF9]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FBFBF9]/40 focus:border-[#C5A880] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
+                className="w-full min-w-0 rounded-none border border-[#FDF9F0]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FDF9F0]/40 focus:border-[#DD9E59] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#DD9E59]"
                 placeholder="Enter your email"
               />
               <button
                 type="submit"
-                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-none bg-[#C5A880] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#EFEFEA] hover:text-white"
+                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-none bg-[#DD9E59] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#F0D8A1] hover:text-white"
               >
                 Join
               </button>
@@ -176,7 +176,7 @@ export default function Footer() {
         </div>
 
         {/* Divider and Copyright */}
-        <div className="mt-16 border-t border-[#FBFBF9]/8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FBFBF9]/50 font-sans">
+        <div className="mt-16 border-t border-[#FDF9F0]/8 pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#FDF9F0]/50 font-sans">
           <p>&copy; {new Date().getFullYear()} Warm Delights Bakery. All rights reserved.</p>
           <div className="mt-4 sm:mt-0 space-x-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">

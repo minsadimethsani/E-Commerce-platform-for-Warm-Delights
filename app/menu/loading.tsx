@@ -2,7 +2,7 @@ import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 
 export default function MenuLoading() {
   return (
-    <div className="bg-[#FBFBF9] min-h-screen py-10">
+    <div className="bg-[#FDF9F0] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Breadcrumb skeleton */}
@@ -16,7 +16,7 @@ export default function MenuLoading() {
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <div className="h-3 w-28 bg-gray-200/60 mx-auto rounded-none animate-pulse" />
           <div className="h-10 w-2/3 sm:w-1/2 bg-gray-200/60 mx-auto rounded-none animate-pulse" />
-          <div className="h-1 w-16 bg-[#C5A880]/40 mx-auto rounded-none" />
+          <div className="h-1 w-16 bg-[#DD9E59]/40 mx-auto rounded-none" />
           <div className="space-y-2 max-w-xl mx-auto">
             <div className="h-3.5 w-full bg-gray-200/60 rounded-none animate-pulse" />
             <div className="h-3.5 w-5/6 bg-gray-200/60 mx-auto rounded-none animate-pulse" />
@@ -24,7 +24,7 @@ export default function MenuLoading() {
         </div>
 
         {/* Top Control Bar skeleton */}
-        <div className="flex items-center justify-between border-b border-[#2A1E17]/10 pb-5 mb-8">
+        <div className="flex items-center justify-between border-b border-[#A47251]/10 pb-5 mb-8">
           <div className="h-4 w-28 bg-gray-200/60 rounded-none animate-pulse" />
           <div className="h-8 w-36 bg-gray-200/60 rounded-none animate-pulse" />
         </div>
@@ -34,9 +34,9 @@ export default function MenuLoading() {
           
           {/* Desktop Filters Sidebar skeleton */}
           <aside className="hidden lg:block w-64 flex-shrink-0 space-y-8">
-            <div className="bg-[#EFEFEA]/50 border border-[#2A1E17]/5 rounded-none p-6 space-y-6">
+            <div className="bg-[#F0D8A1]/50 border border-[#A47251]/5 rounded-none p-6 space-y-6">
               
-              <div className="flex items-center justify-between border-b border-[#2A1E17]/5 pb-4">
+              <div className="flex items-center justify-between border-b border-[#A47251]/5 pb-4">
                 <div className="h-5 w-16 bg-gray-200/60 rounded-none animate-pulse" />
                 <div className="h-3 w-12 bg-gray-200/60 rounded-none animate-pulse" />
               </div>

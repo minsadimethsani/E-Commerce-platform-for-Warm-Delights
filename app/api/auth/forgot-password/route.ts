@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #2a1e17/10; rounded: 8px;">
               <h2 style="font-family: serif; color: #2a1e17; text-align: center;">Warm Delights Bakery</h2>
-              <p style="font-size: 14px; color: #3a2e2b; line-height: 1.6;">Hello,</p>
-              <p style="font-size: 14px; color: #3a2e2b; line-height: 1.6;">
+              <p style="font-size: 14px; color: #2A1E17; line-height: 1.6;">Hello,</p>
+              <p style="font-size: 14px; color: #2A1E17; line-height: 1.6;">
                 We received a request to reset the password for your account at Warm Delights. 
                 Please click the button below to choose a new password. This link is valid for 1 hour.
               </p>
@@ -61,11 +61,11 @@ export async function POST(req: NextRequest) {
                   Reset Password
                 </a>
               </div>
-              <p style="font-size: 12px; color: #3a2e2b/60; line-height: 1.6;">
+              <p style="font-size: 12px; color: #2A1E17/60; line-height: 1.6;">
                 If you did not make this request, you can safely ignore this email.
               </p>
               <hr style="border: 0; border-top: 1px solid #eef0f2; margin: 20px 0;" />
-              <p style="font-size: 11px; text-align: center; color: #3a2e2b/40;">
+              <p style="font-size: 11px; text-align: center; color: #2A1E17/40;">
                 Warm Delights Bakery, Inc.
               </p>
             </div>

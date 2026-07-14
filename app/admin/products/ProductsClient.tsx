@@ -541,25 +541,25 @@ export default function ProductsClient({
 
         {/* Table header control panel */}
         <div className="flex items-center justify-between pb-2">
-          <div className="text-xs font-semibold text-[#3A2E2B]/60 uppercase tracking-wider">
+          <div className="text-xs font-semibold text-[#2A1E17]/60 uppercase tracking-wider">
             Total Inventory: {products.length} Items
           </div>
           <button
             onClick={openAddForm}
             disabled={isUpdating}
-            className="flex items-center space-x-2 bg-[#2A1E17] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer shadow-xs disabled:opacity-50"
+            className="flex items-center space-x-2 bg-[#A47251] text-white rounded-full px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer shadow-xs disabled:opacity-50"
           >
             <span>Add Product</span>
           </button>
         </div>
 
         {/* Real Table */}
-        <div className="overflow-hidden rounded-2xl border border-[#2A1E17]/5 bg-white shadow-xs">
+        <div className="overflow-hidden rounded-2xl border border-[#A47251]/5 bg-white shadow-xs">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#2A1E17]/5">
-              <thead className="bg-[#EFEFEA]">
+            <table className="min-w-full divide-y divide-[#A47251]/5">
+              <thead className="bg-[#F0D8A1]">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60 w-12">
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60 w-12">
                     <input
                       type="checkbox"
                       disabled={isUpdating}
@@ -571,20 +571,20 @@ export default function ProductsClient({
                           setSelectedProductIds([]);
                         }
                       }}
-                      className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                      className="rounded border-[#A47251]/20 text-[#DD9E59] focus:ring-[#DD9E59] h-4 w-4 cursor-pointer accent-[#DD9E59]"
                     />
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Product</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Price</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Available Variations</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Rating</th>
-                  <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#3A2E2B]/60">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Product</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Category</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Price</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Available Variations</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Rating</th>
+                  <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2A1E17]/5 bg-white">
+              <tbody className="divide-y divide-[#A47251]/5 bg-white">
                 {products.map((p) => (
-                  <tr key={p.id} className="hover:bg-[#EFEFEA]/30 transition-colors">
+                  <tr key={p.id} className="hover:bg-[#F0D8A1]/30 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap w-12">
                       <input
                         type="checkbox"
@@ -597,21 +597,21 @@ export default function ProductsClient({
                             setSelectedProductIds((prev) => prev.filter((id) => id !== p.id));
                           }
                         }}
-                        className="rounded border-[#2A1E17]/20 text-[#C5A880] focus:ring-[#C5A880] h-4 w-4 cursor-pointer accent-[#C5A880]"
+                        className="rounded border-[#A47251]/20 text-[#DD9E59] focus:ring-[#DD9E59] h-4 w-4 cursor-pointer accent-[#DD9E59]"
                       />
                     </td>
                     {/* Image & Title */}
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="flex items-center space-x-3">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-none bg-[#2A1E17]/5">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-none bg-[#A47251]/5">
                           <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
                         </div>
                         <div>
-                          <Link href={`/admin/products/${p.id}`} className="block text-sm font-bold text-[#2A1E17] hover:text-[#C5A880] transition-colors cursor-pointer">
+                          <Link href={`/admin/products/${p.id}`} className="block text-sm font-bold text-[#2A1E17] hover:text-[#DD9E59] transition-colors cursor-pointer">
                             {p.name}
                           </Link>
                           {p.badge && (
-                            <span className="inline-block rounded-none bg-[#EFEFEA] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
+                            <span className="inline-block rounded-none bg-[#F0D8A1] px-1.5 py-0.5 text-[8px] font-bold text-white uppercase tracking-wider">
                               {p.badge}
                             </span>
                           )}
@@ -619,7 +619,7 @@ export default function ProductsClient({
                       </div>
                     </td>
                     {/* Category */}
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-[#3A2E2B]">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-[#2A1E17]">
                       {p.category}
                     </td>
                     {/* Price */}
@@ -632,9 +632,9 @@ export default function ProductsClient({
                         {/* Sizes */}
                         {p.sizes && p.sizes.length > 0 && (
                           <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
+                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
                             {p.sizes.map((s: any, idx: number) => (
-                              <span key={idx} className="inline-block bg-[#EFEFEA] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
+                              <span key={idx} className="inline-block bg-[#F0D8A1] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#A47251]/5">
                                 {s.name} {s.price > 0 ? `(+Rs.${s.price})` : s.price < 0 ? `(-Rs.${Math.abs(s.price)})` : ""}
                               </span>
                             ))}
@@ -643,12 +643,12 @@ export default function ProductsClient({
                         {/* Flavors */}
                         {p.flavors && p.flavors.length > 0 && (
                           <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Flavors:</span>
+                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Flavors:</span>
                             {p.flavors.map((f: any, idx: number) => {
                               const fName = typeof f === "string" ? f : f.name;
                               const fPrice = typeof f === "string" ? 0 : f.price;
                               return (
-                                <span key={idx} className="inline-block bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#C5A880]/10">
+                                <span key={idx} className="inline-block bg-[#DD9E59]/15 text-[#DD9E59] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#DD9E59]/10">
                                   {fName} {fPrice > 0 ? `(+Rs.${fPrice})` : fPrice < 0 ? `(-Rs.${Math.abs(fPrice)})` : ""}
                                 </span>
                               );
@@ -658,12 +658,12 @@ export default function ProductsClient({
                         {/* Icings */}
                         {(p as any).icings && (p as any).icings.length > 0 && (
                           <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#3A2E2B]/50 uppercase tracking-wide block mr-1 self-center">Icings:</span>
+                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Icings:</span>
                             {(p as any).icings.map((ic: any, idx: number) => {
                               const icName = typeof ic === "string" ? ic : ic.name;
                               const icPrice = typeof ic === "string" ? 0 : ic.price;
                               return (
-                                <span key={idx} className="inline-block bg-[#2A1E17]/10 text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#2A1E17]/5">
+                                <span key={idx} className="inline-block bg-[#A47251]/10 text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#A47251]/5">
                                   {icName} {icPrice > 0 ? `(+Rs.${icPrice})` : icPrice < 0 ? `(-Rs.${Math.abs(icPrice)})` : ""}
                                 </span>
                               );
@@ -671,7 +671,7 @@ export default function ProductsClient({
                           </div>
                         )}
                         {(!p.sizes || p.sizes.length === 0) && (!p.flavors || p.flavors.length === 0) && (!(p as any).icings || (p as any).icings.length === 0) && (
-                          <span className="text-[10px] text-[#3A2E2B]/40 italic">None</span>
+                          <span className="text-[10px] text-[#2A1E17]/40 italic">None</span>
                         )}
                       </div>
                     </td>
@@ -684,7 +684,7 @@ export default function ProductsClient({
                         onClick={() => openEditForm(p)}
                         disabled={isUpdating}
                         aria-label="Edit product details"
-                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#C5A880] hover:bg-[#EFEFEA] hover:text-[#2A1E17] transition-colors cursor-pointer disabled:opacity-30"
+                        className="inline-flex items-center justify-center p-1.5 rounded-lg text-[#DD9E59] hover:bg-[#F0D8A1] hover:text-[#2A1E17] transition-colors cursor-pointer disabled:opacity-30"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4.5 h-4.5">
                           <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 20.04a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
@@ -712,14 +712,14 @@ export default function ProductsClient({
 
       {/* Product Form Editor Modal (Full-Screen Overlay Page) */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 bg-[#FBFBF9] overflow-y-auto flex flex-col">
+        <div className="fixed inset-0 z-50 bg-[#FDF9F0] overflow-y-auto flex flex-col">
           {/* Header Bar */}
-          <header className="sticky top-0 z-10 flex h-20 items-center justify-between bg-[#2A1E17] text-[#FBFBF9] px-6 sm:px-10 shadow-md">
+          <header className="sticky top-0 z-10 flex h-20 items-center justify-between bg-[#A47251] text-[#FDF9F0] px-6 sm:px-10 shadow-md">
             <div>
               <h2 className="font-serif text-xl font-bold tracking-wide text-white">
                 {editingProduct ? `Edit Product: ${editingProduct.id}` : "Add New Product"}
               </h2>
-              <span className="text-[#C5A880] text-[10px] uppercase font-sans font-bold tracking-wider mt-0.5 block">
+              <span className="text-[#DD9E59] text-[10px] uppercase font-sans font-bold tracking-wider mt-0.5 block">
                 Warm Delights Inventory Manager
               </span>
             </div>
@@ -727,7 +727,7 @@ export default function ProductsClient({
             {/* Close Button */}
             <button
               onClick={() => setIsFormOpen(false)}
-              className="rounded-full bg-white/10 p-2 text-[#FBFBF9] hover:bg-white/20 transition-all cursor-pointer"
+              className="rounded-full bg-white/10 p-2 text-[#FDF9F0] hover:bg-white/20 transition-all cursor-pointer"
               aria-label="Close editor"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor">
@@ -738,12 +738,12 @@ export default function ProductsClient({
 
           {/* Form Content Body */}
           <div className="flex-1 py-10 px-4 sm:px-6">
-            <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#2A1E17]/5 p-8 sm:p-10 shadow-sm">
+            <div className="mx-auto max-w-2xl bg-white rounded-3xl border border-[#A47251]/5 p-8 sm:p-10 shadow-sm">
               <form onSubmit={handleSave} className="space-y-6">
 
                 {/* 1. Name Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label htmlFor="name" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                     Product Name *
                   </label>
                   <input
@@ -753,13 +753,13 @@ export default function ProductsClient({
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Signature Focaccia"
                     required
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                    className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
                   />
                 </div>
 
                 {/* 2. Category Dropdown */}
                 <div className="space-y-1.5">
-                  <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label htmlFor="category" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                     Category *
                   </label>
                   <select
@@ -769,7 +769,7 @@ export default function ProductsClient({
                       setCategory(e.target.value);
                       setSubcategory(""); // Reset subcategory when category changes
                     }}
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                    className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                   >
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.name}>
@@ -778,10 +778,10 @@ export default function ProductsClient({
                     ))}
                   </select>
                   <div className="flex justify-between items-center mt-1.5 px-0.5">
-                    <span className="text-[9px] text-[#3A2E2B]/60 font-sans">Need a different category?</span>
+                    <span className="text-[9px] text-[#2A1E17]/60 font-sans">Need a different category?</span>
                     <Link
                       href="/admin/categories"
-                      className="text-[9px] font-bold text-[#C5A880] hover:text-[#2A1E17] hover:underline transition-colors font-sans"
+                      className="text-[9px] font-bold text-[#DD9E59] hover:text-[#2A1E17] hover:underline transition-colors font-sans"
                     >
                       Manage Categories & Subcategories →
                     </Link>
@@ -797,14 +797,14 @@ export default function ProductsClient({
                   if (subcats.length === 0) return null;
                   return (
                     <div className="space-y-1.5">
-                      <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                      <label htmlFor="subcategory" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                         Subcategory
                       </label>
                       <select
                         id="subcategory"
                         value={subcategory}
                         onChange={(e) => setSubcategory(e.target.value)}
-                        className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                        className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                       >
                         <option value="">None</option>
                         {subcats.map((sub) => (
@@ -818,20 +818,20 @@ export default function ProductsClient({
                 })()}
 
                 {/* 4. Product Variations (Size, Flavor, Icing) */}
-                <div className="space-y-4 p-5 bg-[#EFEFEA]/30 border border-[#2A1E17]/5 rounded-2xl">
+                <div className="space-y-4 p-5 bg-[#F0D8A1]/30 border border-[#A47251]/5 rounded-2xl">
                   <div>
                     <h4 className="font-serif text-sm font-bold text-[#2A1E17]">Product Variations</h4>
-                    <p className="text-[10px] text-[#3A2E2B]/75">Configure default baseline variants (covered by base price) and other dynamic variants with additional costs.</p>
+                    <p className="text-[10px] text-[#2A1E17]/75">Configure default baseline variants (covered by base price) and other dynamic variants with additional costs.</p>
                   </div>
 
                   {/* A. Default Selections (Manual Text Inputs) */}
-                  <div className="space-y-3 border-t border-[#2A1E17]/5 pt-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <div className="space-y-3 border-t border-[#A47251]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                       Default Variant Selections (Base Price Baseline)
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#2A1E17]/60 mb-1">
                           Default Size/Weight
                         </label>
                         <input
@@ -842,12 +842,12 @@ export default function ProductsClient({
                             setDefaultSize(e.target.value);
                             setIsMutating(true);
                           }}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#2A1E17]/60 mb-1">
                           Default Flavor
                         </label>
                         <input
@@ -858,12 +858,12 @@ export default function ProductsClient({
                             setDefaultFlavor(e.target.value);
                             setIsMutating(true);
                           }}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/60 mb-1">
+                        <label className="block text-[9px] font-bold uppercase tracking-wider text-[#2A1E17]/60 mb-1">
                           Default Icing
                         </label>
                         <input
@@ -874,29 +874,29 @@ export default function ProductsClient({
                             setDefaultIcing(e.target.value);
                             setIsMutating(true);
                           }}
-                          className="w-full bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                          className="w-full bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* B. Size Variations */}
-                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <div className="space-y-2 border-t border-[#A47251]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                       Size / Weight Variations (Other than default)
                     </span>
 
                     {sizes.length === 0 ? (
-                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      <p className="text-[10px] text-[#2A1E17]/55 italic bg-white p-2.5 rounded-lg border border-[#A47251]/5">
                         No additional sizes configured.
                       </p>
                     ) : (
                       <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
                         {sizes.map((s, idx) => (
-                          <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#2A1E17]/10 text-xs text-[#2A1E17]">
+                          <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-lg border border-[#A47251]/10 text-xs text-[#2A1E17]">
                             <span className="font-semibold">{s.name}</span>
                             <div className="flex items-center space-x-4">
-                              <span className="text-[#3A2E2B]/85 font-medium">
+                              <span className="text-[#2A1E17]/85 font-medium">
                                 {s.price > 0 ? `+Rs. ${s.price.toFixed(2)}` : s.price < 0 ? `-Rs. ${Math.abs(s.price).toFixed(2)}` : "Rs. 0.00"} {s.priceMultiplier ? `(x${s.priceMultiplier})` : ""}
                               </span>
                               <button
@@ -922,7 +922,7 @@ export default function ProductsClient({
                           setNewSizeName(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] flex-1"
                       />
                       <input
                         type="number"
@@ -933,7 +933,7 @@ export default function ProductsClient({
                           setNewSizePrice(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-20"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] w-20"
                       />
                       <button
                         type="button"
@@ -955,7 +955,7 @@ export default function ProductsClient({
                           setNewSizePrice("");
                           setIsMutating(false);
                         }}
-                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer"
+                        className="bg-[#A47251] hover:bg-[#DD9E59] hover:text-[#2A1E17] text-white rounded-lg px-4 py-2 text-xs font-bold transition-all cursor-pointer"
                       >
                         Add
                       </button>
@@ -963,22 +963,22 @@ export default function ProductsClient({
                   </div>
 
                   {/* C. Flavor Variations */}
-                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <div className="space-y-2 border-t border-[#A47251]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                       Flavor Variations (Other than default)
                     </span>
 
                     {flavors.length === 0 ? (
-                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      <p className="text-[10px] text-[#2A1E17]/55 italic bg-white p-2.5 rounded-lg border border-[#A47251]/5">
                         No additional flavors configured.
                       </p>
                     ) : (
-                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#A47251]/5 rounded-lg">
                         {flavors.map((f, idx) => {
                           const fName = typeof f === "string" ? f : f.name;
                           const fPrice = typeof f === "string" ? 0 : f.price;
                           return (
-                            <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                            <span key={idx} className="inline-flex items-center bg-[#F0D8A1] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
                               <span>{fName} {fPrice > 0 ? `(+Rs. ${fPrice})` : fPrice < 0 ? `(-Rs. ${Math.abs(fPrice)})` : ""}</span>
                               <button
                                 type="button"
@@ -1002,7 +1002,7 @@ export default function ProductsClient({
                           setNewFlavor(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] flex-1"
                       />
                       <input
                         type="number"
@@ -1013,7 +1013,7 @@ export default function ProductsClient({
                           setNewFlavorPrice(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-24"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] w-24"
                       />
                       <button
                         type="button"
@@ -1029,7 +1029,7 @@ export default function ProductsClient({
                             setIsMutating(false);
                           }
                         }}
-                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                        className="bg-[#A47251] hover:bg-[#DD9E59] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
                       >
                         Add
                       </button>
@@ -1037,22 +1037,22 @@ export default function ProductsClient({
                   </div>
 
                   {/* D. Icing Variations */}
-                  <div className="space-y-2 border-t border-[#2A1E17]/5 pt-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <div className="space-y-2 border-t border-[#A47251]/5 pt-3">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                       Icing Variations (Other than default)
                     </span>
 
                     {icings.length === 0 ? (
-                      <p className="text-[10px] text-[#3A2E2B]/55 italic bg-white p-2.5 rounded-lg border border-[#2A1E17]/5">
+                      <p className="text-[10px] text-[#2A1E17]/55 italic bg-white p-2.5 rounded-lg border border-[#A47251]/5">
                         No additional icings configured.
                       </p>
                     ) : (
-                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#2A1E17]/5 rounded-lg">
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1 bg-white border border-[#A47251]/5 rounded-lg">
                         {icings.map((ic, idx) => {
                           const icName = typeof ic === "string" ? ic : ic.name;
                           const icPrice = typeof ic === "string" ? 0 : ic.price;
                           return (
-                            <span key={idx} className="inline-flex items-center bg-[#EFEFEA] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
+                            <span key={idx} className="inline-flex items-center bg-[#F0D8A1] text-[#2A1E17] text-[10px] font-bold px-2 py-0.5 rounded-md">
                               <span>{icName} {icPrice > 0 ? `(+Rs. ${icPrice})` : icPrice < 0 ? `(-Rs. ${Math.abs(icPrice)})` : ""}</span>
                               <button
                                 type="button"
@@ -1076,7 +1076,7 @@ export default function ProductsClient({
                           setNewIcing(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] flex-1"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] flex-1"
                       />
                       <input
                         type="number"
@@ -1087,7 +1087,7 @@ export default function ProductsClient({
                           setNewIcingPrice(e.target.value);
                           setIsMutating(true);
                         }}
-                        className="bg-white border border-[#2A1E17]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] w-24"
+                        className="bg-white border border-[#A47251]/10 rounded-lg p-2 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] w-24"
                       />
                       <button
                         type="button"
@@ -1103,7 +1103,7 @@ export default function ProductsClient({
                             setIsMutating(false);
                           }
                         }}
-                        className="bg-[#2A1E17] hover:bg-[#C5A880] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
+                        className="bg-[#A47251] hover:bg-[#DD9E59] hover:text-[#2A1E17] text-white rounded-lg px-4 text-xs font-bold transition-all cursor-pointer"
                       >
                         Add
                       </button>
@@ -1114,7 +1114,7 @@ export default function ProductsClient({
 
                 {/* 5. Base Price Input */}
                 <div className="space-y-1.5">
-                  <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label htmlFor="price" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                     Price (Rs.) *
                   </label>
                   <input
@@ -1126,20 +1126,20 @@ export default function ProductsClient({
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="12.50"
                     required
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880]"
+                    className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59]"
                   />
                 </div>
 
                 {/* 6. Badge Dropdown */}
                 <div className="space-y-1.5">
-                  <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label htmlFor="badge" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                     Badge / Promo Tag
                   </label>
                   <select
                     id="badge"
                     value={badge}
                     onChange={(e) => setBadge(e.target.value)}
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] cursor-pointer"
+                    className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                   >
                     <option value="">No Badge / None</option>
                     {badges.map((bg) => (
@@ -1154,7 +1154,7 @@ export default function ProductsClient({
                 <div className="space-y-3">
                   {/* Upload Photos & Videos */}
                   <div className="space-y-1.5">
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                       Upload Photos & Videos
                     </label>
                     <input
@@ -1162,9 +1162,9 @@ export default function ProductsClient({
                       multiple
                       accept="image/*,video/*"
                       onChange={handleMediaUpload}
-                      className="w-full text-xs text-[#3A2E2B]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#EFEFEA] file:text-[#2A1E17] file:hover:bg-[#C5A880] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
+                      className="w-full text-xs text-[#2A1E17]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#F0D8A1] file:text-[#2A1E17] file:hover:bg-[#DD9E59] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                     />
-                    <p className="text-[9px] text-[#3A2E2B]/55">
+                    <p className="text-[9px] text-[#2A1E17]/55">
                       Photos will be WebP auto-compressed. Videos must be WebM/MP4, max 2MB.
                     </p>
                     {isCompressing && (
@@ -1177,12 +1177,12 @@ export default function ProductsClient({
                   {/* Uploaded Preview Thumbnails */}
                   {(uploadedImages.length > 0 || videoUrl) && (
                     <div className="space-y-1.5">
-                      <span className="block text-[9px] font-bold uppercase tracking-wider text-[#3A2E2B]/50">
+                      <span className="block text-[9px] font-bold uppercase tracking-wider text-[#2A1E17]/50">
                         Uploaded Media ({uploadedImages.length + (videoUrl ? 1 : 0)})
                       </span>
-                      <div className="flex flex-wrap gap-2.5 p-2 bg-[#EFEFEA] border border-[#2A1E17]/5 rounded-none max-h-36 overflow-y-auto">
+                      <div className="flex flex-wrap gap-2.5 p-2 bg-[#F0D8A1] border border-[#A47251]/5 rounded-none max-h-36 overflow-y-auto">
                         {videoUrl && (
-                          <div className="relative h-14 w-14 rounded-none overflow-hidden border border-[#2A1E17]/10 group bg-black">
+                          <div className="relative h-14 w-14 rounded-none overflow-hidden border border-[#A47251]/10 group bg-black">
                             <video src={videoUrl} className="h-full w-full object-cover" muted playsInline />
                             <span className="absolute top-0.5 right-0.5 bg-black/60 rounded-none px-1 text-[7px] text-white font-bold uppercase tracking-wider">
                               Video
@@ -1197,7 +1197,7 @@ export default function ProductsClient({
                           </div>
                         )}
                         {uploadedImages.map((imgUrl, idx) => (
-                          <div key={idx} className="relative h-14 w-14 rounded-none overflow-hidden border border-[#2A1E17]/10 group">
+                          <div key={idx} className="relative h-14 w-14 rounded-none overflow-hidden border border-[#A47251]/10 group">
                             <img src={imgUrl} alt="Upload preview" className="h-full w-full object-cover" />
                             <button
                               type="button"
@@ -1215,7 +1215,7 @@ export default function ProductsClient({
 
                 {/* 9. Description Textarea */}
                 <div className="space-y-1.5">
-                  <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#3A2E2B]/75">
+                  <label htmlFor="desc" className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
                     Description *
                   </label>
                   <textarea
@@ -1225,23 +1225,23 @@ export default function ProductsClient({
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Explain the taste profile, decoration, size..."
                     required
-                    className="w-full bg-[#EFEFEA] border border-[#2A1E17]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#C5A880] resize-none"
+                    className="w-full bg-[#F0D8A1] border border-[#A47251]/10 rounded-lg p-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] resize-none"
                   />
                 </div>
 
                 {/* Actions row */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#2A1E17]/5">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-[#A47251]/5">
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="flex-1 rounded-full bg-[#2A1E17] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#C5A880] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
+                    className="flex-1 rounded-full bg-[#A47251] text-white py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer disabled:opacity-40"
                   >
                     {isSaving ? "Saving..." : "Save Product"}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
-                    className="flex-1 rounded-full bg-transparent border border-[#2A1E17]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#EFEFEA] transition-all cursor-pointer"
+                    className="flex-1 rounded-full bg-transparent border border-[#A47251]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#F0D8A1] transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
