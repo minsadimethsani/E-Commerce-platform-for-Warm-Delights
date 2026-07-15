@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function Story() {
   return (
     // 1. Reduced top padding drastically (pt-2 / sm:pt-4) to remove the gap beneath the cards
-    <section className="bg-[#F0D8A1] pt-2 pb-12 sm:pt-4 sm:pb-20 border-y border-[#A47251]/5">
+    <section className="bg-[#F0D8A1] pt-2 pb-6 sm:pt-4 sm:pb-10 border-y border-[#A47251]/5">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* 2. Changed items-center to items-start to place content and image align top flush */}
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-20">

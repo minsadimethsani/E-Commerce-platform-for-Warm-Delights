@@ -1,4 +1,4 @@
-import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where, doc, setDoc, deleteDoc } from "firebase/firestore";
 import { db } from "./firebase";
 import { Review } from "@/types/database";
 
@@ -72,5 +72,47 @@ export async function getReviewsByProductId(productId: string): Promise<Review[]
   } catch (error) {
     console.error(`Error fetching reviews for product ${productId}:`, error);
     return [];
+  }
+}
+
+/**
+ * Create a new review in Firestore.
+ * Automatically generates a unique ID, writes to Firestore, and returns the serialized review.
+ */
+export async function addReview(review: Omit<Review, "id" | "createdAt">): Promise<Review> {
+  const reviewsRef = collection(db, "reviews");
+  const newDocRef = doc(reviewsRef);
+  const dateNow = new Date();
+  
+  const newReview: Review = {
+    id: newDocRef.id,
+    productId: review.productId,
+    userId: review.userId,
+    userName: review.userName,
+    rating: review.rating,
+    comment: review.comment,
+    createdAt: dateNow as any, // Stored as Date/Timestamp in Firestore
+  };
+
+  await setDoc(newDocRef, newReview);
+
+  // Return with serialized createdAt ISO string
+  return {
+    ...newReview,
+    createdAt: dateNow.toISOString() as any,
+  };
+}
+
+/**
+ * Delete a review from Firestore by document ID.
+ */
+export async function deleteReview(id: string): Promise<boolean> {
+  try {
+    const docRef = doc(db, "reviews", id);
+    await deleteDoc(docRef);
+    return true;
+  } catch (error) {
+    console.error(`Error deleting review ${id}:`, error);
+    return false;
   }
 }

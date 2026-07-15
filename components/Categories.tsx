@@ -102,7 +102,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
     },
   ];
   return (
-    <section className="bg-[#FDF9F0] py-24 sm:py-32">
+    <section className="bg-[#FDF9F0] py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <div className="text-center max-w-2xl mx-auto mb-16 sm:mb-20">

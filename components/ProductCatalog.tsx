@@ -89,7 +89,7 @@ export default function ProductCatalog({ initialProducts }: ProductCatalogProps)
 
 
   return (
-    <section id="catalog-section" className="bg-[#FDF9F0] py-24 sm:py-32 scroll-mt-20">
+    <section id="catalog-section" className="bg-[#FDF9F0] py-12 sm:py-16 scroll-mt-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Title & Header */}

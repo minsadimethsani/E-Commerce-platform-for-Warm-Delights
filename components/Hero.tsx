@@ -4,11 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Product, products as localProducts } from "@/data/products";
 
-interface HeroProps {
-  products?: Product[];
-}
+// Slide configurations
+const SLIDE_2_CONFIG = {
+  tagline: "Seasonal Collections & Fresh Batches",
+  headline: "The Seasonal Collection",
+  subheadline: "Indulge in our limited-edition fresh fruit pastries and signature treats. Crafted with 100% natural ingredients.",
+  ctaText: "View Seasonal Specials",
+  targetRoute: "/menu?category=seasonal"
+};
 
-export default function Hero({ products = [] }: HeroProps) {
+export default function Hero({ products = [] }: { products?: Product[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -37,19 +42,22 @@ export default function Hero({ products = [] }: HeroProps) {
   const availableProduct =
     activeProducts.find((p) => p.isAvailable !== false && p.image) || activeProducts[0];
 
-  // Slide 2: Four-column product image section (using product images from firestore/database)
+  // Slide 2: Seasonal products (using badge "Seasonal" or category "Pastry" / "Cake" as fallback)
   let imageProducts = activeProducts.filter((p) => p.isAvailable !== false && p.image);
-  if (imageProducts.length < 4) {
-    const merged = [...imageProducts];
-    for (const item of activeProducts) {
+  let seasonalProducts = activeProducts.filter(
+    (p) => p.isAvailable !== false && p.image && (p.badge?.toLowerCase() === "seasonal" || p.category === "Pastry")
+  );
+  if (seasonalProducts.length < 4) {
+    const merged = [...seasonalProducts];
+    for (const item of imageProducts) {
       if (merged.length >= 4) break;
       if (!merged.some((m) => m.id === item.id)) {
         merged.push(item);
       }
     }
-    imageProducts = merged;
+    seasonalProducts = merged;
   }
-  const slide2Products = imageProducts.slice(0, 4);
+  const slide2SeasonalProducts = seasonalProducts.slice(0, 4);
 
   // Slide 3: Find custom cakes (fallback to Custom category or products 4, 18, 20)
   let customCakes = activeProducts.filter(
@@ -62,7 +70,7 @@ export default function Hero({ products = [] }: HeroProps) {
   }
 
   return (
-    <div className="relative min-h-[80vh] md:min-h-[75vh] flex items-center justify-center overflow-hidden bg-[#A47251] py-12 sm:py-16">
+    <div className="relative min-h-[70vh] md:min-h-[65vh] flex items-center justify-center overflow-hidden bg-[#A47251] py-8 sm:py-10">
       {/* Background Image for Slide 1 */}
       <div
         className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -87,7 +95,7 @@ export default function Hero({ products = [] }: HeroProps) {
 
         {/* SLIDE 1: Brand & Available Product */}
         <div
-          className={`transition-all duration-500 transform min-h-[600px] md:min-h-[500px] lg:min-h-[440px] flex flex-col justify-end pb-6 md:pb-10 ${currentSlide === 0
+          className={`transition-all duration-500 transform min-h-[560px] md:min-h-[480px] lg:min-h-[440px] flex flex-col justify-end pb-6 md:pb-8 ${currentSlide === 0
             ? "opacity-100 translate-x-0 relative flex"
             : "opacity-0 absolute pointer-events-none translate-x-4 hidden"
             } ${isTransitioning ? "opacity-0" : ""}`}
@@ -102,7 +110,7 @@ export default function Hero({ products = [] }: HeroProps) {
             </p>
           </div>
 
-          <div className="space-y-6 text-center mx-auto max-w-2xl animate-fade-in-up mt-28 sm:mt-32 lg:mt-24">
+          <div className="space-y-6 text-center mx-auto max-w-2xl animate-fade-in-up mt-28 sm:mt-36 lg:mt-32">
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight sm:whitespace-nowrap">
               Artisanal Pastries & Signature Cakes
             </h1>
@@ -128,70 +136,87 @@ export default function Hero({ products = [] }: HeroProps) {
           </div>
         </div>
 
-        {/* SLIDE 2: Four-Column Product Showcase */}
+        {/* SLIDE 2: Seasonal Collections & Fresh Batches */}
         <div
-          className={`transition-all duration-500 transform min-h-[580px] md:min-h-[480px] lg:min-h-[420px] flex flex-col justify-center ${currentSlide === 1
+          className={`transition-all duration-500 transform min-h-[560px] md:min-h-[480px] lg:min-h-[440px] flex flex-col justify-center ${currentSlide === 1
             ? "opacity-100 translate-x-0 relative flex"
             : "opacity-0 absolute pointer-events-none translate-x-4 hidden"
             } ${isTransitioning ? "opacity-0" : ""}`}
         >
-          <div className="text-center max-w-3xl mx-auto mb-6">
-            <span className="inline-block rounded-none bg-[#F0D8A1]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10 mb-3">
-              Our Signature Delights
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white tracking-tight">
-              Featured Delicacies
-            </h2>
-            <p className="mt-2 text-xs sm:text-sm text-[#FDF9F0]/75 max-w-lg mx-auto">
-              Explore our most loved handcrafted delicacies, made fresh daily with premium ingredients and baked to perfection.
-            </p>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Content Column */}
+            <div className="space-y-6 text-left max-w-xl lg:col-span-5">
+              <span className="inline-block rounded-none bg-[#F0D8A1]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10">
+                {SLIDE_2_CONFIG.tagline}
+              </span>
 
-          <div className="grid grid-cols-2 md:flex md:flex-row gap-4 w-full max-w-6xl mx-auto h-auto md:h-[300px] lg:h-[320px]">
-            {slide2Products.map((p) => (
-              <Link
-                key={p.id}
-                href={`/menu/${p.id}`}
-                className="group relative flex-1 hover:md:flex-[2] transition-all duration-500 ease-in-out overflow-hidden rounded-none border border-white/10 shadow-lg cursor-pointer bg-[#A47251] flex flex-col justify-end text-left h-[180px] sm:h-[220px] md:h-full"
-              >
-                {/* Product Image */}
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                {SLIDE_2_CONFIG.headline}
+              </h2>
 
-                {/* Subtle Hover Overlay & Vignette for Text Readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 opacity-80 group-hover:opacity-90" />
+              <p className="text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85">
+                {SLIDE_2_CONFIG.subheadline}
+              </p>
 
-                {/* Product Information Overlay */}
-                <div className="relative z-10 p-3 sm:p-5 flex flex-col gap-1 w-full translate-y-0 md:translate-y-3 md:group-hover:translate-y-0 transition-transform duration-300">
-                  <span className="text-[9px] uppercase tracking-widest font-semibold text-[#F0D8A1]">
-                    {p.category}
-                  </span>
-                  <h3 className="font-serif text-base sm:text-lg font-bold text-white leading-snug truncate">
-                    {p.name}
-                  </h3>
-                  <div className="flex items-center justify-between mt-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 delay-75">
-                    <span className="text-xs sm:text-sm font-semibold text-[#DD9E59]">
-                      ${typeof p.price === 'number' ? p.price.toFixed(2) : p.price}
-                    </span>
-                    <span className="text-[10px] font-semibold text-white/90 flex items-center gap-0.5">
-                      Order Now
-                      <svg className="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+              <div className="pt-2">
+                <Link
+                  href={SLIDE_2_CONFIG.targetRoute}
+                  className="inline-block w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center font-bold"
+                >
+                  {SLIDE_2_CONFIG.ctaText}
+                </Link>
+              </div>
+            </div>
+
+            {/* Right Product Grid Column */}
+            <div className="w-full lg:col-span-7">
+              <div className="grid grid-cols-2 gap-4 h-auto">
+                {slide2SeasonalProducts.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={`/menu/${p.id}`}
+                    className="group relative flex flex-col justify-end text-left h-[150px] sm:h-[180px] md:h-[200px] lg:h-[190px] overflow-hidden rounded-none border border-white/10 shadow-lg cursor-pointer bg-[#A47251]"
+                  >
+                    {/* Product Image */}
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+
+                    {/* Subtle Hover Overlay & Vignette */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-300 opacity-80 group-hover:opacity-90" />
+
+                    {/* Product Information Overlay */}
+                    <div className="relative z-10 p-3 sm:p-5 flex flex-col gap-1 w-full translate-y-0 md:translate-y-3 md:group-hover:translate-y-0 transition-transform duration-300">
+                      <span className="text-[9px] uppercase tracking-widest font-semibold text-[#F0D8A1]">
+                        {p.category}
+                      </span>
+                      <h3 className="font-serif text-sm sm:text-base font-bold text-white leading-snug truncate">
+                        {p.name}
+                      </h3>
+                      <div className="flex items-center justify-between mt-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 delay-75">
+                        <span className="text-xs font-semibold text-[#DD9E59]">
+                          Rs. {typeof p.price === 'number' ? p.price.toFixed(2) : p.price}
+                        </span>
+                        <span className="text-[9px] font-semibold text-white/90 flex items-center gap-0.5">
+                          Order Now
+                          <svg className="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* SLIDE 3: Custom Cakes Showcase */}
         <div
-          className={`transition-all duration-500 transform min-h-[580px] md:min-h-[480px] lg:min-h-[420px] flex flex-col justify-center ${currentSlide === 2
+          className={`transition-all duration-500 transform min-h-[480px] md:min-h-[420px] lg:min-h-[360px] flex flex-col justify-center ${currentSlide === 2
             ? "opacity-100 translate-x-0 relative flex"
             : "opacity-0 absolute pointer-events-none translate-x-4 hidden"
             } ${isTransitioning ? "opacity-0" : ""}`}
@@ -200,18 +225,15 @@ export default function Hero({ products = [] }: HeroProps) {
             {/* Left Content */}
             <div className="space-y-6 text-left max-w-xl">
               <span className="inline-block rounded-none bg-[#F0D8A1]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10">
-                Tailored for Milestones
+                Our Custom creations
               </span>
 
               <h2 className="font-serif text-5xl font-bold tracking-tight text-white sm:text-6xl leading-tight">
-                Custom Made
-                <span className="block text-3xl sm:text-4xl font-sans font-light tracking-wide text-[#DD9E59] mt-2">
-                  Artisanal Cakes
-                </span>
+                Looking for the perfect custom cake ?
               </h2>
 
               <p className="text-base sm:text-lg leading-relaxed text-[#FDF9F0]/85">
-                Your special moments deserve a custom masterpiece. We craft bespoke multi-tiered designs and custom flavor layers for weddings, birthdays, and corporate celebrations. Each flower is hand-pressed, and each layer is decorated to your specifications.
+                From birthdays to baby showers, anniversaries, or any special moment, we create cakes that make your day sweeter!
               </p>
 
               <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">

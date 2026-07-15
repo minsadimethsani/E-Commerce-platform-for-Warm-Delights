@@ -15,11 +15,6 @@ export default function ProductCardSkeleton() {
           </div>
           {/* Title shimmer */}
           <div className="h-5 w-2/3 bg-gray-200/50 animate-pulse rounded-none" />
-          {/* Description line shimmers */}
-          <div className="space-y-1">
-            <div className="h-3 w-full bg-gray-200/50 animate-pulse rounded-none" />
-            <div className="h-3 w-4/5 bg-gray-200/50 animate-pulse rounded-none" />
-          </div>
         </div>
         
         {/* Footer actions shimmers */}

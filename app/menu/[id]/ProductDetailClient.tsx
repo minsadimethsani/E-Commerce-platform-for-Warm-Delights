@@ -10,16 +10,56 @@ import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { AddOn } from "@/lib/addons";
+import { addReview } from "@/lib/reviews";
 
 interface ProductDetailClientProps {
   product: Product;
   relatedProducts: Product[];
   initialAddOns: AddOn[];
+  initialReviews: any[];
 }
 
-export default function ProductDetailClient({ product, relatedProducts, initialAddOns }: ProductDetailClientProps) {
+export default function ProductDetailClient({ product, relatedProducts, initialAddOns, initialReviews }: ProductDetailClientProps) {
   const router = useRouter();
   const { user } = useAuth();
+  
+  const [reviews, setReviews] = useState<any[]>(initialReviews);
+  const [rating, setRating] = useState<number>(5);
+  const [comment, setComment] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!comment.trim()) {
+      setSubmitError("Please write a comment.");
+      return;
+    }
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const newReview = await addReview({
+        productId: product.id,
+        userId: user.uid,
+        userName: user.displayName || user.email || "Anonymous",
+        rating,
+        comment,
+      });
+      setReviews([newReview, ...reviews]);
+      setComment("");
+      setRating(5);
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    } catch (err) {
+      console.error("Failed to submit review:", err);
+      setSubmitError("Failed to submit review. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdded, setIsAdded] = useState<boolean>(false);
@@ -595,6 +635,159 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
 
           </div>
         </div>
+
+        {/* Reviews and Comments Section */}
+        <section className="border-t border-[#A47251]/10 pt-12 pb-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            {/* Reviews Summary & List */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex items-center justify-between border-b border-[#A47251]/10 pb-4">
+                <h3 className="font-serif text-2xl font-bold text-[#2A1E17]">
+                  Customer Reviews ({reviews.length})
+                </h3>
+                {reviews.length > 0 && (
+                  <div className="flex items-center space-x-2 bg-[#F0D8A1]/35 px-3 py-1.5 text-xs font-bold rounded-none text-[#2A1E17]">
+                    <span>Avg. Rating:</span>
+                    <span className="font-bold text-[#DD9E59]">
+                      {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                    </span>
+                    <span>/ 5</span>
+                  </div>
+                )}
+              </div>
+
+              {reviews.length === 0 ? (
+                <div className="text-center py-10 bg-[#F0D8A1]/10 rounded-none border border-dashed border-[#A47251]/10">
+                  <p className="text-sm text-[#2A1E17]/60">No reviews yet for this treat. Be the first to write one!</p>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2 scrollbar-thin">
+                  {reviews.map((r) => (
+                    <div key={r.id} className="bg-[#F0D8A1]/20 border border-[#A47251]/5 p-5 space-y-2.5 rounded-none">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <div className="h-8.5 w-8.5 rounded-full bg-[#DD9E59]/20 text-[#2A1E17] font-bold text-xs flex items-center justify-center">
+                            {r.userName?.[0]?.toUpperCase() || "A"}
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold text-[#2A1E17]">{r.userName}</p>
+                            <div className="mt-0.5">{renderStars(r.rating)}</div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] text-[#2A1E17]/50 font-medium">
+                          {new Date(r.createdAt).toLocaleDateString(undefined, {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-[#2A1E17]/85 leading-relaxed pl-10">
+                        {r.comment}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Review Submission Form */}
+            <div className="bg-[#F0D8A1]/35 border border-[#A47251]/10 p-6 sm:p-8 rounded-none h-fit">
+              <h4 className="font-serif text-xl font-bold text-[#2A1E17] mb-4 pb-2 border-b border-[#A47251]/10">
+                Write a Review
+              </h4>
+              
+              {user ? (
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  {/* Interactive Star Rating Selector */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-[#2A1E17]/70 mb-2">
+                      Your Rating
+                    </label>
+                    <div className="flex items-center space-x-1.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          className="text-[#DD9E59] hover:scale-110 transition-transform cursor-pointer"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill={star <= rating ? "#DD9E59" : "none"}
+                            stroke="#DD9E59"
+                            strokeWidth={1.5}
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M11.48 3.499c-.198-.39-1.31-.39-1.508 0L7.54 6.792 3.82 7.333c-.43.06-.6.586-.288.892l2.69 2.622-.636 3.705c-.074.43.382.762.766.56l3.313-1.741 3.313 1.742c.384.203.84-.128.766-.56l-.636-3.705 2.69-2.622c.313-.306.142-.832-.288-.892l-3.72-.541-1.637-3.294Z"
+                            />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Comment Textarea */}
+                  <div>
+                    <label htmlFor="comment" className="block text-xs font-bold uppercase tracking-wider text-[#2A1E17]/70 mb-2">
+                      Review Comment
+                    </label>
+                    <textarea
+                      id="comment"
+                      rows={4}
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      placeholder="Share your thoughts about this treat..."
+                      className="w-full bg-[#FDF9F0] border border-[#A47251]/20 rounded-none p-3 text-xs sm:text-sm text-[#2A1E17] placeholder-[#2A1E17]/40 focus:outline-none focus:border-[#DD9E59] focus:ring-1 focus:ring-[#DD9E59] transition-all resize-none"
+                    />
+                  </div>
+
+                  {submitError && (
+                    <p className="text-xs font-semibold text-red-600 bg-red-50 p-2 border border-red-200">
+                      {submitError}
+                    </p>
+                  )}
+
+                  {submitSuccess && (
+                    <p className="text-xs font-semibold text-[#2A1E17] bg-[#DCF0C3] p-2 border border-[#DCF0C3]">
+                      Review submitted successfully! Thank you.
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full rounded-none bg-[#A47251] text-white py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center"
+                  >
+                    {isSubmitting ? (
+                      <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      "Submit Review"
+                    )}
+                  </button>
+                </form>
+              ) : (
+                <div className="text-center py-6 space-y-4">
+                  <p className="text-xs sm:text-sm text-[#2A1E17]/70">
+                    You must be logged in to leave a review for this product.
+                  </p>
+                  <Link
+                    href={`/login?redirect=%2Fmenu%2F${product.id}`}
+                    className="inline-block rounded-none bg-[#A47251] text-white px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer"
+                  >
+                    Log In to Review
+                  </Link>
+                </div>
+              )}
+            </div>
+
+          </div>
+        </section>
 
         {/* Recommendations / Related Products */}
         <section className="border-t border-[#A47251]/10 pt-8 mb-16">

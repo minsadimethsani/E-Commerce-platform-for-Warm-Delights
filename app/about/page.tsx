@@ -12,7 +12,7 @@ export default function AboutPage() {
   return (
     <div className="bg-[#FDF9F0] min-h-screen py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        
+
         {/* Breadcrumbs */}
         <nav aria-label="Breadcrumb" className="mb-8">
           <ol className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-[#2A1E17]/60">
@@ -36,11 +36,11 @@ export default function AboutPage() {
             Baking With Love
           </span>
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#2A1E17]">
-            Our Story & Heritage
+            Our Story
           </h1>
           <div className="h-1 w-16 bg-[#DD9E59] mx-auto rounded-none" />
           <p className="text-sm sm:text-base md:text-lg text-[#2A1E17]/80 leading-relaxed max-w-2xl mx-auto">
-            From a humble home kitchen to an artisanal neighborhood sanctuary—discover the passion, quality ingredients, and slow-baking philosophy behind every Warm Delights creation.
+            From our humble home kitchen to your neighborhood sanctuary. At Warm Delights, we combine premium ingredients with a slow-baking philosophy to craft moments of pure, artisanal joy.
           </p>
         </div>
 
@@ -49,16 +49,17 @@ export default function AboutPage() {
           {/* Left: Text Content */}
           <div className="lg:col-span-7 space-y-6 text-[#2A1E17]/90">
             <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#2A1E17] leading-tight">
-              Crafting Sweet Moments and Savory Pleasures Since 2018
+              Crafting Sweet Moments since 2018
             </h2>
+            <p className="font-italic font-bold  text-sm sm:text-base leading-relaxed">
+              Every celebration has a flavor. We are here to help you find yours.
+            </p>
+
             <p className="font-sans text-sm sm:text-base leading-relaxed">
-              Warm Delights began with a simple belief: that baking is an act of pure connection. Founded by Chef Pierre after years of training in European pastry arts, our goal has always been to elevate the neighborhood bakery into a space of comfort, premium flavor, and visual wonder.
+              Warm Delights began with a simple belief that baking is an act of pure connection. Founded by Chef Pierre after years of mastering the European pastry arts, our mission is to elevate your most meaningful moments into edible works of art.
             </p>
             <p className="font-sans text-sm sm:text-base leading-relaxed">
-              We reject shortcuts. There are no artificial preservatives, emulsifiers, or frozen doughs in our kitchen. Instead, our team wakes up at 3:00 AM every morning to hand-laminate croissants, simmer fresh berry compotes, and feed our organic sourdough starter. We believe that time, patience, and attention to detail are what separate ordinary pastries from memory-making treats.
-            </p>
-            <p className="font-sans text-sm sm:text-base leading-relaxed">
-              Every cake, quiche, and cookie that leaves our ovens is a labor of love. We build long-term relationships with local organic wheat farmers, pasture-raised egg producers, and premium dairy creameries to ensure our ingredients are as sustainable as they are delicious.
+              We specialize in crafting premium cakes and bespoke custom designs tailored entirely to your story. In our kitchen, we completely reject shortcuts—you won't find artificial preservatives or frozen doughs here. Instead, we collaborate with local organic wheat farmers and pasture-raised creameries to ensure our ingredients are as sustainable as they are delicious. From the first sketch of a custom wedding cake to the final flourish of buttercream, every creation is a labor of love, patience, and memory-making flavor.
             </p>
           </div>
 
@@ -184,7 +185,7 @@ export default function AboutPage() {
           {/* Subtle background glow */}
           <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#DD9E59] opacity-10 rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[#DD9E59] opacity-10 rounded-full blur-3xl" />
-          
+
           <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59] block relative z-10">
             Taste the Craftsmanship
           </span>

@@ -1,10 +1,39 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { subscribeToNewsletter } from "@/app/actions";
 
 export default function Footer() {
   const pathname = usePathname();
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const data = await subscribeToNewsletter(email);
+
+      if (data.success) {
+        setStatus("success");
+        setEmail("");
+      } else {
+        setStatus("error");
+        setMessage(data.error || "Subscription failed. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+      setMessage("An unexpected error occurred. Please try again.");
+    }
+  };
 
   // Hide public storefront footer on admin portal pages
   if (pathname && pathname.startsWith("/admin")) {
@@ -153,25 +182,42 @@ export default function Footer() {
             <p className="text-sm leading-relaxed text-[#FDF9F0]/75 font-sans">
               Subscribe to receive updates on seasonal specials, New Arrivals and exclusive offers.
             </p>
-            <form className="mt-4 sm:flex sm:max-w-md gap-2" onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
-              </label>
-              <input
-                type="email"
-                name="email"
-                id="email-address"
-                required
-                className="w-full min-w-0 rounded-none border border-[#FDF9F0]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FDF9F0]/40 focus:border-[#DD9E59] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#DD9E59]"
-                placeholder="Enter your email"
-              />
-              <button
-                type="submit"
-                className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-none bg-[#DD9E59] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#F0D8A1] hover:text-white"
-              >
-                Join
-              </button>
-            </form>
+            {status === "success" ? (
+              <div className="rounded-none bg-[#DD9E59]/10 border border-[#DD9E59]/30 p-4 mt-4">
+                <p className="text-sm font-semibold text-[#F0D8A1] font-sans">
+                  Subscribed! Thank you for joining our newsletter. A verification email has been sent.
+                </p>
+              </div>
+            ) : (
+              <form className="mt-4 sm:flex sm:max-w-md gap-2" onSubmit={handleSubscribe}>
+                <label htmlFor="email-address" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email-address"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={status === "loading"}
+                  className="w-full min-w-0 rounded-none border border-[#FDF9F0]/15 bg-white/5 px-4 py-2 text-sm text-white placeholder-[#FDF9F0]/40 focus:border-[#DD9E59] focus:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#DD9E59]"
+                  placeholder="Enter your email"
+                />
+                <button
+                  type="submit"
+                  disabled={status === "loading"}
+                  className="mt-2 sm:mt-0 flex w-full sm:w-auto items-center justify-center rounded-none bg-[#DD9E59] px-4 py-2 text-sm font-semibold text-[#2A1E17] transition-colors hover:bg-[#F0D8A1] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {status === "loading" ? "Joining..." : "Join"}
+                </button>
+              </form>
+            )}
+            {status === "error" && (
+              <p className="mt-2 text-xs font-semibold text-red-300 font-sans">
+                {message}
+              </p>
+            )}
           </div>
         </div>
 

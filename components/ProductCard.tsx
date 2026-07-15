@@ -99,9 +99,6 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.name}
             </h3>
           </Link>
-          <p className="font-sans text-xs leading-relaxed text-[#2A1E17]/75 line-clamp-2">
-            {product.description}
-          </p>
         </div>
 
         {/* Price and Add Button */}
