@@ -28,3 +28,87 @@ input::-ms-reveal,
 input::-ms-clear {
   display: none;
 }
+
+/* Hero Page Load Animations */
+@keyframes heroBgFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroContentEntrance {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-hero-bg {
+  animation: heroBgFadeIn 1.0s ease-out both;
+  will-change: opacity;
+}
+
+.animate-hero-content-brand {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.0s;
+  will-change: transform, opacity;
+}
+
+.animate-hero-content-1 {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.2s;
+  will-change: transform, opacity;
+}
+
+.animate-hero-content-2 {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.4s;
+  will-change: transform, opacity;
+}
+
+.animate-hero-content-3 {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.6s;
+  will-change: transform, opacity;
+}
+
+/* Slide 2 Animations */
+.animate-slide2-grid {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 0.2s;
+  will-change: transform, opacity;
+}
+
+.animate-slide2-tagline {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 0.8s;
+  will-change: transform, opacity;
+}
+
+.animate-slide2-headline {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.0s;
+  will-change: transform, opacity;
+}
+
+.animate-slide2-desc {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.2s;
+  will-change: transform, opacity;
+}
+
+.animate-slide2-cta {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.4s;
+  will-change: transform, opacity;
+}
+
+
+

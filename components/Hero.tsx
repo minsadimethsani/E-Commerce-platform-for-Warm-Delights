@@ -16,6 +16,7 @@ const SLIDE_2_CONFIG = {
 export default function Hero({ products = [] }: { products?: Product[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const handleSlideChange = useCallback((index: number) => {
     if (index === currentSlide) return;
@@ -33,6 +34,16 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
     }, 5000);
     return () => clearInterval(timer);
   }, [currentSlide, handleSlideChange]);
+
+  // Clean up initial load animations after completion
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+
 
 
   // Safe fallback list of products
@@ -70,17 +81,18 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
   }
 
   return (
-    <div className="relative min-h-[70vh] md:min-h-[65vh] flex items-center justify-center overflow-hidden bg-[#A47251] py-8 sm:py-10">
+    <div className="relative min-h-[calc(100vh-80px)] w-full flex items-center justify-center overflow-hidden bg-[#A47251] py-8 sm:py-10">
       {/* Background Image for Slide 1 */}
       <div
-        className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+          currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
+        } ${isInitialLoad ? "animate-hero-bg" : ""}`}
+        style={{
+          backgroundImage: "url('/hero_slide_1.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
-        <img
-          src="/hero_slide_1.jpg"
-          alt="Warm Delights Bakery Interior"
-          className="w-full h-full object-cover"
-        />
         <div className="absolute inset-0 bg-black/35" />
       </div>
 
@@ -102,24 +114,26 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
         >
           {/* Brand Signage Overlay - Top Middle */}
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-center pointer-events-none select-none w-full max-w-lg">
-            <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide text-[#DD9E59] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
-              Warm Delights
-            </h2>
-            <p className="text-[8px] sm:text-[10px] font-sans tracking-[0.25em] uppercase text-[#F0D8A1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] mt-1 sm:mt-1.5">
-              Bespoke Cakes & Events
-            </p>
+            <div className={isInitialLoad ? "animate-hero-content-brand" : ""}>
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide text-[#DD9E59] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                Warm Delights
+              </h2>
+              <p className="text-[8px] sm:text-[10px] font-sans tracking-[0.25em] uppercase text-[#F0D8A1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] mt-1 sm:mt-1.5">
+                Bespoke Cakes & Events
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-6 text-center mx-auto max-w-2xl animate-fade-in-up mt-28 sm:mt-36 lg:mt-32">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight sm:whitespace-nowrap">
+          <div className="space-y-6 text-center mx-auto max-w-2xl mt-28 sm:mt-36 lg:mt-32">
+            <h1 className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight sm:whitespace-nowrap ${isInitialLoad ? "animate-hero-content-1" : ""}`}>
               Artisanal Pastries & Signature Cakes
             </h1>
 
-            <p className="text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 max-w-xl mx-auto">
+            <p className={`text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 max-w-xl mx-auto ${isInitialLoad ? "animate-hero-content-2" : ""}`}>
               From rustic, decadent signature cakes for your special milestones to warm, flaky, golden-brown savory pastries. Baked fresh daily with love and local premium ingredients.
             </p>
 
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className={`pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 ${isInitialLoad ? "animate-hero-content-3" : ""}`}>
               <Link
                 href="/menu"
                 className="w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center"
@@ -136,6 +150,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
           </div>
         </div>
 
+
         {/* SLIDE 2: Seasonal Collections & Fresh Batches */}
         <div
           className={`transition-all duration-500 transform min-h-[560px] md:min-h-[480px] lg:min-h-[440px] flex flex-col justify-center ${currentSlide === 1
@@ -144,32 +159,8 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
             } ${isTransitioning ? "opacity-0" : ""}`}
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Left Content Column */}
-            <div className="space-y-6 text-left max-w-xl lg:col-span-5">
-              <span className="inline-block rounded-none bg-[#F0D8A1]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10">
-                {SLIDE_2_CONFIG.tagline}
-              </span>
-
-              <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
-                {SLIDE_2_CONFIG.headline}
-              </h2>
-
-              <p className="text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85">
-                {SLIDE_2_CONFIG.subheadline}
-              </p>
-
-              <div className="pt-2">
-                <Link
-                  href={SLIDE_2_CONFIG.targetRoute}
-                  className="inline-block w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center font-bold"
-                >
-                  {SLIDE_2_CONFIG.ctaText}
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Product Grid Column */}
-            <div className="w-full lg:col-span-7">
+            {/* Left Product Grid Column */}
+            <div className={`w-full lg:col-span-7 ${currentSlide === 1 ? "animate-slide2-grid" : ""}`}>
               <div className="grid grid-cols-2 gap-4 h-auto">
                 {slide2SeasonalProducts.map((p) => (
                   <Link
@@ -209,6 +200,30 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
                     </div>
                   </Link>
                 ))}
+              </div>
+            </div>
+
+            {/* Right Content Column */}
+            <div className="space-y-6 text-left max-w-xl lg:col-span-5">
+              <span className={`inline-block rounded-none bg-[#F0D8A1]/10 px-3 py-1 text-[10px] sm:text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10 ${currentSlide === 1 ? "animate-slide2-tagline" : ""}`}>
+                {SLIDE_2_CONFIG.tagline}
+              </span>
+
+              <h2 className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight ${currentSlide === 1 ? "animate-slide2-headline" : ""}`}>
+                {SLIDE_2_CONFIG.headline}
+              </h2>
+
+              <p className={`text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 ${currentSlide === 1 ? "animate-slide2-desc" : ""}`}>
+                {SLIDE_2_CONFIG.subheadline}
+              </p>
+
+              <div className={`pt-2 ${currentSlide === 1 ? "animate-slide2-cta" : ""}`}>
+                <Link
+                  href={SLIDE_2_CONFIG.targetRoute}
+                  className="inline-block w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center font-bold"
+                >
+                  {SLIDE_2_CONFIG.ctaText}
+                </Link>
               </div>
             </div>
           </div>
