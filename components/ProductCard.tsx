@@ -1,16 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/data/products";
 import { addToCart } from "@/lib/cart";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const { user } = useAuth();
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) {
+      const currentPath = typeof window !== "undefined" ? window.location.pathname + window.location.search : "";
+      window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+      return;
+    }
     if (product.variants && product.variants.length > 0) {
       window.location.href = `/menu/${product.id}`;
     } else {

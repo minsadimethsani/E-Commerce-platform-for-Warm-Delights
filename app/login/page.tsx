@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { seedAdminUser } from "@/lib/auth-seed";
 
@@ -18,12 +18,12 @@ function LoginForm() {
     seedAdminUser();
   }, []);
 
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   // Error States
-  const [emailError, setEmailError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,18 +31,27 @@ function LoginForm() {
   // Form Validation
   const validateForm = (): boolean => {
     let isValid = true;
-    setEmailError("");
+    setUsernameError("");
     setPasswordError("");
     setGeneralError("");
 
-    if (!email.trim()) {
-      setEmailError("Email address is required.");
+    if (!username.trim()) {
+      setUsernameError("Email address or phone number is required.");
       isValid = false;
     } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        setEmailError("Please enter a valid email address.");
-        isValid = false;
+      const isEmail = username.includes("@");
+      if (isEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(username.trim())) {
+          setUsernameError("Please enter a valid email address.");
+          isValid = false;
+        }
+      } else {
+        const phoneRegex = /^\+?[0-9\s-]{9,15}$/;
+        if (!phoneRegex.test(username.trim())) {
+          setUsernameError("Please enter a valid email address or phone number.");
+          isValid = false;
+        }
       }
     }
 
@@ -62,8 +71,58 @@ function LoginForm() {
     setGeneralError("");
 
     try {
+      const usersRef = collection(db, "users");
+      let targetEmail = "";
+      let accountExists = false;
+
+      const cleanedUsername = username.trim();
+      const isEmail = cleanedUsername.includes("@");
+
+      if (isEmail) {
+        // Check if email exists
+        const qEmail = query(usersRef, where("email", "==", cleanedUsername.toLowerCase()));
+        const snapEmail = await getDocs(qEmail);
+        if (!snapEmail.empty) {
+          accountExists = true;
+          targetEmail = cleanedUsername.toLowerCase();
+        }
+      } else {
+        // Check if phone number exists
+        const qPhone = query(usersRef, where("phoneNumber", "==", cleanedUsername));
+        const snapPhone = await getDocs(qPhone);
+        if (!snapPhone.empty) {
+          accountExists = true;
+          const userData = snapPhone.docs[0].data();
+          targetEmail = userData.email;
+        }
+      }
+
+      // Fallback check on email / phone if formats are ambiguous
+      if (!accountExists) {
+        const qEmailFallback = query(usersRef, where("email", "==", cleanedUsername.toLowerCase()));
+        const snapEmailFallback = await getDocs(qEmailFallback);
+        if (!snapEmailFallback.empty) {
+          accountExists = true;
+          targetEmail = cleanedUsername.toLowerCase();
+        } else {
+          const qPhoneFallback = query(usersRef, where("phoneNumber", "==", cleanedUsername));
+          const snapPhoneFallback = await getDocs(qPhoneFallback);
+          if (!snapPhoneFallback.empty) {
+            accountExists = true;
+            const userData = snapPhoneFallback.docs[0].data();
+            targetEmail = userData.email;
+          }
+        }
+      }
+
+      if (!accountExists) {
+        setGeneralError("Please create an account");
+        setIsSubmitting(false);
+        return;
+      }
+
       // 1. Sign in with Firebase Authentication
-      const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+      const userCredential = await signInWithEmailAndPassword(auth, targetEmail, password);
       const user = userCredential.user;
 
       // 2. Fetch User Profile from Firestore to determine the user role
@@ -122,7 +181,7 @@ function LoginForm() {
         case "auth/invalid-credential":
         case "auth/wrong-password":
         case "auth/user-not-found":
-          setGeneralError("Incorrect email or password. Please try again.");
+          setGeneralError("Incorrect password. Please try again.");
           break;
         case "auth/user-disabled":
           setGeneralError("This account has been disabled. Please contact support.");
@@ -146,37 +205,34 @@ function LoginForm() {
       <div className="text-center space-y-2 mb-8">
         <span className="text-xs font-bold uppercase tracking-widest text-[#DD9E59]">Welcome Back</span>
         <h2 className="font-serif text-3xl font-bold tracking-tight text-[#2A1E17]">Log In</h2>
-        <p className="text-xs text-[#2A1E17]/60 font-semibold uppercase tracking-wider">Indulge in artisanal delicacies</p>
       </div>
 
       {generalError && (
         <div className="bg-red-50 border border-red-250 text-red-750 p-4 text-xs font-semibold mb-6 flex items-center space-x-2">
-          <span className="font-sans px-1 py-0.5 border border-red-300 bg-white text-[9px] uppercase tracking-wider text-red-700">Error</span>
           <span>{generalError}</span>
         </div>
       )}
 
       <form onSubmit={handleLogin} className="space-y-6">
-        {/* Email Address */}
+        {/* Email Address or Phone Number */}
         <div className="space-y-1">
           <label className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
-            Email Address
+            User name
           </label>
           <input
-            type="email"
-            value={email}
+            type="text"
+            value={username}
             onChange={(e) => {
-              setEmail(e.target.value);
-              setEmailError("");
+              setUsername(e.target.value);
+              setUsernameError("");
             }}
-            placeholder="customer@example.com"
-            className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-              emailError
-                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
-            }`}
+            placeholder="Email or phone number"
+            className={`w-full bg-[#FDF9F0] border rounded-xl px-4 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${usernameError
+              ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+              : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
+              }`}
           />
-          {emailError && <p className="text-[10.5px] font-semibold text-red-500">{emailError}</p>}
+          {usernameError && <p className="text-[10.5px] font-semibold text-red-500">{usernameError}</p>}
         </div>
 
         {/* Password */}
@@ -201,11 +257,10 @@ function LoginForm() {
                 setPasswordError("");
               }}
               placeholder="••••••••"
-              className={`w-full bg-[#FDF9F0] border rounded-xl pl-4 pr-10 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${
-                passwordError
-                  ? "border-red-500 focus:border-red-500 focus:ring-red-500"
-                  : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
-              }`}
+              className={`w-full bg-[#FDF9F0] border rounded-xl pl-4 pr-10 py-3 text-sm text-[#2A1E17] focus:outline-none focus:ring-1 ${passwordError
+                ? "border-red-500 focus:border-red-500 focus:ring-red-500"
+                : "border-[#A47251]/10 focus:border-[#DD9E59] focus:ring-[#DD9E59]"
+                }`}
             />
             <button
               type="button"

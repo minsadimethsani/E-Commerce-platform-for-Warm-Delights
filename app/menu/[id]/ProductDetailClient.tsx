@@ -148,6 +148,10 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
   const decrementQty = () => setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
 
   const handleAddToCart = () => {
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return;
+    }
     addToCart(
       product,
       quantity,

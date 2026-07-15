@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -13,6 +13,23 @@ export default function Header() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
+  
+  // Profile dropdown menu states
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Click outside profile menu logic
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Interactive States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -433,21 +450,18 @@ export default function Header() {
             </div>
 
             {/* Profile Button (Desktop Only) */}
-            <div className="hidden md:flex items-center">
-              <Link
-                href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
-                onClick={async (e) => {
-                  if (user && userProfile?.role !== "admin") {
-                    e.preventDefault();
-                    if (confirm("Are you sure you want to log out?")) {
-                      await logout();
-                      router.push("/");
-                    }
+            <div className="hidden md:block relative" ref={profileMenuRef}>
+              <button
+                onClick={() => {
+                  if (user) {
+                    setIsProfileMenuOpen(!isProfileMenuOpen);
+                  } else {
+                    router.push("/login");
                   }
                 }}
-                title={user ? `Logged in as ${userProfile?.displayName || user.email} (Click to Logout)` : "Login / Sign Up"}
-                aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
-                className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer flex items-center space-x-1 text-[#0D1B2A]"
+                title={user ? `My Account (${userProfile?.displayName || user.email})` : "Login / Sign Up"}
+                aria-label={user ? "Toggle Account Menu" : "Login"}
+                className="p-1.5 rounded-full transition-colors hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E] cursor-pointer flex items-center space-x-1 text-[#0D1B2A] focus:outline-none"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -464,11 +478,162 @@ export default function Header() {
                   />
                 </svg>
                 {user && (
-                  <span className="text-[10px] font-bold text-[#0D1B2A]/70 uppercase tracking-wider hidden lg:inline">
+                  <span className="text-[10px] font-bold text-[#0D1B2A]/70 uppercase tracking-wider hidden lg:inline max-w-[80px] truncate">
                     {userProfile?.displayName?.split(" ")[0] || "User"}
                   </span>
                 )}
-              </Link>
+              </button>
+
+              {/* Profile Dropdown Mega Menu */}
+              {user && isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2.5 w-72 rounded-2xl bg-white border border-[#A47251]/10 shadow-2xl py-4 text-[#2A1E17] z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {/* User Profile Summary */}
+                  <div className="px-5 py-3 border-b border-[#0D1B2A]/5 flex items-center space-x-3">
+                    <div className="flex-shrink-0 h-10 w-10 rounded-full bg-[#E09F3E] text-white flex items-center justify-center font-serif text-lg font-bold">
+                      {userProfile?.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-[#2A1E17] truncate leading-tight">
+                        {userProfile?.displayName || "Warm Delights Guest"}
+                      </p>
+                      <p className="text-xs text-[#2A1E17]/60 truncate leading-tight mt-0.5">
+                        {user.email}
+                      </p>
+                      <span className="inline-block mt-1 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#E09F3E]/10 text-[#E09F3E]">
+                        {userProfile?.role || "customer"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Menu Options */}
+                  <div className="px-2 py-2.5 space-y-0.5">
+                    <Link
+                      href="/profile?tab=details"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-[#0D1B2A]/5 text-[#2A1E17] hover:text-[#E09F3E]"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                        stroke="currentColor"
+                        className="w-4.5 h-4.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                        />
+                      </svg>
+                      <span>My Profile</span>
+                    </Link>
+
+                    <Link
+                      href="/profile?tab=orders"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-[#0D1B2A]/5 text-[#2A1E17] hover:text-[#E09F3E]"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                        stroke="currentColor"
+                        className="w-4.5 h-4.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                        />
+                      </svg>
+                      <span>My Orders</span>
+                    </Link>
+
+                    <Link
+                      href="/profile?tab=addresses"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors hover:bg-[#0D1B2A]/5 text-[#2A1E17] hover:text-[#E09F3E]"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                        stroke="currentColor"
+                        className="w-4.5 h-4.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                        />
+                      </svg>
+                      <span>Shipping Addresses</span>
+                    </Link>
+
+                    {userProfile?.role === "admin" && (
+                      <Link
+                        href="/admin/dashboard"
+                        onClick={() => setIsProfileMenuOpen(false)}
+                        className="flex items-center space-x-3 px-3 py-2 rounded-xl text-sm font-medium bg-[#E09F3E]/5 border border-[#E09F3E]/10 transition-colors hover:bg-[#E09F3E]/10 text-[#E09F3E]"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={1.8}
+                          stroke="currentColor"
+                          className="w-4.5 h-4.5"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
+                          />
+                        </svg>
+                        <span>Admin Dashboard</span>
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* Sign Out Button */}
+                  <div className="px-4 pt-2 pb-1 border-t border-[#0D1B2A]/5 mt-2">
+                    <button
+                      onClick={async () => {
+                        setIsProfileMenuOpen(false);
+                        if (confirm("Are you sure you want to log out?")) {
+                          await logout();
+                          router.push("/");
+                        }
+                      }}
+                      className="w-full flex items-center justify-center space-x-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors cursor-pointer shadow-md shadow-red-600/10"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.8}
+                        stroke="currentColor"
+                        className="w-4.5 h-4.5"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                        />
+                      </svg>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Cart Button (Mobile & Desktop) */}
@@ -558,18 +723,9 @@ export default function Header() {
             <div className="mt-4 border-t border-[#0D1B2A]/5 pt-4 flex items-center justify-around text-[#0D1B2A]">
               {/* Profile Button Mobile */}
               <Link
-                href={user ? (userProfile?.role === "admin" ? "/admin" : "#") : "/login"}
-                onClick={async (e) => {
-                  if (user && userProfile?.role !== "admin") {
-                    e.preventDefault();
-                    if (confirm("Are you sure you want to log out?")) {
-                      await logout();
-                      router.push("/");
-                    }
-                  }
-                  setIsOpen(false);
-                }}
-                aria-label={user ? `Logout ${userProfile?.displayName || user.email}` : "Login"}
+                href={user ? "/profile" : "/login"}
+                onClick={() => setIsOpen(false)}
+                aria-label={user ? "My Profile" : "Login"}
                 className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-[#0D1B2A]/5 cursor-pointer text-[#0D1B2A]"
               >
                 <svg
@@ -587,7 +743,7 @@ export default function Header() {
                   />
                 </svg>
                 <span className="text-sm font-medium">
-                  {user ? `Logout (${userProfile?.displayName?.split(" ")[0] || "User"})` : "Account"}
+                  {user ? "Profile" : "Login"}
                 </span>
               </Link>
 
@@ -623,6 +779,37 @@ export default function Header() {
                 </div>
                 <span className="text-sm font-medium">Cart</span>
               </button>
+
+              {/* Logout Button Mobile (Only when logged in) */}
+              {user && (
+                <button
+                  onClick={async () => {
+                    setIsOpen(false);
+                    if (confirm("Are you sure you want to log out?")) {
+                      await logout();
+                      router.push("/");
+                    }
+                  }}
+                  aria-label="Logout"
+                  className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-[#0D1B2A]/5 cursor-pointer text-red-600 font-medium focus:outline-none"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.8}
+                    stroke="currentColor"
+                    className="w-5.5 h-5.5 text-red-600"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                    />
+                  </svg>
+                  <span className="text-sm">Sign Out</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

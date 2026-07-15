@@ -52,3 +52,43 @@ export async function subscribeToNewsletter(email: string) {
     return { error: "An unexpected error occurred. Please try again." };
   }
 }
+
+export async function sendWelcomeEmail(email: string, displayName: string) {
+  try {
+    const trimmedEmail = email.trim().toLowerCase();
+    const mailRef = collection(db, "mail");
+    await addDoc(mailRef, {
+      to: trimmedEmail,
+      message: {
+        subject: "Welcome to Warm Delights! 🎂 Your Account is Created",
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #FDF9F0; border: 1px solid #A47251; border-radius: 16px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="color: #2A1E17; font-family: serif; margin: 0;">Warm Delights</h1>
+              <p style="color: #DD9E59; text-transform: uppercase; font-size: 10px; font-weight: bold; letter-spacing: 2px; margin: 5px 0 0 0;">Artisanal Cakes & Savory Treats</p>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #A47251; opacity: 0.15; margin-bottom: 20px;"/>
+            <h2 style="color: #2A1E17; font-family: serif; font-size: 20px; margin-top: 0;">Welcome, ${displayName}!</h2>
+            <p style="color: #2A1E17; font-size: 14px; line-height: 1.6; opacity: 0.85;">Your account at Warm Delights has been successfully created. We are thrilled to have you join our community of sweet and savory enthusiasts!</p>
+            <p style="color: #2A1E17; font-size: 14px; line-height: 1.6; opacity: 0.85;">With your account, you can now:</p>
+            <ul style="color: #2A1E17; font-size: 14px; line-height: 1.6; opacity: 0.85; padding-left: 20px;">
+              <li>Customize and place orders for cakes, pastries, and savory treats.</li>
+              <li>Manage your shipping destinations for faster checkouts.</li>
+              <li>Keep track of your complete order receipts and fulfillment history.</li>
+            </ul>
+            <div style="background-color: #F0D8A1; padding: 15px; border-radius: 12px; margin: 25px 0; border: 1px solid #A47251; opacity: 0.9; text-align: center;">
+              <p style="margin: 0; font-size: 14px; color: #2A1E17; font-weight: bold;">Need something sweet today?</p>
+              <a href="https://warm-delights.web.app/menu" style="display: inline-block; margin-top: 10px; background-color: #A47251; color: white; padding: 10px 20px; text-decoration: none; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 8px;">Explore Our Menu</a>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #A47251; opacity: 0.15; margin-top: 25px; margin-bottom: 15px;"/>
+            <p style="color: #2A1E17; font-size: 11px; text-align: center; opacity: 0.6;">This email was sent to ${trimmedEmail} to confirm your registration with Warm Delights.</p>
+          </div>
+        `
+      }
+    });
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error sending welcome email:", error);
+    return { error: error.message };
+  }
+}
