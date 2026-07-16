@@ -191,7 +191,21 @@ export default function Header() {
     setIsOrderSubmitting(true);
 
     try {
-      const generatedOrderId = `order-${Math.floor(100000 + Math.random() * 900000)}`;
+      const { collection, getDocs, doc, setDoc } = await import("firebase/firestore");
+      const ordersRef = collection(db, "orders");
+      const ordersSnapshot = await getDocs(ordersRef);
+      let maxNum = 0;
+      ordersSnapshot.forEach((docSnap) => {
+        const docId = docSnap.id;
+        const numPart = docId.replace("order-", "");
+        const parsed = parseInt(numPart, 10);
+        if (!isNaN(parsed) && parsed > maxNum) {
+          maxNum = parsed;
+        }
+      });
+      const nextNum = maxNum + 1;
+      const generatedOrderId = `order-${nextNum}`;
+
       const subtotal = totalAmount;
       const tax = subtotal * 0.08;
       const deliveryFee = deliveryType === "delivery" ? 350 : 0;
@@ -288,8 +302,6 @@ export default function Header() {
         updatedAt: new Date()
       };
 
-      // Import Firestore write
-      const { doc, setDoc } = await import("firebase/firestore");
       const orderDocRef = doc(db, "orders", generatedOrderId);
       await setDoc(orderDocRef, orderData);
 

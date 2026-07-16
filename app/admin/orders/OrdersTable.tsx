@@ -365,9 +365,30 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                 <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
                   Order Note
                 </h3>
-                <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3.5 rounded-xl border border-yellow-200/25 italic leading-relaxed">
+                <div className="text-xs bg-yellow-55/20 text-[#2A1E17]/90 p-3.5 rounded-xl border border-yellow-200/25 italic leading-relaxed whitespace-pre-wrap font-sans">
                   "{selectedOrder.orderNote}"
                 </div>
+              </div>
+            )}
+
+            {/* Custom Design Reference Image Card */}
+            {(selectedOrder as any).isCustomOrder && (selectedOrder as any).customSampleImage && (
+              <div className="rounded-2xl border border-[#A47251]/5 bg-white p-6 shadow-xs space-y-3">
+                <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
+                  Design Reference Image
+                </h3>
+                <a
+                  href={(selectedOrder as any).customSampleImage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative h-64 w-full overflow-hidden rounded-xl border border-[#A47251]/10 bg-[#FDF9F0] hover:opacity-95 transition-opacity cursor-pointer"
+                >
+                  <img
+                    src={(selectedOrder as any).customSampleImage}
+                    alt="Customer custom cake design reference"
+                    className="h-full w-full object-contain"
+                  />
+                </a>
               </div>
             )}
           </div>

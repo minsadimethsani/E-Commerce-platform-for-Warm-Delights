@@ -135,14 +135,35 @@ function LoginForm() {
 
         // 3. Direct roles to correct paths
         if (role === "admin") {
-          // Set administrative session cookies (valid for 1 hour)
-          document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
-          document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
-          router.replace("/admin/dashboard");
+          const isStorefrontLogin = !redirect || !redirect.startsWith("/admin");
+          
+          if (isStorefrontLogin) {
+            if (typeof window !== "undefined") {
+              localStorage.setItem("storefront-admin-active", "true");
+            }
+            document.cookie = "session-storefront-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
+            document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
+            document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
+            router.replace(redirect || "/");
+          } else {
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("storefront-admin-active");
+            }
+            document.cookie = "session-storefront-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+            
+            // Set administrative session cookies (valid for 1 hour)
+            document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
+            document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
+            router.replace("/admin/dashboard");
+          }
         } else {
           // Clear cookies for non-admin
           document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
           document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          document.cookie = "session-storefront-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("storefront-admin-active");
+          }
 
           // If a customer attempts to access the admin portal, block them
           if (redirect && redirect.startsWith("/admin")) {
@@ -161,6 +182,10 @@ function LoginForm() {
         // Fallback for missing profile
         document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
         document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        document.cookie = "session-storefront-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("storefront-admin-active");
+        }
 
         if (redirect && redirect.startsWith("/admin")) {
           setGeneralError("Access denied. Admin profile document not found.");

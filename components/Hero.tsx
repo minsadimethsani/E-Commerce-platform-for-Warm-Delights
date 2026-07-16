@@ -16,7 +16,6 @@ const SLIDE_2_CONFIG = {
 export default function Hero({ products = [] }: { products?: Product[] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const handleSlideChange = useCallback((index: number) => {
     if (index === currentSlide) return;
@@ -35,13 +34,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
     return () => clearInterval(timer);
   }, [currentSlide, handleSlideChange]);
 
-  // Clean up initial load animations after completion
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialLoad(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+
 
 
 
@@ -86,7 +79,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
       <div
         className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
           currentSlide === 0 ? "opacity-100" : "opacity-0 pointer-events-none"
-        } ${isInitialLoad ? "animate-hero-bg" : ""}`}
+        } ${currentSlide === 0 ? "animate-hero-bg" : ""}`}
         style={{
           backgroundImage: "url('/hero_slide_1.jpg')",
           backgroundSize: "cover",
@@ -114,7 +107,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
         >
           {/* Brand Signage Overlay - Top Middle */}
           <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-center pointer-events-none select-none w-full max-w-lg">
-            <div className={isInitialLoad ? "animate-hero-content-brand" : ""}>
+            <div className={currentSlide === 0 ? "animate-hero-content-brand" : ""}>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-wide text-[#DD9E59] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
                 Warm Delights
               </h2>
@@ -125,15 +118,15 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
           </div>
 
           <div className="space-y-6 text-center mx-auto max-w-2xl mt-28 sm:mt-36 lg:mt-32">
-            <h1 className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight sm:whitespace-nowrap ${isInitialLoad ? "animate-hero-content-1" : ""}`}>
+            <h1 className={`font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight sm:whitespace-nowrap ${currentSlide === 0 ? "animate-hero-content-1" : ""}`}>
               Artisanal Pastries & Signature Cakes
             </h1>
 
-            <p className={`text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 max-w-xl mx-auto ${isInitialLoad ? "animate-hero-content-2" : ""}`}>
+            <p className={`text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 max-w-xl mx-auto ${currentSlide === 0 ? "animate-hero-content-2" : ""}`}>
               From rustic, decadent signature cakes for your special milestones to warm, flaky, golden-brown savory pastries. Baked fresh daily with love and local premium ingredients.
             </p>
 
-            <div className={`pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 ${isInitialLoad ? "animate-hero-content-3" : ""}`}>
+            <div className={`pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 ${currentSlide === 0 ? "animate-hero-content-3" : ""}`}>
               <Link
                 href="/menu"
                 className="w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center"
@@ -239,19 +232,19 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-6 text-left max-w-xl">
-              <span className="inline-block rounded-none bg-[#F0D8A1]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10">
+              <span className={`inline-block rounded-none bg-[#F0D8A1]/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-[#F0D8A1] uppercase backdrop-blur-sm border border-white/10 ${currentSlide === 2 ? "animate-slide3-tagline" : ""}`}>
                 Our Custom creations
               </span>
 
-              <h2 className="font-serif text-5xl font-bold tracking-tight text-white sm:text-6xl leading-tight">
+              <h2 className={`font-serif text-5xl font-bold tracking-tight text-white sm:text-6xl leading-tight ${currentSlide === 2 ? "animate-slide3-headline" : ""}`}>
                 Looking for the perfect custom cake ?
               </h2>
 
-              <p className="text-base sm:text-lg leading-relaxed text-[#FDF9F0]/85">
+              <p className={`text-xs sm:text-sm md:text-base leading-relaxed text-[#FDF9F0]/85 ${currentSlide === 2 ? "animate-slide3-desc" : ""}`}>
                 From birthdays to baby showers, anniversaries, or any special moment, we create cakes that make your day sweeter!
               </p>
 
-              <div className="pt-4 flex flex-col sm:flex-row items-center gap-4">
+              <div className={`pt-4 flex flex-col sm:flex-row items-center gap-4 ${currentSlide === 2 ? "animate-slide3-cta" : ""}`}>
                 <Link
                   href="/menu?category=Custom"
                   className="w-full sm:w-auto rounded-none bg-[#DD9E59] px-8 py-4 text-sm font-semibold tracking-wide text-[#2A1E17] shadow-lg transition-all hover:bg-[#F0D8A1] hover:text-white hover:scale-102 hover:shadow-xl text-center"
@@ -272,7 +265,7 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
               <div className="absolute w-[80%] aspect-square bg-[#DD9E59]/5 rounded-full blur-3xl -z-10" />
 
               {/* Photo Collage Stack */}
-              <div className="relative w-full h-full max-w-[450px]">
+              <div className={`relative w-full h-full max-w-[450px] ${currentSlide === 2 ? "animate-slide3-collage" : ""}`}>
                 {/* Photo 1 (Back left, tilted) */}
                 {customCakes[0] && (
                   <div className="absolute top-[10%] left-0 w-[52%] lg:w-[55%] aspect-square rounded-none overflow-hidden shadow-lg border-4 border-white/95 rotate-[-4deg] lg:rotate-[-6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">

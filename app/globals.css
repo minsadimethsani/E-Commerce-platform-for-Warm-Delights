@@ -109,6 +109,33 @@ input::-ms-clear {
   animation-delay: 1.4s;
   will-change: transform, opacity;
 }
+/* Slide 3 Animations */
+.animate-slide3-collage {
+  animation: heroContentEntrance 0.8s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 0.2s;
+  will-change: transform, opacity;
+}
 
+.animate-slide3-tagline {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 0.8s;
+  will-change: transform, opacity;
+}
 
+.animate-slide3-headline {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.0s;
+  will-change: transform, opacity;
+}
 
+.animate-slide3-desc {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.2s;
+  will-change: transform, opacity;
+}
+
+.animate-slide3-cta {
+  animation: heroContentEntrance 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: 1.4s;
+  will-change: transform, opacity;
+}

@@ -5,6 +5,7 @@ import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { UserProfile } from "@/types/database";
+import { usePathname } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +30,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isMutating, setIsMutating] = useState(false);
+  const pathname = usePathname();
+
+  const [storefrontAdminActive, setStorefrontAdminActive] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setStorefrontAdminActive(localStorage.getItem("storefront-admin-active") === "true");
+    }
+  }, [pathname]);
 
   useEffect(() => {
     let unsubscribeProfile: (() => void) | null = null;
@@ -87,15 +97,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof document !== "undefined") {
       document.cookie = "session-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       document.cookie = "session-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      document.cookie = "session-storefront-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     }
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("storefront-admin-active");
+    }
+    setStorefrontAdminActive(false);
     await signOut(auth);
     setUser(null);
     setUserProfile(null);
     setLoading(false);
   };
 
+  const isStorefront = !pathname?.startsWith("/admin");
+  const activeUser = (isStorefront && userProfile?.role === "admin" && !storefrontAdminActive) ? null : user;
+  const activeUserProfile = (isStorefront && userProfile?.role === "admin" && !storefrontAdminActive) ? null : userProfile;
+
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, logout, isMutating, setIsMutating }}>
+    <AuthContext.Provider value={{ user: activeUser, userProfile: activeUserProfile, loading, logout, isMutating, setIsMutating }}>
       {children}
     </AuthContext.Provider>
   );

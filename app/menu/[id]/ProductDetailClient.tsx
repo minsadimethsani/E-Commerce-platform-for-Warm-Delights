@@ -10,7 +10,7 @@ import { addToCart } from "@/lib/cart";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { AddOn } from "@/lib/addons";
-import { addReview } from "@/lib/reviews";
+import { addReview, deleteReview } from "@/lib/reviews";
 
 interface ProductDetailClientProps {
   product: Product;
@@ -21,7 +21,7 @@ interface ProductDetailClientProps {
 
 export default function ProductDetailClient({ product, relatedProducts, initialAddOns, initialReviews }: ProductDetailClientProps) {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   
   const [reviews, setReviews] = useState<any[]>(initialReviews);
   const [rating, setRating] = useState<number>(5);
@@ -29,6 +29,27 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDeleteReview = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this review? This action cannot be undone.")) {
+      return;
+    }
+    setDeletingId(id);
+    try {
+      const success = await deleteReview(id);
+      if (success) {
+        setReviews(reviews.filter((r) => r.id !== id));
+      } else {
+        alert("Failed to delete the review. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      alert("An unexpected error occurred.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
 
   const handleSubmitReview = async (e: React.FormEvent) => {
@@ -679,13 +700,24 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
                             <div className="mt-0.5">{renderStars(r.rating)}</div>
                           </div>
                         </div>
-                        <span className="text-[10px] text-[#2A1E17]/50 font-medium">
-                          {new Date(r.createdAt).toLocaleDateString(undefined, {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
-                        </span>
+                        <div className="flex items-center space-x-3">
+                          <span className="text-[10px] text-[#2A1E17]/50 font-medium">
+                            {new Date(r.createdAt).toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
+                          {userProfile?.role === "admin" && (
+                            <button
+                              onClick={() => handleDeleteReview(r.id)}
+                              disabled={deletingId === r.id}
+                              className="text-red-650 hover:text-red-900 disabled:opacity-50 text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                            >
+                              {deletingId === r.id ? "Deleting..." : "Delete"}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <p className="text-xs sm:text-sm text-[#2A1E17]/85 leading-relaxed pl-10">
                         {r.comment}

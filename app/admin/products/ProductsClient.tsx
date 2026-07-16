@@ -577,7 +577,6 @@ export default function ProductsClient({
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Product</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Category</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Price</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Available Variations</th>
                   <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Rating</th>
                   <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Actions</th>
                 </tr>
@@ -625,55 +624,6 @@ export default function ProductsClient({
                     {/* Price */}
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-bold text-[#2A1E17]">
                       Rs. {p.price.toFixed(2)}
-                    </td>
-                    {/* Available Variations Column */}
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col space-y-1 max-w-[200px]">
-                        {/* Sizes */}
-                        {p.sizes && p.sizes.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Sizes:</span>
-                            {p.sizes.map((s: any, idx: number) => (
-                              <span key={idx} className="inline-block bg-[#F0D8A1] text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#A47251]/5">
-                                {s.name} {s.price > 0 ? `(+Rs.${s.price})` : s.price < 0 ? `(-Rs.${Math.abs(s.price)})` : ""}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                        {/* Flavors */}
-                        {p.flavors && p.flavors.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Flavors:</span>
-                            {p.flavors.map((f: any, idx: number) => {
-                              const fName = typeof f === "string" ? f : f.name;
-                              const fPrice = typeof f === "string" ? 0 : f.price;
-                              return (
-                                <span key={idx} className="inline-block bg-[#DD9E59]/15 text-[#DD9E59] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#DD9E59]/10">
-                                  {fName} {fPrice > 0 ? `(+Rs.${fPrice})` : fPrice < 0 ? `(-Rs.${Math.abs(fPrice)})` : ""}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                        {/* Icings */}
-                        {(p as any).icings && (p as any).icings.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            <span className="text-[8px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block mr-1 self-center">Icings:</span>
-                            {(p as any).icings.map((ic: any, idx: number) => {
-                              const icName = typeof ic === "string" ? ic : ic.name;
-                              const icPrice = typeof ic === "string" ? 0 : ic.price;
-                              return (
-                                <span key={idx} className="inline-block bg-[#A47251]/10 text-[#2A1E17] text-[9px] font-bold px-1.5 py-0.5 rounded border border-[#A47251]/5">
-                                  {icName} {icPrice > 0 ? `(+Rs.${icPrice})` : icPrice < 0 ? `(-Rs.${Math.abs(icPrice)})` : ""}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                        {(!p.sizes || p.sizes.length === 0) && (!p.flavors || p.flavors.length === 0) && (!(p as any).icings || (p as any).icings.length === 0) && (
-                          <span className="text-[10px] text-[#2A1E17]/40 italic">None</span>
-                        )}
-                      </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm font-semibold text-[#2A1E17]">
                       <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1 py-0.5">Rating: {p.rating.toFixed(1)}</span> ({p.reviewsCount})

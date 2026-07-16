@@ -171,6 +171,127 @@ export default function AdminProductDetailClient({
           </div>
         </div>
 
+        {/* Product Variations Card */}
+        {((product.sizes && product.sizes.length > 0) || 
+          (product.flavors && product.flavors.length > 0) || 
+          (product.icings && product.icings.length > 0) ||
+          product.defaultSize || product.defaultFlavor || product.defaultIcing) && (
+          <div className="rounded-none border border-[#A47251]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
+            <h3 className="font-serif text-lg font-bold text-[#2A1E17] border-b border-[#A47251]/5 pb-3">
+              Product Variations
+            </h3>
+
+            {/* Default Configuration */}
+            {(product.defaultSize || product.defaultFlavor || product.defaultIcing) && (
+              <div className="space-y-3">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Default Configuration</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {product.defaultSize && (
+                    <div className="bg-[#F0D8A1]/10 border border-[#A47251]/10 p-3 rounded-none">
+                      <span className="block text-[10px] font-bold text-[#A47251]/80 uppercase tracking-wider">Default Size</span>
+                      <span className="text-sm font-bold text-[#2A1E17]">{product.defaultSize}</span>
+                    </div>
+                  )}
+                  {product.defaultFlavor && (
+                    <div className="bg-[#DD9E59]/10 border border-[#DD9E59]/20 p-3 rounded-none">
+                      <span className="block text-[10px] font-bold text-[#DD9E59] uppercase tracking-wider">Default Flavor</span>
+                      <span className="text-sm font-bold text-[#2A1E17]">{product.defaultFlavor}</span>
+                    </div>
+                  )}
+                  {product.defaultIcing && (
+                    <div className="bg-[#A47251]/10 border border-[#A47251]/20 p-3 rounded-none">
+                      <span className="block text-[10px] font-bold text-[#A47251] uppercase tracking-wider">Default Icing</span>
+                      <span className="text-sm font-bold text-[#2A1E17]">{product.defaultIcing}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Optional Customizations (Other Variations) */}
+            {((product.sizes && product.sizes.filter(s => s.name !== product.defaultSize).length > 0) ||
+              (product.flavors && product.flavors.filter(f => (typeof f === 'string' ? f : f.name) !== product.defaultFlavor).length > 0) ||
+              (product.icings && product.icings.filter(ic => (typeof ic === 'string' ? ic : ic.name) !== product.defaultIcing).length > 0)) && (
+              <div className="space-y-4 pt-4 border-t border-[#A47251]/5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Optional Customizations (Other Variations)</h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Other Sizes */}
+                  {product.sizes && product.sizes.filter(s => s.name !== product.defaultSize).length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block">Other Sizes</span>
+                      <div className="flex flex-wrap gap-2">
+                        {product.sizes
+                          .filter(s => s.name !== product.defaultSize)
+                          .map((s, idx) => (
+                            <span key={idx} className="inline-block text-xs font-semibold bg-white border border-[#A47251]/10 text-[#2A1E17]/80 px-3 py-1.5 rounded-none">
+                              {s.name}
+                              {s.price !== 0 && (
+                                <span className="ml-1 text-[10px] font-bold text-[#DD9E59]">
+                                  {s.price > 0 ? `(+Rs. ${s.price.toFixed(2)})` : `(-Rs. ${Math.abs(s.price).toFixed(2)})`}
+                                </span>
+                              )}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Other Flavors */}
+                  {product.flavors && product.flavors.filter(f => (typeof f === 'string' ? f : f.name) !== product.defaultFlavor).length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block">Other Flavors</span>
+                      <div className="flex flex-wrap gap-2">
+                        {product.flavors
+                          .filter(f => (typeof f === 'string' ? f : f.name) !== product.defaultFlavor)
+                          .map((f, idx) => {
+                            const name = typeof f === "string" ? f : f.name;
+                            const price = typeof f === "string" ? 0 : f.price;
+                            return (
+                              <span key={idx} className="inline-block text-xs font-semibold bg-white border border-[#A47251]/10 text-[#2A1E17]/80 px-3 py-1.5 rounded-none">
+                                {name}
+                                {price !== 0 && (
+                                  <span className="ml-1 text-[10px] font-bold text-[#DD9E59]">
+                                    {price > 0 ? `(+Rs. ${price.toFixed(2)})` : `(-Rs. ${Math.abs(price).toFixed(2)})`}
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Other Icings */}
+                  {product.icings && product.icings.filter(ic => (typeof ic === 'string' ? ic : ic.name) !== product.defaultIcing).length > 0 && (
+                    <div className="space-y-2">
+                      <span className="text-[10px] font-bold text-[#2A1E17]/50 uppercase tracking-wide block">Other Icings</span>
+                      <div className="flex flex-wrap gap-2">
+                        {product.icings
+                          .filter(ic => (typeof ic === 'string' ? ic : ic.name) !== product.defaultIcing)
+                          .map((ic, idx) => {
+                            const name = typeof ic === "string" ? ic : ic.name;
+                            const price = typeof ic === "string" ? 0 : ic.price;
+                            return (
+                              <span key={idx} className="inline-block text-xs font-semibold bg-white border border-[#A47251]/10 text-[#2A1E17]/80 px-3 py-1.5 rounded-none">
+                                {name}
+                                {price !== 0 && (
+                                  <span className="ml-1 text-[10px] font-bold text-[#DD9E59]">
+                                    {price > 0 ? `(+Rs. ${price.toFixed(2)})` : `(-Rs. ${Math.abs(price).toFixed(2)})`}
+                                  </span>
+                                )}
+                              </span>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Ingredients & Care Details */}
         <div className="rounded-none border border-[#A47251]/5 bg-white p-6 sm:p-8 shadow-xs space-y-6">
           {/* Description */}
@@ -178,23 +299,6 @@ export default function AdminProductDetailClient({
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Description</h4>
             <p className="text-sm text-[#2A1E17] leading-relaxed">{product.description}</p>
           </div>
-
-          {/* Video Reel Preview */}
-          {product.videoUrl && (
-            <div className="space-y-2 pt-4 border-t border-[#A47251]/5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]/60">Product Reel Video</h4>
-              <div className="relative aspect-[9/16] w-36 overflow-hidden rounded-none bg-black border border-[#A47251]/10 shadow-sm">
-                <video
-                  src={product.videoUrl}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Ingredients list */}
           {product.ingredients && product.ingredients.length > 0 && (
