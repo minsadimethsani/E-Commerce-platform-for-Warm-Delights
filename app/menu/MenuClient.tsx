@@ -48,6 +48,72 @@ export default function MenuClient() {
     }
   }, [user, isCustomOrderOpen]);
 
+  const [availableSizes, setAvailableSizes] = useState<string[]>(["500g", "1kg", "1.5kg", "2kg", "3kg"]);
+  const [availableFlavors, setAvailableFlavors] = useState<string[]>(["Signature Chocolate", "Vanilla Sponge", "Red Velvet", "Carrot & Nut"]);
+  const [availableIcings, setAvailableIcings] = useState<string[]>(["Buttercream", "Fondant", "Fresh Cream"]);
+
+  useEffect(() => {
+    const loadAllProductVariations = async () => {
+      try {
+        const response = await fetch("/api/products?limit=100", { cache: "no-store" });
+        if (response.ok) {
+          const data = await response.json();
+          const allProducts: Product[] = data.products || [];
+          
+          const sizesSet = new Set<string>();
+          const flavorsSet = new Set<string>();
+          const icingsSet = new Set<string>();
+
+          allProducts.forEach((p) => {
+            if (p.sizes && Array.isArray(p.sizes)) {
+              p.sizes.forEach((s: any) => {
+                if (s && s.name) sizesSet.add(s.name);
+              });
+            }
+            if ((p as any).defaultSize) sizesSet.add((p as any).defaultSize);
+
+            if (p.flavors && Array.isArray(p.flavors)) {
+              p.flavors.forEach((f: any) => {
+                const name = typeof f === "string" ? f : f.name;
+                if (name) flavorsSet.add(name);
+              });
+            }
+            if ((p as any).defaultFlavor) flavorsSet.add((p as any).defaultFlavor);
+
+            if (p.icings && Array.isArray(p.icings)) {
+              p.icings.forEach((ic: any) => {
+                const name = typeof ic === "string" ? ic : ic.name;
+                if (name) icingsSet.add(name);
+              });
+            }
+            if ((p as any).defaultIcing) icingsSet.add((p as any).defaultIcing);
+          });
+
+          const finalSizes = Array.from(sizesSet);
+          const finalFlavors = Array.from(flavorsSet);
+          const finalIcings = Array.from(icingsSet);
+
+          if (finalSizes.length > 0) {
+            setAvailableSizes(finalSizes);
+            setCakeSize(finalSizes[0]);
+          }
+          if (finalFlavors.length > 0) {
+            setAvailableFlavors(finalFlavors);
+            setCakeFlavor(finalFlavors[0]);
+          }
+          if (finalIcings.length > 0) {
+            setAvailableIcings(finalIcings);
+            setCakeIcing(finalIcings[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading product variations:", error);
+      }
+    };
+
+    loadAllProductVariations();
+  }, []);
+
   const handleOpenCustomOrder = () => {
     if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
@@ -260,7 +326,7 @@ export default function MenuClient() {
         }
         
         const data = await response.json();
-        setProductsList(data.products);
+        setProductsList(data.products as Product[]);
         setTotalProducts(data.total);
         setTotalPages(data.totalPages);
         setError(null);
@@ -952,11 +1018,9 @@ export default function MenuClient() {
                           onChange={(e) => setCakeSize(e.target.value)}
                           className="w-full bg-white border border-[#A47251]/10 rounded-none px-3.5 py-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                         >
-                          <option value="500g">500g</option>
-                          <option value="1kg">1kg</option>
-                          <option value="1.5kg">1.5kg</option>
-                          <option value="2kg">2kg</option>
-                          <option value="3kg">3kg</option>
+                          {availableSizes.map((size) => (
+                            <option key={size} value={size}>{size}</option>
+                          ))}
                           <option value="Custom / Multi-tier">Custom / Multi-tier</option>
                         </select>
                       </div>
@@ -967,10 +1031,9 @@ export default function MenuClient() {
                           onChange={(e) => setCakeFlavor(e.target.value)}
                           className="w-full bg-white border border-[#A47251]/10 rounded-none px-3.5 py-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                         >
-                          <option value="Signature Chocolate">Signature Chocolate</option>
-                          <option value="Vanilla Sponge">Vanilla Sponge</option>
-                          <option value="Red Velvet">Red Velvet</option>
-                          <option value="Carrot & Nut">Carrot & Nut</option>
+                          {availableFlavors.map((flavor) => (
+                            <option key={flavor} value={flavor}>{flavor}</option>
+                          ))}
                           <option value="Custom Flavor">Custom Flavor (specify below)</option>
                         </select>
                       </div>
@@ -981,9 +1044,9 @@ export default function MenuClient() {
                           onChange={(e) => setCakeIcing(e.target.value)}
                           className="w-full bg-white border border-[#A47251]/10 rounded-none px-3.5 py-2.5 text-xs text-[#2A1E17] focus:outline-none focus:border-[#DD9E59] cursor-pointer"
                         >
-                          <option value="Buttercream">Buttercream</option>
-                          <option value="Fondant">Fondant</option>
-                          <option value="Fresh Cream">Fresh Cream</option>
+                          {availableIcings.map((icing) => (
+                            <option key={icing} value={icing}>{icing}</option>
+                          ))}
                           <option value="Custom Cream">Custom / Other (specify below)</option>
                         </select>
                       </div>

@@ -110,7 +110,6 @@ export default function CategoriesClient({
       };
 
       await setDoc(doc(db, "categories", id), categoryPayload);
-      setCategories((prev) => [...prev, categoryPayload].sort((a, b) => a.name.localeCompare(b.name)));
       setNewCatName("");
     } catch (error) {
       console.error("Failed to add category:", error);
@@ -130,7 +129,6 @@ export default function CategoriesClient({
     setIsMutating(true);
     try {
       await deleteDoc(doc(db, "categories", id));
-      setCategories((prev) => prev.filter((c) => c.id !== id));
     } catch (error) {
       console.error(`Failed to delete category ${id}:`, error);
       alert("Error deleting category from database.");
@@ -162,11 +160,6 @@ export default function CategoriesClient({
         subcategories: updatedSubcategories,
       });
 
-      // Update state
-      setCategories((prev) =>
-        prev.map((c) => (c.id === catId ? { ...c, subcategories: updatedSubcategories } : c))
-      );
-
       // Clear input
       setNewSubcatNames((prev) => ({ ...prev, [catId]: "" }));
     } catch (error) {
@@ -191,11 +184,6 @@ export default function CategoriesClient({
         ...targetCat,
         subcategories: updatedSubcategories,
       });
-
-      // Update state
-      setCategories((prev) =>
-        prev.map((c) => (c.id === catId ? { ...c, subcategories: updatedSubcategories } : c))
-      );
     } catch (error) {
       console.error("Failed to delete subcategory:", error);
       alert("Error deleting subcategory from database.");
@@ -228,7 +216,6 @@ export default function CategoriesClient({
       };
 
       await setDoc(doc(db, "badges", id), badgePayload);
-      setBadges((prev) => [...prev, badgePayload].sort((a, b) => a.name.localeCompare(b.name)));
       setNewBadgeName("");
     } catch (error) {
       console.error("Failed to add badge:", error);
@@ -248,7 +235,6 @@ export default function CategoriesClient({
     setIsMutating(true);
     try {
       await deleteDoc(doc(db, "badges", id));
-      setBadges((prev) => prev.filter((b) => b.id !== id));
     } catch (error) {
       console.error(`Failed to delete badge ${id}:`, error);
       alert("Error deleting badge from database.");

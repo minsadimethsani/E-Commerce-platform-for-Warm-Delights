@@ -8,13 +8,20 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // 1. Seed Products
-async function seedProductsIfEmpty(batch: any) {
+async function seedProductsIfEmpty(batch: any, force: boolean = false) {
   const productsRef = collection(db, "products");
-  const q = query(productsRef, limit(1));
-  const snapshot = await getDocs(q);
+  let shouldSeed = false;
+  
+  if (force) {
+    shouldSeed = true;
+  } else {
+    const q = query(productsRef, limit(1));
+    const snapshot = await getDocs(q);
+    shouldSeed = snapshot.empty;
+  }
 
-  if (snapshot.empty) {
-    console.log("Firestore products collection is empty. Seeding...");
+  if (shouldSeed) {
+    console.log("Seeding products...");
     for (const p of localProducts) {
       const docRef = doc(db, "products", p.id);
       
@@ -419,7 +426,7 @@ export async function seedAllCollectionsIfEmpty(force: boolean = false) {
       seededBadges,
       seededAddOns
     ] = await Promise.all([
-      seedProductsIfEmpty(batch),
+      seedProductsIfEmpty(batch, force),
       seedUsersIfEmpty(batch),
       seedReviewsIfEmpty(batch),
       seedOrdersIfEmpty(batch),
