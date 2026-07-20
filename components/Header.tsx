@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { getCart, removeFromCart, updateCartQuantity, CartItem, clearCart } from "@/lib/cart";
+import { getCart, removeFromCart, updateCartQuantity, CartItem, clearCart, addToCart } from "@/lib/cart";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 
@@ -91,6 +91,9 @@ export default function Header() {
   const [isOrderSubmitting, setIsOrderSubmitting] = useState(false);
   const [isOrderSuccess, setIsOrderSuccess] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState("");
+  const [orderedItems, setOrderedItems] = useState<CartItem[]>([]);
+  const [orderedTotal, setOrderedTotal] = useState(0);
+  const [orderedDeliveryFee, setOrderedDeliveryFee] = useState(0);
 
   // Billing Fields
   const [billingFirstName, setBillingFirstName] = useState("");
@@ -185,6 +188,61 @@ export default function Header() {
       }
     }
   }, [user]);
+
+  // Process any pending cart actions after successful login
+  useEffect(() => {
+    if (user && mounted) {
+      // Process pending Add to Cart
+      const pendingAdd = localStorage.getItem("pending-add-to-cart");
+      if (pendingAdd) {
+        try {
+          const parsed = JSON.parse(pendingAdd);
+          addToCart(
+            parsed.product,
+            parsed.quantity || 1,
+            parsed.selectedVariant,
+            parsed.selectedSize,
+            parsed.selectedFlavor,
+            parsed.selectedIcing,
+            parsed.selectedAddOns,
+            parsed.finalPrice
+          );
+          // Dispatch event to refresh header cart list
+          window.dispatchEvent(new Event("cart-updated"));
+        } catch (e) {
+          console.error("Error processing pending add to cart:", e);
+        } finally {
+          localStorage.removeItem("pending-add-to-cart");
+        }
+      }
+
+      // Process pending Buy Now
+      const pendingBuy = localStorage.getItem("pending-buy-now");
+      if (pendingBuy) {
+        try {
+          const parsed = JSON.parse(pendingBuy);
+          addToCart(
+            parsed.product,
+            parsed.quantity || 1,
+            parsed.selectedVariant,
+            parsed.selectedSize,
+            parsed.selectedFlavor,
+            parsed.selectedIcing,
+            parsed.selectedAddOns,
+            parsed.finalPrice
+          );
+          // Dispatch event to refresh header cart list
+          window.dispatchEvent(new Event("cart-updated"));
+          // Open checkout
+          setIsCheckoutOpen(true);
+        } catch (e) {
+          console.error("Error processing pending buy now:", e);
+        } finally {
+          localStorage.removeItem("pending-buy-now");
+        }
+      }
+    }
+  }, [user, mounted]);
 
   const cartCount = mounted ? cartItems.reduce((acc, item) => acc + item.quantity, 0) : 0;
   const totalAmount = cartItems.reduce(
@@ -347,6 +405,9 @@ export default function Header() {
       const orderDocRef = doc(db, "orders", generatedOrderId);
       await setDoc(orderDocRef, orderData);
 
+      setOrderedItems([...cartItems]);
+      setOrderedTotal(totalAmount);
+      setOrderedDeliveryFee(deliveryType === "delivery" ? 350 : 0);
       setCreatedOrderId(generatedOrderId);
       setIsOrderSuccess(true);
       clearCart();
@@ -364,6 +425,9 @@ export default function Header() {
     setAgreeToPrivacy(false);
     setDeliverySlipUrl("");
     setBankSlipUrl("");
+    setOrderedItems([]);
+    setOrderedTotal(0);
+    setOrderedDeliveryFee(0);
   };
 
   // Helper mapping for database categories/subcategories dynamically
@@ -664,7 +728,7 @@ export default function Header() {
                   if (user) {
                     setIsProfileMenuOpen(!isProfileMenuOpen);
                   } else {
-                    router.push("/login");
+                    router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
                   }
                 }}
                 title={user ? `My Account (${userProfile?.displayName || user.email})` : "Login / Sign Up"}
@@ -945,7 +1009,7 @@ export default function Header() {
             <div className="mt-4 border-t border-[#0D1B2A]/5 pt-4 flex items-center justify-around text-[#0D1B2A]">
               {/* Profile Button Mobile */}
               <Link
-                href={user ? "/profile" : "/login"}
+                href={user ? "/profile" : `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`}
                 onClick={() => setIsOpen(false)}
                 aria-label={user ? "My Profile" : "Login"}
                 className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-[#0D1B2A]/5 cursor-pointer text-[#0D1B2A]"
@@ -1258,26 +1322,138 @@ export default function Header() {
             {/* Modal Body / Form */}
             <div className="p-6 sm:p-8 md:p-10">
               {isOrderSuccess ? (
-                /* Success View */
-                <div className="py-16 text-center space-y-6 max-w-md mx-auto animate-fade-in">
-                  <div className="mx-auto h-20 w-20 bg-[#DCF0C3] border border-[#DCF0C3] flex items-center justify-center">
-                    <span className="font-sans px-2 py-1 border border-[#DCF0C3] bg-white text-xs uppercase tracking-wider text-[#2A1E17] font-bold">Success</span>
+                /* Success Receipt View */
+                <div className="py-2 space-y-6 max-w-2xl mx-auto animate-fade-in text-left">
+                  {/* Icon & Success Title */}
+                  <div className="text-center space-y-2">
+                    <div className="mx-auto h-16 w-16 bg-[#DCF0C3] border border-[#DCF0C3] flex items-center justify-center rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8 text-[#2A1E17]">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    <h4 className="font-serif text-2xl font-bold text-[#2A1E17]">Order Placed Successfully!</h4>
+                    <p className="text-xs text-[#2A1E17]/70 font-semibold uppercase tracking-wider">Thank you for baking with Warm Delights</p>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-serif text-2xl font-bold text-[#2A1E17]">Order Placed!</h4>
-                    <p className="text-sm text-[#2A1E17]/85">
-                      Your bakery order has been successfully sent to the kitchen.
-                    </p>
-                    <div className="bg-[#F0D8A1]/60 border border-[#A47251]/5 rounded-2xl p-4 text-xs font-mono text-[#2A1E17] tracking-wider mt-4">
-                      Order ID: {createdOrderId}
+
+                  {/* Receipt Box */}
+                  <div className="bg-[#F0D8A1]/30 border border-[#A47251]/10 rounded-2xl p-6 space-y-5">
+                    {/* Order ID */}
+                    <div className="flex justify-between items-center border-b border-[#A47251]/10 pb-3">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-[#2A1E17]/60 tracking-wider">Order Reference</span>
+                        <div className="font-mono text-sm font-bold text-[#2A1E17] mt-0.5">{createdOrderId}</div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] uppercase font-bold text-[#2A1E17]/60 tracking-wider">Date</span>
+                        <div className="text-xs font-bold text-[#2A1E17] mt-0.5">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                      </div>
+                    </div>
+
+                    {/* Customer & Fulfillment Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                      <div>
+                        <h5 className="font-bold text-[#2A1E17] uppercase tracking-wide text-[10px] mb-1.5 text-[#DD9E59]">Customer Details</h5>
+                        <p className="font-semibold text-[#2A1E17]">{billingFirstName} {billingLastName}</p>
+                        <p className="text-[#2A1E17]/85 mt-0.5">{billingPhone}</p>
+                        <p className="text-[#2A1E17]/85 mt-0.5 truncate">{billingEmail}</p>
+                      </div>
+                      <div>
+                        <h5 className="font-bold text-[#2A1E17] uppercase tracking-wide text-[10px] mb-1.5 text-[#DD9E59]">Fulfillment ({deliveryType === "pickup" ? "Store Pickup" : "Home Delivery"})</h5>
+                        {deliveryType === "pickup" ? (
+                          <div className="space-y-0.5 text-[#2A1E17]/85">
+                            <p className="font-semibold text-[#2A1E17]">{pickupBranch.split(' (')[0]}</p>
+                            <p className="text-[11px] leading-tight">{pickupBranch}</p>
+                            <p className="font-medium text-[#2A1E17] mt-1.5">Date: {pickupDate} at {pickupTime}</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-0.5 text-[#2A1E17]/85">
+                            <p className="font-semibold text-[#2A1E17]">{deliveryDetails.firstName} {deliveryDetails.lastName}</p>
+                            <p className="leading-tight">{deliveryDetails.address}, {deliveryDetails.city}</p>
+                            <p className="font-medium text-[#2A1E17] mt-1.5">Recipient Phone: {deliveryDetails.recipientPhone}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Ordered Items Summary */}
+                    <div className="border-t border-[#A47251]/10 pt-4 space-y-3">
+                      <h5 className="font-bold text-[#2A1E17] uppercase tracking-wide text-[10px] text-[#DD9E59]">Items Ordered</h5>
+                      <div className="max-h-48 overflow-y-auto space-y-3 pr-2">
+                        {orderedItems.map((item, idx) => {
+                          const itemPrice = item.calculatedPrice !== undefined
+                            ? item.calculatedPrice
+                            : (item.selectedVariant ? item.selectedVariant.price : item.product.price);
+                          const itemKey = `${item.product.id}-${item.selectedVariant?.name || "base"}-${item.selectedSize || ""}-${item.selectedFlavor || ""}-${item.selectedIcing || ""}-${idx}`;
+                          return (
+                            <div key={itemKey} className="flex justify-between items-start text-xs border-b border-[#A47251]/5 pb-2 last:border-0 last:pb-0">
+                              <div>
+                                <p className="font-bold text-[#2A1E17]">{item.product.name}</p>
+                                <div className="flex flex-wrap gap-1 mt-0.5">
+                                  {item.selectedVariant && (
+                                    <span className="inline-block px-1 py-0.5 bg-[#A47251]/5 rounded text-[8px] font-bold text-[#2A1E17]/70 uppercase tracking-wide">
+                                      {item.selectedVariant.name}
+                                    </span>
+                                  )}
+                                  {item.selectedSize && (
+                                    <span className="inline-block px-1 py-0.5 bg-[#DD9E59]/10 rounded text-[8px] font-bold text-[#DD9E59] uppercase tracking-wide">
+                                      {item.selectedSize}
+                                    </span>
+                                  )}
+                                  {item.selectedFlavor && (
+                                    <span className="inline-block px-1 py-0.5 bg-rose-50 rounded text-[8px] font-bold text-rose-700 uppercase tracking-wide">
+                                      {item.selectedFlavor}
+                                    </span>
+                                  )}
+                                  {item.selectedIcing && (
+                                    <span className="inline-block px-1 py-0.5 bg-sky-50 rounded text-[8px] font-bold text-sky-700 uppercase tracking-wide">
+                                      {item.selectedIcing}
+                                    </span>
+                                  )}
+                                  {item.selectedAddOns && item.selectedAddOns.map((addon) => (
+                                    <span key={addon} className="inline-block px-1 py-0.5 bg-[#DCF0C3] rounded text-[8px] font-bold text-[#2A1E17] uppercase tracking-wide">
+                                      +{addon}
+                                    </span>
+                                  ))}
+                                </div>
+                                <p className="text-[10px] text-[#2A1E17]/60 mt-1">Qty: {item.quantity} &times; Rs. {itemPrice.toFixed(2)}</p>
+                              </div>
+                              <span className="font-bold text-[#2A1E17]">Rs. {(itemPrice * item.quantity).toFixed(2)}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Total Summary */}
+                    <div className="border-t border-[#A47251]/10 pt-4 space-y-1.5 text-xs text-[#2A1E17]">
+                      <div className="flex justify-between text-[#2A1E17]/85">
+                        <span>Subtotal</span>
+                        <span>Rs. {orderedTotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#2A1E17]/85">
+                        <span>Tax (8%)</span>
+                        <span>Rs. {(orderedTotal * 0.08).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-[#2A1E17]/85">
+                        <span>Fulfillment ({deliveryType === "pickup" ? "Pickup" : "Delivery"})</span>
+                        <span>{orderedDeliveryFee === 0 ? "Free" : `Rs. ${orderedDeliveryFee.toFixed(2)}`}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-bold text-[#2A1E17] pt-2 border-t border-dashed border-[#A47251]/10">
+                        <span>Total Paid via {paymentMethod === "cod" ? "COD" : paymentMethod === "card" ? "Credit/Debit Card" : "Bank Transfer"}</span>
+                        <span>Rs. {(orderedTotal + (orderedTotal * 0.08) + orderedDeliveryFee).toFixed(2)}</span>
+                      </div>
                     </div>
                   </div>
-                  <button
-                    onClick={handleCloseModal}
-                    className="w-full rounded-none bg-[#A47251] text-white py-3 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer"
-                  >
-                    Back to Shop
-                  </button>
+
+                  {/* Actions */}
+                  <div className="pt-2">
+                    <button
+                      onClick={handleCloseModal}
+                      className="w-full rounded-full bg-[#A47251] text-white py-3.5 px-8 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all cursor-pointer text-center"
+                    >
+                      Continue Shopping
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* Form View */

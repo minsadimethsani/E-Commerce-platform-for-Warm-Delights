@@ -177,6 +177,18 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
 
   const handleAddToCart = () => {
     if (!user) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pending-add-to-cart", JSON.stringify({
+          product,
+          quantity,
+          selectedVariant,
+          selectedSize,
+          selectedFlavor,
+          selectedIcing,
+          selectedAddOns,
+          finalPrice
+        }));
+      }
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
       return;
     }
@@ -198,6 +210,18 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
 
   const handleBuyNow = () => {
     if (!user) {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pending-buy-now", JSON.stringify({
+          product,
+          quantity,
+          selectedVariant,
+          selectedSize,
+          selectedFlavor,
+          selectedIcing,
+          selectedAddOns,
+          finalPrice
+        }));
+      }
       router.push(`/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`);
       return;
     }
