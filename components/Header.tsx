@@ -43,6 +43,48 @@ export default function Header() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+  const [dbCategories, setDbCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { collection, getDocs } = await import("firebase/firestore");
+        const categoriesRef = collection(db, "categories");
+        const snapshot = await getDocs(categoriesRef);
+        const list: any[] = [];
+        snapshot.forEach((docSnap) => {
+          list.push(docSnap.data());
+        });
+        setDbCategories(list);
+      } catch (error) {
+        console.error("Error fetching categories in Header:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const [featuredProducts, setFeaturedProducts] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const { doc, getDoc } = await import("firebase/firestore");
+        const ids = ["prod-2", "prod-6"];
+        const fetched: Record<string, any> = {};
+        for (const id of ids) {
+          const docRef = doc(db, "products", id);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+            fetched[id] = snap.data();
+          }
+        }
+        setFeaturedProducts(fetched);
+      } catch (error) {
+        console.error("Error fetching featured products in Header:", error);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   // Checkout Modal States
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -324,6 +366,19 @@ export default function Header() {
     setBankSlipUrl("");
   };
 
+  // Helper mapping for database categories/subcategories dynamically
+  const cakeCategory = dbCategories.find(c => c.id === "cake" || c.name?.toLowerCase() === "cake");
+  const cakeSubcategories = cakeCategory?.subcategories || ["Sponge Cake", "Fudge Cake", "Cheesecakes"];
+
+  const savoryCategory = dbCategories.find(c => c.id === "savory" || c.name?.toLowerCase() === "savory");
+  const savorySubcategories = savoryCategory?.subcategories || ["Quiches", "Bread", "Pies"];
+
+  const pastryCategory = dbCategories.find(c => c.id === "pastry" || c.name?.toLowerCase() === "pastry");
+  const pastrySubcategories = pastryCategory?.subcategories || ["Croissants", "Tarts", "Danishes"];
+
+  const cookieCategory = dbCategories.find(c => c.id === "cookie" || c.name?.toLowerCase() === "cookie");
+  const cookieSubcategories = cookieCategory?.subcategories || ["Chocolate Chip", "Macarons", "Shortbread"];
+
   // Hide public storefront header on admin portal pages
   if (pathname && pathname.startsWith("/admin")) {
     return null;
@@ -382,28 +437,169 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex space-x-10">
+          <nav className="hidden md:flex space-x-10 items-center">
             <Link
               href="/"
-              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E]"
+              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Home
             </Link>
             <Link
               href="/menu"
-              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E]"
+              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Menu
             </Link>
+
+            {/* Cake Link + Mega Menu */}
+            <div className="relative group">
+              <Link
+                href="/menu?category=Cake"
+                className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
+              >
+                <span>Cake</span>
+                <svg className="ml-1 h-3 w-3 text-[#0D1B2A]/50 group-hover:text-[#E09F3E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+              {/* Mega Menu Dropdown */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[450px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-2 gap-6">
+                  {/* Left Column: Subcategories */}
+                  <div className="space-y-4 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Cake Categories</h4>
+                    <ul className="space-y-3">
+                      {cakeSubcategories.map((subcat: string) => (
+                        <li key={subcat}>
+                          <Link href={`/menu?category=Cake&search=${encodeURIComponent(subcat)}`} className="block group/item">
+                            <span className="text-xs font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
+                          </Link>
+                        </li>
+                      ))}
+                      <li className="pt-2 border-t border-[#0D1B2A]/5">
+                        <Link href="/signature-cakes" className="block group/item">
+                          <span className="text-xs font-bold text-[#DD9E59] transition-colors block">Signature Showcase &rarr;</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                  {/* Right Column: Featured Image / Promo */}
+                  <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-4 flex flex-col justify-between text-left">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
+                      <Image
+                        src={featuredProducts["prod-2"]?.image || "/category_cakes.png"}
+                        alt={featuredProducts["prod-2"]?.name || "Signature Strawberry Gateau"}
+                        fill
+                        className="object-cover"
+                        sizes="180px"
+                      />
+                    </div>
+                    <div className="mt-3 space-y-1">
+                      <span className="inline-block text-[8px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1.5 py-0.5">Chef's Choice</span>
+                      <h5 className="text-[11px] font-bold text-[#2A1E17] leading-tight truncate">
+                        {featuredProducts["prod-2"]?.name || "Strawberry Gateau"}
+                      </h5>
+                      <p className="text-[9px] text-[#2A1E17]/70 leading-normal line-clamp-2">
+                        {featuredProducts["prod-2"]?.description || "Organic strawberries & chantilly cream."}
+                      </p>
+                      <Link href="/menu/prod-2" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-1">
+                        Order Now &rarr;
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Combined Baked Goods & Desserts Link + Mega Menu */}
+            <div className="relative group">
+              <div
+                className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
+              >
+                <span>Baked Goods & Desserts</span>
+                <svg className="ml-1 h-3 w-3 text-[#0D1B2A]/50 group-hover:text-[#E09F3E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              {/* Mega Menu Dropdown */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[650px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-4 gap-4">
+                  {/* Column 1: Savory */}
+                  <div className="space-y-3 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Savories</h4>
+                    <ul className="space-y-2">
+                      {savorySubcategories.map((subcat: string) => (
+                        <li key={subcat}>
+                          <Link href={`/menu?category=Savory&search=${encodeURIComponent(subcat)}`} className="block group/item">
+                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Column 2: Pastry */}
+                  <div className="space-y-3 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Pastries</h4>
+                    <ul className="space-y-2">
+                      {pastrySubcategories.map((subcat: string) => (
+                        <li key={subcat}>
+                          <Link href={`/menu?category=Pastry&search=${encodeURIComponent(subcat)}`} className="block group/item">
+                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Column 3: Cookie */}
+                  <div className="space-y-3 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Cookies</h4>
+                    <ul className="space-y-2">
+                      {cookieSubcategories.map((subcat: string) => (
+                        <li key={subcat}>
+                          <Link href={`/menu?category=Cookie&search=${encodeURIComponent(subcat)}`} className="block group/item">
+                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Column 4: Promo card */}
+                  <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3 flex flex-col justify-between text-left">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
+                      <Image
+                        src={featuredProducts["prod-6"]?.image || "/about_bakery.png"}
+                        alt={featuredProducts["prod-6"]?.name || "Belgian Chocolate Eclair"}
+                        fill
+                        className="object-cover"
+                        sizes="150px"
+                      />
+                    </div>
+                    <div className="mt-2 space-y-0.5">
+                      <span className="inline-block text-[7px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1 py-0.5">Featured</span>
+                      <h5 className="text-[10px] font-bold text-[#2A1E17] leading-tight truncate">
+                        {featuredProducts["prod-6"]?.name || "Belgian Eclair"}
+                      </h5>
+                      <Link href="/menu/prod-6" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-0.5">
+                        Order Now &rarr;
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Link
               href="/about"
-              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E]"
+              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E]"
+              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Contact
             </Link>
@@ -696,6 +892,20 @@ export default function Header() {
               className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E]"
             >
               Menu
+            </Link>
+            <Link
+              href="/menu?category=Cake"
+              onClick={() => setIsOpen(false)}
+              className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E] pl-6 border-l-2 border-[#E09F3E]/40"
+            >
+              &mdash; Cake
+            </Link>
+            <Link
+              href="/menu"
+              onClick={() => setIsOpen(false)}
+              className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E] pl-6 border-l-2 border-[#E09F3E]/40"
+            >
+              &mdash; Baked Goods & Desserts
             </Link>
             <Link
               href="/about"

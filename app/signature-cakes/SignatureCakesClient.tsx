@@ -15,16 +15,12 @@ export default function SignatureCakesClient() {
     const fetchCakes = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/products?limit=100", { cache: "no-store" });
+        const response = await fetch("/api/products?limit=100&category=" + encodeURIComponent("Cake"), { cache: "no-store" });
         if (!response.ok) {
           throw new Error("Failed to load products. Please check your connection.");
         }
         const data = await response.json();
-        const allProducts: Product[] = data.products || [];
-        // Filter by category "Cake" and availability
-        const cakes = allProducts.filter(
-          (p) => p.category === "Cake" && p.isAvailable !== false
-        );
+        const cakes: Product[] = data.products || [];
         setProductsList(cakes);
       } catch (err: any) {
         console.error("Error fetching cakes:", err);

@@ -65,21 +65,57 @@ export default function ProductCard({ product }: ProductCardProps) {
     return stars;
   };
 
+  // Get secondary hover image dynamically
+  let secondaryImage = null;
+  const productImages = (product as any).images;
+  
+  if (Array.isArray(productImages) && productImages.length > 1) {
+    secondaryImage = productImages[1];
+  } else {
+    // Category-specific fallback secondary images
+    if (product.category === "Cake") {
+      secondaryImage = product.image === "/hero_bakery.png" ? "/category_cakes.png" : "/hero_bakery.png";
+    } else if (product.category === "Savory") {
+      secondaryImage = product.image === "/category_savories.png" ? "/hero_bakery.png" : "/category_savories.png";
+    } else if (product.category === "Pastry") {
+      secondaryImage = product.image === "/category_savories.png" ? "/category_cakes.png" : "/category_savories.png";
+    } else if (product.category === "Cookie") {
+      secondaryImage = product.image === "/category_cakes.png" ? "/category_custom.png" : "/category_cakes.png";
+    } else if (product.category === "Custom") {
+      secondaryImage = product.image === "/category_custom.png" ? "/category_cakes.png" : "/category_custom.png";
+    } else if (product.category === "Gifts & Hampers") {
+      secondaryImage = product.image === "/about_bakery.png" ? "/category_custom.png" : "/about_bakery.png";
+    }
+  }
+
   return (
     <div className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1]/50 border border-[#A47251]/5 transition-all duration-300 hover:bg-[#F0D8A1] hover:-translate-y-1 hover:shadow-md">
       {/* Image Frame */}
       <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#A47251]/5 block cursor-pointer">
+        {/* Primary Image */}
         <Image
           src={product.image}
           alt={product.name}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-103"
+          className="object-cover transition-all duration-700 ease-in-out group-hover:scale-103"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          priority
         />
+        
+        {/* Secondary Hover Image (Cross-fade transition) */}
+        {secondaryImage && (
+          <Image
+            src={secondaryImage}
+            alt={`${product.name} alternate view`}
+            fill
+            className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 scale-100 group-hover:scale-103 transition-all duration-700 ease-in-out"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          />
+        )}
         
         {/* Badge */}
         {product.badge && (
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-3 left-3 z-10">
             <span className="inline-block rounded-none bg-[#DD9E59] px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase shadow-sm">
               {product.badge}
             </span>

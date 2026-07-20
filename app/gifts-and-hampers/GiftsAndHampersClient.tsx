@@ -15,16 +15,12 @@ export default function GiftsAndHampersClient() {
     const fetchGifts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/products?limit=100", { cache: "no-store" });
+        const response = await fetch("/api/products?limit=100&category=" + encodeURIComponent("Gifts & Hampers"), { cache: "no-store" });
         if (!response.ok) {
           throw new Error("Failed to load products. Please check your connection.");
         }
         const data = await response.json();
-        const allProducts: Product[] = data.products || [];
-        // Filter by category "Gifts & Hampers" and availability
-        const gifts = allProducts.filter(
-          (p) => p.category === "Gifts & Hampers" && p.isAvailable !== false
-        );
+        const gifts: Product[] = data.products || [];
         setProductsList(gifts);
       } catch (err: any) {
         console.error("Error fetching gifts & hampers:", err);
