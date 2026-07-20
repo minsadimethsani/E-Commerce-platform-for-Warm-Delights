@@ -17,7 +17,7 @@ export interface Product {
   price: number;
   image: string;
   badge?: string;
-  category: "Cake" | "Savory" | "Pastry" | "Cookie" | "Custom";
+  category: "Cake" | "Savory" | "Pastry" | "Cookie" | "Custom" | "Gifts & Hampers";
   rating: number;
   reviewsCount: number;
   videoUrl?: string;
@@ -251,7 +251,7 @@ export const products: Product[] = [
     price: 85.00,
     image: "/about_bakery.png",
     badge: "Gift Box",
-    category: "Custom",
+    category: "Gifts & Hampers",
     rating: 5.0,
     reviewsCount: 37,
   },
@@ -276,5 +276,27 @@ export const products: Product[] = [
     category: "Cake",
     rating: 4.9,
     reviewsCount: 38,
+  },
+  {
+    id: "prod-23",
+    name: "Deluxe Tea Time Gift Box",
+    description: "An elegant selection of handcrafted cookies, English tea, and artisanal jam jars.",
+    price: 55.00,
+    image: "/about_bakery.png",
+    badge: "Gift Box",
+    category: "Gifts & Hampers",
+    rating: 4.8,
+    reviewsCount: 22,
+  },
+  {
+    id: "prod-24",
+    name: "Celebration Sweet Selection Hamper",
+    description: "A gorgeous collection of macarons, shortbreads, and signature chocolate truffles.",
+    price: 45.00,
+    image: "/category_custom.png",
+    badge: "Perfect Gift",
+    category: "Gifts & Hampers",
+    rating: 4.9,
+    reviewsCount: 15,
   },
 ];

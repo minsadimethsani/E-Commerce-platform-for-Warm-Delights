@@ -50,7 +50,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
   });
 
   // Helper to find a suitable unique image for a category
-  const getCategoryImage = (categoryName: "Cake" | "Savory" | "Custom", fallbackDefault: string) => {
+  const getCategoryImage = (categoryName: "Cake" | "Savory" | "Custom" | "Gifts & Hampers", fallbackDefault: string) => {
     // 1. Try to find a product in this category that has an image not in usedImages
     const unusedProduct = activeProducts.find(
       (p) => p.category === categoryName && p.image && !usedImages.has(p.image)
@@ -72,7 +72,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
   };
 
   const signatureCakesImage = getCategoryImage("Cake", "/category_cakes.png");
-  const artisanalSavoriesImage = getCategoryImage("Savory", "/category_savories.png");
+  const giftsAndHampersImage = getCategoryImage("Gifts & Hampers", "/about_bakery.png");
   const customCreationsImage = getCategoryImage("Custom", "/category_custom.png");
 
   const categories = [
@@ -81,23 +81,23 @@ export default function Categories({ products = [] }: CategoriesProps) {
       description: "Indulgent layered cakes, classic buttercream sponges, and rich chocolate fudge creations.",
       image: signatureCakesImage,
       linkText: "View Cakes",
-      linkHref: "/menu?category=Cake",
+      linkHref: "/signature-cakes",
       tag: "Bestseller",
     },
     {
-      title: "Artisanal Savories",
-      description: "Warm, flaky puff pastries, freshly baked quiches, and gourmet savory rolls.",
-      image: artisanalSavoriesImage,
-      linkText: "View Savories",
-      linkHref: "/menu?category=Savory",
-      tag: "Fresh Daily",
+      title: "Gifts & Hampers",
+      description: "Beautifully curated gift hampers, signature cookies, and artisanal treats perfect for any occasion.",
+      image: giftsAndHampersImage,
+      linkText: "View Gifts & Hampers",
+      linkHref: "/gifts-and-hampers",
+      tag: "Perfect Gift",
     },
     {
       title: "Custom Creations",
       description: "Intricately designed cakes customized for weddings, birthdays, and milestones.",
       image: customCreationsImage,
       linkText: "Design Your Cake",
-      linkHref: "/menu?category=Custom",
+      linkHref: "/custom-creations",
       tag: "Made to Order",
     },
   ];

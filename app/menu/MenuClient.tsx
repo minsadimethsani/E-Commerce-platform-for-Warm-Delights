@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 
 const ITEMS_PER_PAGE = 8;
-const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom"] as const;
+const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom", "Gifts & Hampers"] as const;
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";
 
