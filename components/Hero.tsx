@@ -46,22 +46,10 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
   const availableProduct =
     activeProducts.find((p) => p.isAvailable !== false && p.image) || activeProducts[0];
 
-  // Slide 2: Seasonal products (using badge "Seasonal" or category "Pastry" / "Cake" as fallback)
-  let imageProducts = activeProducts.filter((p) => p.isAvailable !== false && p.image);
-  let seasonalProducts = activeProducts.filter(
-    (p) => p.isAvailable !== false && p.image && (p.badge?.toLowerCase() === "seasonal" || p.category === "Pastry")
-  );
-  if (seasonalProducts.length < 4) {
-    const merged = [...seasonalProducts];
-    for (const item of imageProducts) {
-      if (merged.length >= 4) break;
-      if (!merged.some((m) => m.id === item.id)) {
-        merged.push(item);
-      }
-    }
-    seasonalProducts = merged;
-  }
-  const slide2SeasonalProducts = seasonalProducts.slice(0, 4);
+  // Slide 2: Seasonal products (only show products with the badge "seasonal")
+  const slide2SeasonalProducts = activeProducts
+    .filter((p) => p.isAvailable !== false && p.image && p.badge?.toLowerCase() === "seasonal")
+    .slice(0, 4);
 
   // Slide 3: Find custom cakes (fallback to Custom category or products 4, 18, 20)
   let customCakes = activeProducts.filter(

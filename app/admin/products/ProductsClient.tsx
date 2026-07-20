@@ -8,6 +8,8 @@ import Link from "next/link";
 import { Category } from "@/lib/categories";
 import { Badge } from "@/lib/badges";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getTimestampMillis } from "@/lib/products";
 
 interface ProductsClientProps {
   initialProducts: Product[];
@@ -21,6 +23,10 @@ export default function ProductsClient({
   badgesList,
 }: ProductsClientProps) {
   const { setIsMutating } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editParam = searchParams ? searchParams.get("edit") : null;
+  const addParam = searchParams ? searchParams.get("add") : null;
   // Deduplicate initial products by id
   const uniqueInitial = initialProducts.reduce((acc: Product[], current) => {
     const x = acc.find(item => item.id === current.id);
@@ -39,7 +45,7 @@ export default function ProductsClient({
 
   useEffect(() => {
     const productsRef = collection(db, "products");
-    const q = query(productsRef, orderBy("id", "asc"));
+    const q = query(productsRef);
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const list: Product[] = [];
@@ -67,6 +73,8 @@ export default function ProductsClient({
           defaultSize: data.defaultSize || "",
           defaultFlavor: data.defaultFlavor || "",
           defaultIcing: data.defaultIcing || "",
+          createdAt: data.createdAt,
+          updatedAt: data.updatedAt,
         } as any);
       });
 
@@ -79,6 +87,20 @@ export default function ProductsClient({
           return acc;
         }
       }, []);
+
+      // Sort client-side by latest added products
+      uniqueList.sort((a, b) => {
+        const timeA = getTimestampMillis(a.createdAt);
+        const timeB = getTimestampMillis(b.createdAt);
+
+        if (timeB !== timeA) {
+          return timeB - timeA;
+        }
+
+        const numA = parseInt(a.id.replace("prod-", ""), 10) || 0;
+        const numB = parseInt(b.id.replace("prod-", ""), 10) || 0;
+        return numB - numA;
+      });
 
       setProducts(uniqueList);
     }, (error) => {
@@ -139,6 +161,101 @@ export default function ProductsClient({
   // Multiple compressed images state
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isCompressing, setIsCompressing] = useState(false);
+  const [compressionProgress, setCompressionProgress] = useState(0);
+  const [compressionStatus, setCompressionStatus] = useState("");
+
+  const closeForm = () => {
+    router.push("/admin/products");
+  };
+
+  useEffect(() => {
+    if (addParam === "true") {
+      if (!isFormOpen || editingProduct !== null) {
+        setEditingProduct(null);
+        setName("");
+        setPrice("");
+        setDescription("");
+        setCategory(categories[0]?.name || "Cake");
+        setSubcategory("");
+        setBadge("");
+        setImage("/category_cakes.png");
+        setVideoUrl("");
+        setUploadedImages([]);
+        setVariants([]);
+        setNewVariantName("");
+        setNewVariantPrice("");
+        setSizes([]);
+        setNewSizeName("");
+        setNewSizePrice("");
+        setFlavors([]);
+        setNewFlavor("");
+        setNewFlavorPrice("");
+        setIcings([]);
+        setNewIcing("");
+        setNewIcingPrice("");
+        setDefaultSize("");
+        setDefaultFlavor("");
+        setDefaultIcing("");
+        setIsFormOpen(true);
+      }
+    } else if (editParam) {
+      const p = products.find((prod) => prod.id === editParam);
+      if (p) {
+        if (!isFormOpen || !editingProduct || editingProduct.id !== editParam) {
+          setEditingProduct(p);
+          setName(p.name);
+          setPrice(p.price.toString());
+          setDescription(p.description);
+          setCategory(p.category);
+          setSubcategory((p as any).subcategory || "");
+          setBadge(p.badge || "");
+          setImage(p.image);
+          setVideoUrl((p as any).videoUrl || "");
+          setUploadedImages((p as any).images || [p.image]);
+          setVariants((p as any).variants || []);
+          setNewVariantName("");
+          setNewVariantPrice("");
+
+          const defaultSz = (p as any).defaultSize || "";
+          const defaultFl = (p as any).defaultFlavor || "";
+          const defaultIc = (p as any).defaultIcing || "";
+
+          setDefaultSize(defaultSz);
+          setDefaultFlavor(defaultFl);
+          setDefaultIcing(defaultIc);
+
+          const rawSizes = (p as any).sizes || [];
+          setSizes(rawSizes.filter((s: any) => s.name !== defaultSz));
+          setNewSizeName("");
+          setNewSizePrice("");
+
+          const loadedFlavors = ((p as any).flavors || []).map((f: any) => 
+            typeof f === "string" ? { name: f, price: 0 } : f
+          );
+          setFlavors(loadedFlavors.filter((f: any) => f.name !== defaultFl));
+          setNewFlavor("");
+          setNewFlavorPrice("");
+
+          const loadedIcings = ((p as any).icings || []).map((ic: any) => 
+            typeof ic === "string" ? { name: ic, price: 0 } : ic
+          );
+          setIcings(loadedIcings.filter((ic: any) => ic.name !== defaultIc));
+          setNewIcing("");
+          setNewIcingPrice("");
+
+          setIsFormOpen(true);
+        }
+      } else {
+        setIsFormOpen(false);
+        setEditingProduct(null);
+      }
+    } else {
+      if (isFormOpen) {
+        setIsFormOpen(false);
+        setEditingProduct(null);
+      }
+    }
+  }, [editParam, addParam, products]);
 
   // In-browser WebP image compression helper
   const compressImage = (file: File): Promise<string> => {
@@ -182,9 +299,131 @@ export default function ProductsClient({
     });
   };
 
+  const compressVideo = (
+    file: File,
+    onProgress: (progress: number) => void
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const video = document.createElement("video");
+      video.preload = "auto";
+      video.muted = true;
+      video.playsInline = true;
+
+      const objectUrl = URL.createObjectURL(file);
+      video.src = objectUrl;
+
+      video.onloadedmetadata = () => {
+        video.currentTime = 0.2;
+      };
+
+      video.onseeked = () => {
+        const targetHeight = 720;
+        const scale = targetHeight / video.videoHeight;
+        const targetWidth = Math.round(video.videoWidth * scale);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("Failed to initialize canvas render context"));
+          return;
+        }
+
+        const stream = (canvas as any).captureStream
+          ? (canvas as any).captureStream(24)
+          : null;
+        if (!stream) {
+          reject(new Error("Canvas stream capture is not supported in this browser"));
+          return;
+        }
+
+        let mimeType = "video/webm;codecs=vp8";
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = "video/webm";
+        }
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = "";
+        }
+
+        const chunks: Blob[] = [];
+        let recorder: MediaRecorder;
+        try {
+          recorder = new MediaRecorder(
+            stream,
+            mimeType
+              ? {
+                  mimeType,
+                  videoBitsPerSecond: 800000,
+                }
+              : undefined
+          );
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
+        recorder.ondataavailable = (event) => {
+          if (event.data && event.data.size > 0) {
+            chunks.push(event.data);
+          }
+        };
+
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: "video/webm" });
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            resolve(e.target?.result as string);
+          };
+          reader.onerror = (err) => reject(err);
+          reader.readAsDataURL(blob);
+          URL.revokeObjectURL(objectUrl);
+        };
+
+        video.currentTime = 0;
+        video.onseeked = null;
+
+        video
+          .play()
+          .then(() => {
+            recorder.start();
+            const duration = video.duration || 1;
+            let animationId: number;
+
+            const drawFrame = () => {
+              if (video.paused || video.ended) {
+                recorder.stop();
+                cancelAnimationFrame(animationId);
+                return;
+              }
+              ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+              const progress = Math.min(
+                Math.round((video.currentTime / duration) * 100),
+                99
+              );
+              onProgress(progress);
+              animationId = requestAnimationFrame(drawFrame);
+            };
+
+            animationId = requestAnimationFrame(drawFrame);
+          })
+          .catch((err) => {
+            reject(err);
+            URL.revokeObjectURL(objectUrl);
+          });
+      };
+
+      video.onerror = (err) => {
+        reject(err);
+        URL.revokeObjectURL(objectUrl);
+      };
+    });
+  };
+
   const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     setIsCompressing(true);
+    setCompressionProgress(0);
     const files = Array.from(e.target.files);
 
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
@@ -192,18 +431,28 @@ export default function ProductsClient({
 
     if (videoFiles.length > 0) {
       const videoFile = videoFiles[0];
-      if (videoFile.size > 2 * 1024 * 1024) {
-        alert("Video file size exceeds 2MB limit. Please upload a smaller video.");
+      if (videoFile.size > 30 * 1024 * 1024) {
+        alert("Video file size exceeds 30MB limit. Please upload a smaller video.");
       } else {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setVideoUrl(event.target?.result as string);
-        };
-        reader.readAsDataURL(videoFile);
+        try {
+          setCompressionStatus("Compressing and optimizing video...");
+          const compressedVideoUrl = await compressVideo(videoFile, (p) => {
+            setCompressionProgress(p);
+          });
+          setVideoUrl(compressedVideoUrl);
+        } catch (videoError) {
+          console.error("Video compression failed, falling back to base64 read:", videoError);
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            setVideoUrl(event.target?.result as string);
+          };
+          reader.readAsDataURL(videoFile);
+        }
       }
     }
 
     try {
+      setCompressionStatus("Compressing images to WebP...");
       const compressedList: string[] = [];
       for (const file of imageFiles) {
         const compressed = await compressImage(file);
@@ -221,6 +470,8 @@ export default function ProductsClient({
       alert("Failed to compress and upload images.");
     } finally {
       setIsCompressing(false);
+      setCompressionStatus("");
+      setCompressionProgress(0);
     }
   };
 
@@ -235,82 +486,11 @@ export default function ProductsClient({
   };
 
   const openAddForm = () => {
-    setEditingProduct(null);
-    setName("");
-    setPrice("");
-    setDescription("");
-    setCategory(categories[0]?.name || "Cake");
-    setSubcategory("");
-    setBadge("");
-    setImage("/category_cakes.png");
-    setVideoUrl("");
-    setUploadedImages([]);
-    setVariants([]);
-    setNewVariantName("");
-    setNewVariantPrice("");
-
-    // Clear dynamic variations
-    setSizes([]);
-    setNewSizeName("");
-    setNewSizePrice("");
-    setFlavors([]);
-    setNewFlavor("");
-    setNewFlavorPrice("");
-    setIcings([]);
-    setNewIcing("");
-    setNewIcingPrice("");
-
-    setDefaultSize("");
-    setDefaultFlavor("");
-    setDefaultIcing("");
-
-    setIsFormOpen(true);
+    router.push("/admin/products?add=true");
   };
 
   const openEditForm = (p: Product) => {
-    setEditingProduct(p);
-    setName(p.name);
-    setPrice(p.price.toString());
-    setDescription(p.description);
-    setCategory(p.category);
-    setSubcategory((p as any).subcategory || "");
-    setBadge(p.badge || "");
-    setImage(p.image);
-    setVideoUrl((p as any).videoUrl || "");
-    setUploadedImages((p as any).images || [p.image]);
-    setVariants((p as any).variants || []);
-    setNewVariantName("");
-    setNewVariantPrice("");
-
-    const defaultSz = (p as any).defaultSize || "";
-    const defaultFl = (p as any).defaultFlavor || "";
-    const defaultIc = (p as any).defaultIcing || "";
-
-    setDefaultSize(defaultSz);
-    setDefaultFlavor(defaultFl);
-    setDefaultIcing(defaultIc);
-
-    // Populate dynamic variations (filtering out defaults)
-    const rawSizes = (p as any).sizes || [];
-    setSizes(rawSizes.filter((s: any) => s.name !== defaultSz));
-    setNewSizeName("");
-    setNewSizePrice("");
-
-    const loadedFlavors = ((p as any).flavors || []).map((f: any) => 
-      typeof f === "string" ? { name: f, price: 0 } : f
-    );
-    setFlavors(loadedFlavors.filter((f: any) => f.name !== defaultFl));
-    setNewFlavor("");
-    setNewFlavorPrice("");
-
-    const loadedIcings = ((p as any).icings || []).map((ic: any) => 
-      typeof ic === "string" ? { name: ic, price: 0 } : ic
-    );
-    setIcings(loadedIcings.filter((ic: any) => ic.name !== defaultIc));
-    setNewIcing("");
-    setNewIcingPrice("");
-
-    setIsFormOpen(true);
+    router.push(`/admin/products?edit=${p.id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -422,19 +602,24 @@ export default function ProductsClient({
       const finalImage = image;
 
       // Prepend defaults with price 0 if they are specified
-      const finalSizes = [...sizes];
-      if (defaultSize.trim() && !sizes.some(s => s.name === defaultSize.trim())) {
-        finalSizes.unshift({ name: defaultSize.trim(), price: 0 });
-      }
+      let finalSizes = [...sizes];
+      let finalFlavors = [...flavors];
+      let finalIcings = [...icings];
 
-      const finalFlavors = [...flavors];
-      if (defaultFlavor.trim() && !flavors.some(f => f.name === defaultFlavor.trim())) {
-        finalFlavors.unshift({ name: defaultFlavor.trim(), price: 0 });
-      }
-
-      const finalIcings = [...icings];
-      if (defaultIcing.trim() && !icings.some(ic => ic.name === defaultIcing.trim())) {
-        finalIcings.unshift({ name: defaultIcing.trim(), price: 0 });
+      if (category === "Custom") {
+        finalSizes = defaultSize.trim() ? [{ name: defaultSize.trim(), price: 0 }] : [];
+        finalFlavors = defaultFlavor.trim() ? [{ name: defaultFlavor.trim(), price: 0 }] : [];
+        finalIcings = defaultIcing.trim() ? [{ name: defaultIcing.trim(), price: 0 }] : [];
+      } else {
+        if (defaultSize.trim() && !sizes.some(s => s.name === defaultSize.trim())) {
+          finalSizes.unshift({ name: defaultSize.trim(), price: 0 });
+        }
+        if (defaultFlavor.trim() && !flavors.some(f => f.name === defaultFlavor.trim())) {
+          finalFlavors.unshift({ name: defaultFlavor.trim(), price: 0 });
+        }
+        if (defaultIcing.trim() && !icings.some(ic => ic.name === defaultIcing.trim())) {
+          finalIcings.unshift({ name: defaultIcing.trim(), price: 0 });
+        }
       }
 
       const savePayload = {
@@ -454,7 +639,7 @@ export default function ProductsClient({
         ingredients,
         careInstructions,
         videoUrl: videoUrl.trim(),
-        variants: variants,
+        variants: category === "Custom" ? [] : variants,
         sizes: finalSizes,
         flavors: finalFlavors,
         icings: finalIcings,
@@ -504,7 +689,7 @@ export default function ProductsClient({
         });
       }
 
-      setIsFormOpen(false);
+      closeForm();
       console.log(`Product ${id} saved successfully.`);
     } catch (error) {
       console.error("Error saving product to Firestore:", error);
@@ -676,7 +861,7 @@ export default function ProductsClient({
 
             {/* Close Button */}
             <button
-              onClick={() => setIsFormOpen(false)}
+              onClick={closeForm}
               className="rounded-full bg-white/10 p-2 text-[#FDF9F0] hover:bg-white/20 transition-all cursor-pointer"
               aria-label="Close editor"
             >
@@ -830,11 +1015,13 @@ export default function ProductsClient({
                     </div>
                   </div>
 
-                  {/* B. Size Variations */}
-                  <div className="space-y-2 border-t border-[#A47251]/5 pt-3">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
-                      Size / Weight Variations (Other than default)
-                    </span>
+                  {category !== "Custom" && (
+                    <>
+                      {/* B. Size Variations */}
+                      <div className="space-y-2 border-t border-[#A47251]/5 pt-3">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-[#2A1E17]/75">
+                          Size / Weight Variations (Other than default)
+                        </span>
 
                     {sizes.length === 0 ? (
                       <p className="text-[10px] text-[#2A1E17]/55 italic bg-white p-2.5 rounded-lg border border-[#A47251]/5">
@@ -1059,6 +1246,8 @@ export default function ProductsClient({
                       </button>
                     </div>
                   </div>
+                    </>
+                  )}
 
                 </div>
 
@@ -1115,11 +1304,11 @@ export default function ProductsClient({
                       className="w-full text-xs text-[#2A1E17]/70 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-[#F0D8A1] file:text-[#2A1E17] file:hover:bg-[#DD9E59] hover:file:text-[#2A1E17] transition-colors cursor-pointer"
                     />
                     <p className="text-[9px] text-[#2A1E17]/55">
-                      Photos will be WebP auto-compressed. Videos must be WebM/MP4, max 2MB.
+                      Photos will be WebP auto-compressed. Videos must be WebM/MP4, max 30MB (will be auto-compressed).
                     </p>
                     {isCompressing && (
                       <span className="text-[10px] text-amber-600 block animate-pulse font-semibold">
-                        [COMPRESSING] Compressing and converting to WebP...
+                        {compressionStatus || "[COMPRESSING] Processing media files..."} {compressionProgress > 0 ? `(${compressionProgress}%)` : ""}
                       </span>
                     )}
                   </div>
@@ -1190,7 +1379,7 @@ export default function ProductsClient({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setIsFormOpen(false)}
+                    onClick={closeForm}
                     className="flex-1 rounded-full bg-transparent border border-[#A47251]/25 text-[#2A1E17] py-3 text-xs font-bold uppercase tracking-wider hover:bg-[#F0D8A1] transition-all cursor-pointer"
                   >
                     Cancel

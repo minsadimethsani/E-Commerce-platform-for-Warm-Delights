@@ -29,6 +29,8 @@ export interface Product {
   defaultSize?: string;
   defaultFlavor?: string;
   defaultIcing?: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export const products: Product[] = [

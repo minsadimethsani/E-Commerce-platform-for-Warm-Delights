@@ -31,6 +31,13 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
   const [submitSuccess, setSubmitSuccess] = useState<boolean>(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Media Gallery List (Images & Video/Reel)
+  const mediaList = [
+    ...((product as any).images || [product.image]).map((img: string) => ({ type: "image" as const, url: img })),
+    ...(product.videoUrl && product.videoUrl.trim() !== "" ? [{ type: "video" as const, url: product.videoUrl }] : []),
+  ];
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
+
   const handleDeleteReview = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this review? This action cannot be undone.")) {
       return;
@@ -276,21 +283,80 @@ export default function ProductDetailClient({ product, relatedProducts, initialA
         {/* Product Panel */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start mb-8">
           
-          {/* Left: Product Image Box */}
-          <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              priority
-              className="object-cover transition-transform duration-500 hover:scale-102"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            {product.badge && (
-              <div className="absolute top-6 left-6">
-                <span className="inline-block rounded-none bg-[#DD9E59] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
-                  {product.badge}
-                </span>
+          {/* Left: Product Image & Video Gallery Box */}
+          <div className="space-y-4">
+            {/* Enlarged Media Container */}
+            <div className="relative aspect-square w-full overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm flex items-center justify-center">
+              {mediaList[activeMediaIndex]?.type === "video" ? (
+                <video
+                  src={mediaList[activeMediaIndex].url}
+                  controls
+                  autoPlay
+                  muted
+                  className="w-full h-full object-contain bg-black"
+                />
+              ) : (
+                <Image
+                  src={mediaList[activeMediaIndex]?.url || product.image}
+                  alt={product.name}
+                  fill
+                  priority
+                  className="object-cover transition-transform duration-500 hover:scale-102"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              )}
+              {product.badge && (
+                <div className="absolute top-6 left-6">
+                  <span className="inline-block rounded-none bg-[#DD9E59] px-3.5 py-1.5 text-xs font-bold tracking-wider text-white uppercase shadow-sm">
+                    {product.badge}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Row below the enlarged image */}
+            {mediaList.length > 1 && (
+              <div className="flex flex-wrap gap-2.5 sm:gap-3">
+                {mediaList.map((media, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveMediaIndex(idx)}
+                    className={`relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden border-2 rounded-none transition-all cursor-pointer bg-[#F0D8A1]/30 ${
+                      activeMediaIndex === idx
+                        ? "border-[#DD9E59] shadow-sm scale-98"
+                        : "border-[#A47251]/10 hover:border-[#DD9E59]/50"
+                    }`}
+                  >
+                    {media.type === "video" ? (
+                      <div className="relative w-full h-full bg-black flex items-center justify-center">
+                        <video
+                          src={media.url}
+                          className="w-full h-full object-cover opacity-60"
+                          muted
+                          playsInline
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/35">
+                          <svg
+                            className="w-5 h-5 text-white drop-shadow-sm"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l8.43-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                          </svg>
+                        </div>
+                      </div>
+                    ) : (
+                      <Image
+                        src={media.url}
+                        alt={`${product.name} gallery image ${idx + 1}`}
+                        fill
+                        className="object-cover"
+                        sizes="10vw"
+                      />
+                    )}
+                  </button>
+                ))}
               </div>
             )}
           </div>

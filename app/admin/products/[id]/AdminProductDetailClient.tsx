@@ -6,6 +6,7 @@ import { Review } from "@/types/database";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 interface AdminProductDetailClientProps {
   product: Product & {
@@ -122,12 +123,23 @@ export default function AdminProductDetailClient({
           </div>
 
           {/* Details list */}
-          <div className="space-y-4 flex-1">
+          <div className="space-y-4 flex-1 w-full">
             <div className="space-y-2">
               <span className="inline-block px-3 py-1 bg-[#F0D8A1] border border-[#A47251]/5 rounded-none text-[10px] font-bold uppercase tracking-wider text-[#DD9E59]">
                 {product.category}
               </span>
-              <h2 className="font-serif text-2xl font-bold text-[#2A1E17]">{product.name}</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 className="font-serif text-2xl font-bold text-[#2A1E17]">{product.name}</h2>
+                <Link
+                  href={`/admin/products?edit=${product.id}`}
+                  className="inline-flex items-center space-x-1.5 bg-[#F0D8A1]/30 border border-[#A47251]/10 text-xs font-bold text-[#A47251] hover:bg-[#DD9E59]/20 hover:text-[#2A1E17] px-3.5 py-1.5 transition-all cursor-pointer rounded-none self-start sm:self-auto"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3.5 h-3.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.83 20.04a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                  </svg>
+                  <span>Edit Details</span>
+                </Link>
+              </div>
               <div className="flex items-center space-x-1.5 pt-0.5">
                 <div className="flex items-center">{renderStars(product.rating)}</div>
                 <span className="text-xs font-bold text-[#2A1E17]/70">

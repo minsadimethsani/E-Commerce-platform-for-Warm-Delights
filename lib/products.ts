@@ -23,14 +23,77 @@ export interface PaginatedResult {
 }
 
 /**
- * Get all products directly from Firestore, ordered by ID.
+ * Helper to convert a Firestore Timestamp (or any date/timestamp representation)
+ * to a plain serializable { seconds, nanoseconds } object.
+ */
+export function toSerializableTimestamp(timestamp: any) {
+  if (!timestamp) return null;
+  if (typeof timestamp.toMillis === "function") {
+    return {
+      seconds: timestamp.seconds,
+      nanoseconds: timestamp.nanoseconds,
+    };
+  }
+  if (typeof timestamp.seconds === "number" && typeof timestamp.nanoseconds === "number") {
+    return {
+      seconds: timestamp.seconds,
+      nanoseconds: timestamp.nanoseconds,
+    };
+  }
+  // Try parsing as date
+  const ms = new Date(timestamp).getTime();
+  if (!isNaN(ms)) {
+    return {
+      seconds: Math.floor(ms / 1000),
+      nanoseconds: (ms % 1000) * 1000000,
+    };
+  }
+  return null;
+}
+
+/**
+ * Extract millisecond values from various timestamp representations for sorting.
+ */
+export function getTimestampMillis(ts: any): number {
+  if (!ts) return 0;
+  if (typeof ts.toMillis === "function") {
+    return ts.toMillis();
+  }
+  if (typeof ts.seconds === "number") {
+    return ts.seconds * 1000 + Math.floor((ts.nanoseconds || 0) / 1000000);
+  }
+  const parsed = new Date(ts).getTime();
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Helper to sort products by latest added (createdAt descending),
+ * falling back to numeric ID descending.
+ */
+export function sortProductsByLatest(productsList: Product[]): Product[] {
+  return [...productsList].sort((a, b) => {
+    const timeA = getTimestampMillis(a.createdAt);
+    const timeB = getTimestampMillis(b.createdAt);
+
+    if (timeB !== timeA) {
+      return timeB - timeA;
+    }
+
+    const numA = parseInt(a.id.replace("prod-", ""), 10) || 0;
+    const numB = parseInt(b.id.replace("prod-", ""), 10) || 0;
+    return numB - numA;
+  });
+}
+
+
+/**
+ * Get all products directly from Firestore, sorted by latest added.
  * Falls back to local data if Firestore fails.
  */
 export async function getAllProducts(): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
-    const q = query(productsRef, orderBy("id", "asc"));
-    const snapshot = await runWithTimeout(getDocs(q), 15000);
+    const snapshot = await runWithTimeout(getDocs(productsRef), 15000);
     
     if (snapshot.empty) {
       return [];
@@ -53,7 +116,7 @@ export async function getAllProducts(): Promise<Product[]> {
         ingredients: data.ingredients || [],
         careInstructions: data.careInstructions || "",
         images: data.images || [],
-        videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        videoUrl: data.videoUrl !== undefined ? data.videoUrl : (localProducts.find((lp) => lp.id === data.id)?.videoUrl || ""),
         variants: data.variants || [],
         sizes: data.sizes || [],
         flavors: data.flavors || [],
@@ -61,12 +124,14 @@ export async function getAllProducts(): Promise<Product[]> {
         defaultSize: data.defaultSize || "",
         defaultFlavor: data.defaultFlavor || "",
         defaultIcing: data.defaultIcing || "",
+        createdAt: toSerializableTimestamp(data.createdAt),
+        updatedAt: toSerializableTimestamp(data.updatedAt),
       } as any);
     });
-    return list;
+    return sortProductsByLatest(list);
   } catch (error) {
     console.error("Error fetching all products from Firestore. Falling back to local data.", error);
-    return localProducts;
+    return sortProductsByLatest(localProducts);
   }
 }
 
@@ -94,7 +159,7 @@ export async function getProductById(id: string): Promise<Product | undefined> {
         ingredients: data.ingredients || [],
         careInstructions: data.careInstructions || "",
         images: data.images || [],
-        videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        videoUrl: data.videoUrl !== undefined ? data.videoUrl : (localProducts.find((lp) => lp.id === data.id)?.videoUrl || ""),
         variants: data.variants || [],
         sizes: data.sizes || [],
         flavors: data.flavors || [],
@@ -102,6 +167,8 @@ export async function getProductById(id: string): Promise<Product | undefined> {
         defaultSize: data.defaultSize || "",
         defaultFlavor: data.defaultFlavor || "",
         defaultIcing: data.defaultIcing || "",
+        createdAt: toSerializableTimestamp(data.createdAt),
+        updatedAt: toSerializableTimestamp(data.updatedAt),
       } as any;
     }
     return undefined;
@@ -207,7 +274,7 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
         ingredients: data.ingredients || [],
         careInstructions: data.careInstructions || "",
         images: data.images || [],
-        videoUrl: data.videoUrl || localProducts.find((lp) => lp.id === data.id)?.videoUrl || "",
+        videoUrl: data.videoUrl !== undefined ? data.videoUrl : (localProducts.find((lp) => lp.id === data.id)?.videoUrl || ""),
         variants: data.variants || [],
         sizes: data.sizes || [],
         flavors: data.flavors || [],
