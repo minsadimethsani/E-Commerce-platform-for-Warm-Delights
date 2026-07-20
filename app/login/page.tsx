@@ -141,9 +141,9 @@ function LoginForm() {
             if (typeof window !== "undefined") {
               localStorage.setItem("storefront-admin-active", "true");
             }
-            document.cookie = "session-storefront-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
-            document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
-            document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
+            document.cookie = "session-storefront-active=true; path=/; max-age=31536000; SameSite=Lax; Secure";
+            document.cookie = "session-active=true; path=/; max-age=31536000; SameSite=Lax; Secure";
+            document.cookie = `session-role=${role}; path=/; max-age=31536000; SameSite=Lax; Secure`;
             router.replace(redirect || "/");
           } else {
             if (typeof window !== "undefined") {
@@ -151,9 +151,9 @@ function LoginForm() {
             }
             document.cookie = "session-storefront-active=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
             
-            // Set administrative session cookies (valid for 1 hour)
-            document.cookie = "session-active=true; path=/; max-age=3600; SameSite=Lax; Secure";
-            document.cookie = `session-role=${role}; path=/; max-age=3600; SameSite=Lax; Secure`;
+            // Set administrative session cookies (valid for 1 year)
+            document.cookie = "session-active=true; path=/; max-age=31536000; SameSite=Lax; Secure";
+            document.cookie = `session-role=${role}; path=/; max-age=31536000; SameSite=Lax; Secure`;
             router.replace("/admin/dashboard");
           }
         } else {

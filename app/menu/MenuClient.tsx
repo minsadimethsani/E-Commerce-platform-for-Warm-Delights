@@ -21,6 +21,36 @@ export default function MenuClient() {
 
   const { user } = useAuth();
   
+  // Dynamic categories from Firestore
+  const [dbCategories, setDbCategories] = useState<string[]>(["All"]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { collection, getDocs } = await import("firebase/firestore");
+        const categoriesRef = collection(db, "categories");
+        const snapshot = await getDocs(categoriesRef);
+        const list: string[] = ["All"];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.name) {
+            list.push(data.name);
+          }
+        });
+        
+        // Ensure "Custom" is available for custom order form triggering
+        if (!list.includes("Custom")) {
+          list.push("Custom");
+        }
+        
+        setDbCategories(list);
+      } catch (error) {
+        console.error("Error fetching categories in Menu:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // Custom Order States
   const [isCustomOrderOpen, setIsCustomOrderOpen] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -248,12 +278,10 @@ export default function MenuClient() {
   };
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [prevCategoryParam, setPrevCategoryParam] = useState<string | null>(null);
 
-  if (categoryParam !== prevCategoryParam) {
-    setPrevCategoryParam(categoryParam);
+  useEffect(() => {
     if (categoryParam) {
-      const matched = CATEGORIES.find(
+      const matched = dbCategories.find(
         (c) => c.toLowerCase() === categoryParam.toLowerCase()
       );
       if (matched) {
@@ -262,7 +290,7 @@ export default function MenuClient() {
     } else {
       setSelectedCategory("All");
     }
-  }
+  }, [categoryParam, dbCategories]);
   const searchParam = searchParams ? searchParams.get("search") : null;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [prevSearchParam, setPrevSearchParam] = useState<string | null>(null);
@@ -511,7 +539,7 @@ export default function MenuClient() {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]">Category</h4>
                 <div className="flex flex-col space-y-1.5">
-                  {CATEGORIES.map((category) => (
+                  {dbCategories.map((category) => (
                     <button
                       key={category}
                       onClick={() => handleCategoryChange(category)}
@@ -529,6 +557,8 @@ export default function MenuClient() {
                         ? "Savories" 
                         : category === "Pastry" 
                         ? "Pastries" 
+                        : category.endsWith("s")
+                        ? category
                         : category + "s"}
                     </button>
                   ))}
@@ -801,7 +831,7 @@ export default function MenuClient() {
               <div className="space-y-2">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-[#2A1E17]">Category</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {CATEGORIES.map((category) => (
+                  {dbCategories.map((category) => (
                     <button
                       key={category}
                       onClick={() => handleCategoryChange(category)}
@@ -819,6 +849,8 @@ export default function MenuClient() {
                         ? "Savories" 
                         : category === "Pastry" 
                         ? "Pastries" 
+                        : category.endsWith("s")
+                        ? category
                         : category + "s"}
                     </button>
                   ))}
