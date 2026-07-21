@@ -96,7 +96,7 @@ export const products: Product[] = [
     name: "Belgian Chocolate Eclair",
     description: "Choux pastry casing filled with vanilla custard and glazed with premium Belgian chocolate.",
     price: 6.50,
-    image: "/category_savories.png",
+    image: "/category_custom.png",
     badge: "Fresh Daily",
     category: "Pastry",
     rating: 4.9,

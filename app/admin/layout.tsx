@@ -34,10 +34,7 @@ export default function AdminLayout({
     }
   }, [user, userProfile, loading, router]);
 
-  // Refresh router on pathname change to pull latest Firestore data
-  useEffect(() => {
-    router.refresh();
-  }, [pathname, router]);
+
 
   if (loading || !user || userProfile?.role !== "admin") {
     return (

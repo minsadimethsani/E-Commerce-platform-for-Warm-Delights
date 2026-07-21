@@ -35,10 +35,6 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  // Refresh router on pathname change to pull latest Firestore data on storefront
-  useEffect(() => {
-    router.refresh();
-  }, [pathname, router]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -434,14 +430,8 @@ export default function Header() {
   const cakeCategory = dbCategories.find(c => c.id === "cake" || c.name?.toLowerCase() === "cake");
   const cakeSubcategories = cakeCategory?.subcategories || ["Sponge Cake", "Fudge Cake", "Cheesecakes"];
 
-  const savoryCategory = dbCategories.find(c => c.id === "savory" || c.name?.toLowerCase() === "savory");
-  const savorySubcategories = savoryCategory?.subcategories || ["Quiches", "Bread", "Pies"];
-
-  const pastryCategory = dbCategories.find(c => c.id === "pastry" || c.name?.toLowerCase() === "pastry");
-  const pastrySubcategories = pastryCategory?.subcategories || ["Croissants", "Tarts", "Danishes"];
-
-  const cookieCategory = dbCategories.find(c => c.id === "cookie" || c.name?.toLowerCase() === "cookie");
-  const cookieSubcategories = cookieCategory?.subcategories || ["Chocolate Chip", "Macarons", "Shortbread"];
+  const bakedCategory = dbCategories.find(c => c.id === "baked-goods-and-desserts" || c.name?.toLowerCase() === "baked goods and desserts" || c.name?.toLowerCase() === "baked goods & desserts");
+  const bakedSubcategories = bakedCategory?.subcategories || ["Breads", "Brownies", "Cup cakes"];
 
   // Hide public storefront header on admin portal pages
   if (pathname && pathname.startsWith("/admin")) {
@@ -535,7 +525,7 @@ export default function Header() {
                     <ul className="space-y-3">
                       {cakeSubcategories.map((subcat: string) => (
                         <li key={subcat}>
-                          <Link href={`/menu?category=Cake&search=${encodeURIComponent(subcat)}`} className="block group/item">
+                          <Link href={`/menu?category=Cake&subcategory=${encodeURIComponent(subcat)}`} className="block group/item">
                             <span className="text-xs font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
                           </Link>
                         </li>
@@ -586,51 +576,23 @@ export default function Header() {
                 </svg>
               </div>
               {/* Mega Menu Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[650px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
-                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-4 gap-4">
-                  {/* Column 1: Savory */}
-                  <div className="space-y-3 text-left">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Savories</h4>
-                    <ul className="space-y-2">
-                      {savorySubcategories.map((subcat: string) => (
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[450px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-2 gap-6">
+                  {/* Left Column: Subcategories */}
+                  <div className="space-y-4 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Baked Goods & Desserts</h4>
+                    <ul className="space-y-3">
+                      {bakedSubcategories.map((subcat: string) => (
                         <li key={subcat}>
-                          <Link href={`/menu?category=Savory&search=${encodeURIComponent(subcat)}`} className="block group/item">
-                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
+                          <Link href={`/menu?category=${encodeURIComponent(bakedCategory?.name || "Baked Goods and Desserts")}&subcategory=${encodeURIComponent(subcat)}`} className="block group/item">
+                            <span className="text-xs font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
                           </Link>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Column 2: Pastry */}
-                  <div className="space-y-3 text-left">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Pastries</h4>
-                    <ul className="space-y-2">
-                      {pastrySubcategories.map((subcat: string) => (
-                        <li key={subcat}>
-                          <Link href={`/menu?category=Pastry&search=${encodeURIComponent(subcat)}`} className="block group/item">
-                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Column 3: Cookie */}
-                  <div className="space-y-3 text-left">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Cookies</h4>
-                    <ul className="space-y-2">
-                      {cookieSubcategories.map((subcat: string) => (
-                        <li key={subcat}>
-                          <Link href={`/menu?category=Cookie&search=${encodeURIComponent(subcat)}`} className="block group/item">
-                            <span className="text-[11px] font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Column 4: Promo card */}
+                  {/* Right Column: Promo card */}
                   <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3 flex flex-col justify-between text-left">
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
                       <Image

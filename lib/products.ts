@@ -4,6 +4,7 @@ import { db, runWithTimeout } from "./firebase";
 
 export interface FilterParams {
   category?: string;
+  subcategory?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -189,6 +190,7 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
 
     const {
       category = "All",
+      subcategory = "",
       search = "",
       minPrice,
       maxPrice,
@@ -202,6 +204,11 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
     // 1. Category Filter (Equality)
     if (category !== "All" && category.trim() !== "") {
       constraints.push(where("category", "==", category));
+    }
+
+    // Subcategory Filter (Equality)
+    if (subcategory && subcategory.trim() !== "") {
+      constraints.push(where("subcategory", "==", subcategory.trim()));
     }
 
     // 2. Bestseller Filter (Equality/In)
@@ -314,14 +321,17 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
     
     // Fallback to filtering all Firestore products in memory
     let result = await getAllProducts();
-    const { category = "All", search = "", minPrice, maxPrice, minRating, onlyBestsellers = false, sortBy = "featured", page = 1, limit: limitVal = 8 } = filters;
+    const { category = "All", subcategory = "", search = "", minPrice, maxPrice, minRating, onlyBestsellers = false, sortBy = "featured", page = 1, limit: limitVal = 8 } = filters;
 
     if (category !== "All" && category.trim() !== "") {
       result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
     }
+    if (subcategory && subcategory.trim() !== "") {
+      result = result.filter((p) => (p as any).subcategory?.toLowerCase() === subcategory.trim().toLowerCase());
+    }
     if (search.trim() !== "") {
       const qStr = search.toLowerCase();
-      result = result.filter((p) => p.name.toLowerCase().includes(qStr) || p.description.toLowerCase().includes(qStr));
+      result = result.filter((p) => p.name.toLowerCase().includes(qStr) || p.description.toLowerCase().includes(qStr) || (p as any).subcategory?.toLowerCase().includes(qStr));
     }
     if (minPrice !== undefined && !isNaN(minPrice)) result = result.filter((p) => p.price >= minPrice);
     if (maxPrice !== undefined && !isNaN(maxPrice)) result = result.filter((p) => p.price <= maxPrice);

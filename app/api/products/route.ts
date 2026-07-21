@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
 
     // Parse parameters from query string
     const category = searchParams.get("category") || "All";
+    const subcategory = searchParams.get("subcategory") || "";
     const search = searchParams.get("search") || "";
     
     const minPriceRaw = searchParams.get("minPrice");
@@ -33,6 +34,7 @@ export async function GET(request: NextRequest) {
     // Query Data Access Layer
     const result = await getFilteredProducts({
       category,
+      subcategory,
       search,
       minPrice,
       maxPrice,

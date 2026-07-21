@@ -89,9 +89,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   return (
-    <div className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1]/50 border border-[#A47251]/5 transition-all duration-300 hover:bg-[#F0D8A1] hover:-translate-y-1 hover:shadow-md">
+    <Link href={`/menu/${product.id}`} className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1]/15 border border-[#A47251]/5 transition-all duration-300 hover:bg-[#F0D8A1]/35 hover:-translate-y-1 hover:shadow-md cursor-pointer">
       {/* Image Frame */}
-      <Link href={`/menu/${product.id}`} className="relative aspect-square w-full overflow-hidden bg-[#A47251]/5 block cursor-pointer">
+      <div className="relative aspect-square w-full overflow-hidden bg-[#A47251]/5 block">
         {/* Primary Image */}
         <Image
           src={product.image}
@@ -121,7 +121,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
           </div>
         )}
-      </Link>
+      </div>
 
       {/* Text info */}
       <div className="flex flex-1 flex-col justify-between p-6">
@@ -140,11 +140,11 @@ export default function ProductCard({ product }: ProductCardProps) {
             </div>
           </div>
 
-          <Link href={`/menu/${product.id}`} className="block cursor-pointer">
-            <h3 className="font-serif text-lg font-bold text-[#2A1E17] leading-snug group-hover:text-[#DD9E59] transition-colors line-clamp-1">
+          <div className="block">
+            <h3 className="font-serif text-lg font-bold text-[#2A1E17] leading-snug group-hover:text-[#A47251] transition-colors line-clamp-1">
               {product.name}
             </h3>
-          </Link>
+          </div>
         </div>
 
         {/* Price and Add Button */}
@@ -195,6 +195,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

@@ -118,9 +118,10 @@ export default function Categories({ products = [] }: CategoriesProps) {
         {/* Categories Grid */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {categories.map((category) => (
-            <div
+            <Link
               key={category.title}
-              className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              href={category.linkHref}
+              className="group flex flex-col overflow-hidden rounded-none bg-[#F0D8A1] border border-[#A47251]/5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md cursor-pointer"
             >
               {/* Image Container */}
               <div className="relative aspect-4/3 overflow-hidden bg-[#A47251]/5">
@@ -151,8 +152,7 @@ export default function Categories({ products = [] }: CategoriesProps) {
                 </div>
                 
                 <div className="mt-8 pt-4 border-t border-[#A47251]/5">
-                  <Link
-                    href={category.linkHref}
+                  <div
                     className="inline-flex items-center text-sm font-semibold tracking-wide text-[#2A1E17] hover:text-[#DD9E59] transition-colors"
                   >
                     <span>{category.linkText}</span>
@@ -170,10 +170,10 @@ export default function Categories({ products = [] }: CategoriesProps) {
                         d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
                       />
                     </svg>
-                  </Link>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

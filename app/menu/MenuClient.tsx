@@ -17,6 +17,7 @@ type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";
 export default function MenuClient() {
   const searchParams = useSearchParams();
   const categoryParam = searchParams ? searchParams.get("category") : null;
+  const subcategoryParam = searchParams ? searchParams.get("subcategory") : null;
   const router = useRouter();
 
   const { user } = useAuth();
@@ -291,6 +292,12 @@ export default function MenuClient() {
       setSelectedCategory("All");
     }
   }, [categoryParam, dbCategories]);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>("");
+
+  useEffect(() => {
+    setSelectedSubcategory(subcategoryParam || "");
+  }, [subcategoryParam]);
+
   const searchParam = searchParams ? searchParams.get("search") : null;
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [prevSearchParam, setPrevSearchParam] = useState<string | null>(null);
@@ -336,6 +343,7 @@ export default function MenuClient() {
       try {
         const queryParams = new URLSearchParams();
         queryParams.set("category", selectedCategory);
+        if (selectedSubcategory) queryParams.set("subcategory", selectedSubcategory);
         queryParams.set("search", debouncedSearchQuery);
         
         if (minPrice) queryParams.set("minPrice", minPrice);
@@ -369,11 +377,12 @@ export default function MenuClient() {
 
     // Fetch products
     fetchProducts();
-  }, [selectedCategory, debouncedSearchQuery, minPrice, maxPrice, minRating, onlyBestsellers, sortBy, currentPage]);
+  }, [selectedCategory, selectedSubcategory, debouncedSearchQuery, minPrice, maxPrice, minRating, onlyBestsellers, sortBy, currentPage]);
 
   // Reset all filters back to default
   const resetFilters = () => {
     setSelectedCategory("All");
+    setSelectedSubcategory("");
     setSearchQuery("");
     setMinPrice("");
     setMaxPrice("");
@@ -385,6 +394,7 @@ export default function MenuClient() {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+    setSelectedSubcategory("");
     setCurrentPage(1);
   };
 
