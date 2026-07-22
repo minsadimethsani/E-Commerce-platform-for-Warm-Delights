@@ -65,7 +65,7 @@ export default function Header() {
     const fetchFeatured = async () => {
       try {
         const { doc, getDoc } = await import("firebase/firestore");
-        const ids = ["prod-2", "prod-6"];
+        const ids = ["prod-2", "prod-21"];
         const fetched: Record<string, any> = {};
         for (const id of ids) {
           const docRef = doc(db, "products", id);
@@ -596,8 +596,8 @@ export default function Header() {
                   <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3 flex flex-col justify-between text-left">
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
                       <Image
-                        src={featuredProducts["prod-6"]?.image || "/about_bakery.png"}
-                        alt={featuredProducts["prod-6"]?.name || "Belgian Chocolate Eclair"}
+                        src={featuredProducts["prod-21"]?.image || "/about_bakery.png"}
+                        alt={featuredProducts["prod-21"]?.name || "Floral cup cakes"}
                         fill
                         className="object-cover"
                         sizes="150px"
@@ -606,9 +606,9 @@ export default function Header() {
                     <div className="mt-2 space-y-0.5">
                       <span className="inline-block text-[7px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1 py-0.5">Featured</span>
                       <h5 className="text-[10px] font-bold text-[#2A1E17] leading-tight truncate">
-                        {featuredProducts["prod-6"]?.name || "Belgian Eclair"}
+                        {featuredProducts["prod-21"]?.name || "Floral cup cakes"}
                       </h5>
-                      <Link href="/menu/prod-6" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-0.5">
+                      <Link href="/menu/prod-21" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-0.5">
                         Order Now &rarr;
                       </Link>
                     </div>

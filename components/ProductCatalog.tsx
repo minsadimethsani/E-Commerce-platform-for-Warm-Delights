@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { products as localProducts, Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 6;
 const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom"] as const;
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";

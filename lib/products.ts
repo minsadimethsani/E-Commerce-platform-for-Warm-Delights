@@ -323,6 +323,8 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
     let result = await getAllProducts();
     const { category = "All", subcategory = "", search = "", minPrice, maxPrice, minRating, onlyBestsellers = false, sortBy = "featured", page = 1, limit: limitVal = 8 } = filters;
 
+    result = result.filter((p) => p.isAvailable);
+
     if (category !== "All" && category.trim() !== "") {
       result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
     }

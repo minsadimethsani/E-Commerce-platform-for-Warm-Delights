@@ -71,21 +71,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   
   if (Array.isArray(productImages) && productImages.length > 1) {
     secondaryImage = productImages[1];
-  } else {
-    // Category-specific fallback secondary images
-    if (product.category === "Cake") {
-      secondaryImage = product.image === "/hero_bakery.png" ? "/category_cakes.png" : "/hero_bakery.png";
-    } else if (product.category === "Savory") {
-      secondaryImage = product.image === "/category_savories.png" ? "/hero_bakery.png" : "/category_savories.png";
-    } else if (product.category === "Pastry") {
-      secondaryImage = product.image === "/category_savories.png" ? "/category_cakes.png" : "/category_savories.png";
-    } else if (product.category === "Cookie") {
-      secondaryImage = product.image === "/category_cakes.png" ? "/category_custom.png" : "/category_cakes.png";
-    } else if (product.category === "Custom") {
-      secondaryImage = product.image === "/category_custom.png" ? "/category_cakes.png" : "/category_custom.png";
-    } else if (product.category === "Gifts & Hampers") {
-      secondaryImage = product.image === "/about_bakery.png" ? "/category_custom.png" : "/about_bakery.png";
-    }
   }
 
   return (
