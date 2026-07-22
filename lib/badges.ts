@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -9,7 +10,7 @@ export interface Badge {
 /**
  * Fetch all promo badges from Firestore ordered alphabetically.
  */
-export async function getAllBadges(): Promise<Badge[]> {
+export const getAllBadges = cache(async function getAllBadges(): Promise<Badge[]> {
   try {
     const badgesRef = collection(db, "badges");
     const q = query(badgesRef, orderBy("name", "asc"));
@@ -27,7 +28,7 @@ export async function getAllBadges(): Promise<Badge[]> {
     console.error("Error fetching badges from Firestore:", error);
     return [];
   }
-}
+});
 
 /**
  * Save or update a badge document in Firestore.

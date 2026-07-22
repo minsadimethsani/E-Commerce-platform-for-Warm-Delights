@@ -72,6 +72,9 @@ export default function AboutPage() {
               className="object-cover transition-transform duration-500 hover:scale-102"
               sizes="(max-width: 1024px) 100vw, 40vw"
               priority
+              quality={65}
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
             />
           </div>
         </div>
@@ -156,6 +159,9 @@ export default function AboutPage() {
               fill
               className="object-cover transition-transform duration-500 hover:scale-102"
               sizes="(max-width: 1024px) 100vw, 40vw"
+              quality={65}
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
             />
           </div>
 

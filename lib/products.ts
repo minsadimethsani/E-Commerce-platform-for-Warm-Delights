@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { products as localProducts, Product } from "@/data/products";
 import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
 import { db, runWithTimeout } from "./firebase";
@@ -91,7 +92,7 @@ export function sortProductsByLatest(productsList: Product[]): Product[] {
  * Get all products directly from Firestore, sorted by latest added.
  * Falls back to local data if Firestore fails.
  */
-export async function getAllProducts(): Promise<Product[]> {
+export const getAllProducts = cache(async function getAllProducts(): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
     const snapshot = await runWithTimeout(getDocs(productsRef), 15000);
@@ -135,12 +136,12 @@ export async function getAllProducts(): Promise<Product[]> {
     console.error("Error fetching all products from Firestore. Falling back to local data.", error);
     return sortProductsByLatest(localProducts);
   }
-}
+});
 
 /**
  * Get a single product by ID directly from Firestore.
  */
-export async function getProductById(id: string): Promise<Product | undefined> {
+export const getProductById = cache(async function getProductById(id: string): Promise<Product | undefined> {
   try {
     const docRef = doc(db, "products", id);
     const docSnap = await runWithTimeout(getDoc(docRef), 15000);
@@ -179,7 +180,7 @@ export async function getProductById(id: string): Promise<Product | undefined> {
     console.error(`Error fetching product ${id} from Firestore. Falling back to local check.`, error);
     return localProducts.find((p) => p.id === id);
   }
-}
+});
 
 /**
  * Filter, sort, and paginate products using database-level Firestore queries.

@@ -1,8 +1,72 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (getUserData().role == 'admin' || getUserData().role == 'Super Admin' || getUserData().role == 'super-admin');
+    }
+
+    function isStaff() {
+      return isSignedIn() && getUserData().role != 'customer';
+    }
+
+    // Roles collection
+    match /roles/{roleId} {
+      allow read: if isStaff();
+      allow write: if isAdmin();
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Products collection
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Categories & Badges
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+    match /badges/{badgeId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Orders
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isStaff());
+      allow create: if isSignedIn();
+      allow update, delete: if isStaff();
+    }
+
+    // Reviews, Reels & Addons
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isStaff();
+    }
+    match /reels/{reelId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+    match /addons/{addonId} {
+      allow read: if true;
+      allow write: if isStaff();
     }
   }
 }

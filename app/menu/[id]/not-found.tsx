@@ -1,14 +1,15 @@
 import Link from "next/link";
 import { getAllProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import { Product } from "@/data/products";
 
 export default async function ProductNotFound() {
-  const allProducts = await getAllProducts();
+  const allProducts: Product[] = await getAllProducts();
   
   // Select 4 recommended products (bestsellers, chef specials, or popular items)
   const recommendations = allProducts
     .filter(
-      (p) =>
+      (p: Product) =>
         p.badge?.toLowerCase() === "bestseller" ||
         p.badge?.toLowerCase() === "best seller" ||
         p.badge?.toLowerCase() === "popular" ||
@@ -19,7 +20,7 @@ export default async function ProductNotFound() {
   // Fallback if we don't have enough featured/bestseller products
   if (recommendations.length < 4) {
     const fallback = allProducts
-      .filter((p) => !recommendations.some((rp) => rp.id === p.id))
+      .filter((p: Product) => !recommendations.some((rp: Product) => rp.id === p.id))
       .slice(0, 4 - recommendations.length);
     recommendations.push(...fallback);
   }

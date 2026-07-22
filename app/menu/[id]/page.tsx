@@ -5,6 +5,8 @@ import { getAllAddOns } from "@/lib/addons";
 import { getReviewsByProductId } from "@/lib/reviews";
 import ProductDetailClient from "./ProductDetailClient";
 
+import { Product } from "@/data/products";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
@@ -14,8 +16,8 @@ interface PageProps {
 
 // Generate static params for Next.js to pre-render the pages
 export async function generateStaticParams() {
-  const allProducts = await getAllProducts();
-  return allProducts.map((product) => ({
+  const allProducts: Product[] = await getAllProducts();
+  return allProducts.map((product: Product) => ({
     id: product.id,
   }));
 }
@@ -40,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const [product, allProducts, addons, reviews] = await Promise.all([
+  const [product, allProducts, addons, reviews]: [Product | undefined, Product[], any[], any[]] = await Promise.all([
     getProductById(resolvedParams.id),
     getAllProducts(),
     getAllAddOns(),
@@ -51,17 +53,17 @@ export default async function ProductDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const availableProducts = allProducts.filter((p) => p.isAvailable !== false);
+  const availableProducts = allProducts.filter((p: Product) => p.isAvailable !== false);
 
   // Find 4 related products in the same category, excluding current product
   const relatedProducts = availableProducts
-    .filter((p) => p.category === product.category && p.id !== product.id)
+    .filter((p: Product) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   // If we don't have enough, pad with other products
   if (relatedProducts.length < 4) {
     const fallbackProducts = availableProducts
-      .filter((p) => p.id !== product.id && !relatedProducts.some((rp) => rp.id === p.id))
+      .filter((p: Product) => p.id !== product.id && !relatedProducts.some((rp: Product) => rp.id === p.id))
       .slice(0, 4 - relatedProducts.length);
     relatedProducts.push(...fallbackProducts);
   }

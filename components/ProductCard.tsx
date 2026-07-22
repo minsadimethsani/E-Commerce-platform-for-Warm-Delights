@@ -10,6 +10,8 @@ interface ProductCardProps {
   product: Product;
 }
 
+const warmBlurUrl = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg==";
+
 export default function ProductCard({ product }: ProductCardProps) {
   const { user } = useAuth();
 
@@ -84,7 +86,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           fill
           className="object-cover transition-all duration-700 ease-in-out group-hover:scale-103"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          priority
+          quality={65}
+          placeholder="blur"
+          blurDataURL={warmBlurUrl}
         />
         
         {/* Secondary Hover Image (Cross-fade transition) */}
@@ -95,6 +99,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             fill
             className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 scale-100 group-hover:scale-103 transition-all duration-700 ease-in-out"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            quality={65}
+            placeholder="blur"
+            blurDataURL={warmBlurUrl}
           />
         )}
         

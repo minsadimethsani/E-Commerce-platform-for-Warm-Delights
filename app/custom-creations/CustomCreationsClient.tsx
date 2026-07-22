@@ -356,6 +356,9 @@ export default function CustomCreationsClient() {
                         fill
                         className="object-cover transition-transform duration-500 group-hover:scale-103"
                         sizes="(max-width: 768px) 50vw, 25vw"
+                        quality={65}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
                       />
                       <div className="absolute inset-0 bg-[#2A1E17]/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                         <span className="text-[9px] font-bold uppercase tracking-widest text-[#DD9E59]">Custom Cake</span>

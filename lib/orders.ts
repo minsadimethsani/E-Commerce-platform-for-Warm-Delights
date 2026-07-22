@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { collection, getDocs, updateDoc, doc, Timestamp, query, orderBy, limit } from "firebase/firestore";
 import { db } from "./firebase";
 import { Order } from "@/types/database";
@@ -6,7 +7,7 @@ import { Order } from "@/types/database";
  * Fetch all orders from Firestore sorted by creation date descending.
  * Converts Timestamp objects to plain ISO strings for React Server Component serialization.
  */
-export async function getAllOrders(): Promise<Order[]> {
+export const getAllOrders = cache(async function getAllOrders(): Promise<Order[]> {
   try {
     const ordersRef = collection(db, "orders");
     const q = query(ordersRef, orderBy("createdAt", "desc"), limit(20));
@@ -46,7 +47,7 @@ export async function getAllOrders(): Promise<Order[]> {
     console.error("Error fetching orders from Firestore:", error);
     return [];
   }
-}
+});
 
 /**
  * Update the status of a specific order in Firestore.

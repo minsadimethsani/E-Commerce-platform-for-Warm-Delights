@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -11,7 +12,7 @@ export interface AddOn {
 /**
  * Fetch all optional add-ons from Firestore ordered alphabetically by name.
  */
-export async function getAllAddOns(): Promise<AddOn[]> {
+export const getAllAddOns = cache(async function getAllAddOns(): Promise<AddOn[]> {
   try {
     const addonsRef = collection(db, "addons");
     const q = query(addonsRef, orderBy("name", "asc"));
@@ -31,7 +32,7 @@ export async function getAllAddOns(): Promise<AddOn[]> {
     console.error("Error fetching add-ons from Firestore:", error);
     return [];
   }
-}
+});
 
 /**
  * Save or update an add-on document in Firestore.

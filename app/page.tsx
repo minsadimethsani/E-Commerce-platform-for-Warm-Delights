@@ -5,8 +5,7 @@ import { getAllProducts } from "@/lib/products";
 import Link from "next/link";
 import { Product } from "@/data/products";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface ProductSectionProps {
   title: string;
@@ -74,13 +73,13 @@ function ProductSection({
 }
 
 export default async function Home() {
-  const allProducts = await getAllProducts();
-  const products = allProducts.filter((p) => p.isAvailable !== false);
+  const allProducts: Product[] = await getAllProducts();
+  const products = allProducts.filter((p: Product) => p.isAvailable !== false);
 
   // 1. Popular Items
   const popularItems = products
     .filter(
-      (p) =>
+      (p: Product) =>
         p.badge === "Bestseller" ||
         p.badge === "Best Seller" ||
         p.badge === "Popular" ||
@@ -90,27 +89,27 @@ export default async function Home() {
 
   // 2. Cakes
   const cakes = products
-    .filter((p) => p.category === "Cake" && !p.name.toLowerCase().includes("gateau"))
+    .filter((p: Product) => p.category === "Cake" && !p.name.toLowerCase().includes("gateau"))
     .slice(0, 4);
 
   // 3. Gateaux
   const gateaux = products
     .filter(
-      (p) =>
+      (p: Product) =>
         p.name.toLowerCase().includes("gateau") ||
         p.description.toLowerCase().includes("gateau")
     )
     .slice(0, 4);
 
   // 4. Savory
-  const savory = products.filter((p) => p.category === "Savory").slice(0, 4);
+  const savory = products.filter((p: Product) => p.category === "Savory").slice(0, 4);
 
   // 5. Custom Cakes
-  const customCakes = products.filter((p) => p.category === "Custom").slice(0, 4);
+  const customCakes = products.filter((p: Product) => p.category === "Custom").slice(0, 4);
 
   // 6. Sweet (Pastry & Cookies)
   const sweet = products
-    .filter((p) => p.category === "Pastry" || p.category === "Cookie")
+    .filter((p: Product) => p.category === "Pastry" || p.category === "Cookie")
     .slice(0, 4);
 
   return (

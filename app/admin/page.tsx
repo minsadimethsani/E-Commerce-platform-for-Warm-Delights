@@ -2,12 +2,14 @@ import Link from "next/link";
 import { getAllProducts } from "@/lib/products";
 import { getAllOrders } from "@/lib/orders";
 import { getAllReviews } from "@/lib/reviews";
+import { Order, Review } from "@/types/database";
+import { Product } from "@/data/products";
 
 // Ensure the page fetches fresh database entries on every load
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [products, orders, reviews] = await Promise.all([
+  const [products, orders, reviews]: [Product[], Order[], Review[]] = await Promise.all([
     getAllProducts(),
     getAllOrders(),
     getAllReviews()
@@ -15,18 +17,18 @@ export default async function AdminDashboard() {
 
   // Compute analytics from live database collections
   const totalSales = orders
-    .filter((o) => o.status !== "cancelled")
-    .reduce((sum, o) => sum + o.total, 0);
+    .filter((o: Order) => o.status !== "cancelled")
+    .reduce((sum: number, o: Order) => sum + o.total, 0);
 
   const activeOrders = orders.filter(
-    (o) => o.status !== "delivered" && o.status !== "cancelled"
+    (o: Order) => o.status !== "delivered" && o.status !== "cancelled"
   );
 
   const totalProducts = products.length;
 
   const avgRating =
     reviews.length > 0
-      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      ? reviews.reduce((sum: number, r: Review) => sum + r.rating, 0) / reviews.length
       : 4.8; // Fallback to baker's default if empty
 
   // Filter 5 most recent orders
@@ -34,7 +36,7 @@ export default async function AdminDashboard() {
 
   // Group top products based on reviews/ratings
   const topProducts = [...products]
-    .sort((a, b) => b.rating - a.rating)
+    .sort((a: Product, b: Product) => b.rating - a.rating)
     .slice(0, 4);
 
   return (

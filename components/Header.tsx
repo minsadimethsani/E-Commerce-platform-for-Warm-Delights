@@ -549,6 +549,9 @@ export default function Header() {
                         fill
                         className="object-cover"
                         sizes="180px"
+                        quality={65}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
                       />
                     </div>
                     <div className="mt-3 space-y-1">
@@ -604,6 +607,9 @@ export default function Header() {
                         fill
                         className="object-cover"
                         sizes="150px"
+                        quality={65}
+                        placeholder="blur"
+                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
                       />
                     </div>
                     <div className="mt-2 space-y-0.5">
@@ -1164,6 +1170,9 @@ export default function Header() {
                                 fill
                                 className="object-cover"
                                 sizes="64px"
+                                quality={65}
+                                placeholder="blur"
+                                blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
                               />
                             </div>
 
@@ -1718,7 +1727,7 @@ export default function Header() {
                               <div key={itemKey} className="flex items-center justify-between text-sm">
                                 <div className="flex items-center space-x-3">
                                   <div className="relative h-10 w-10 overflow-hidden rounded-none bg-white border border-[#A47251]/5 flex-shrink-0">
-                                    <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" />
+                                    <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="40px" quality={65} placeholder="blur" blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg==" />
                                   </div>
                                   <div>
                                     <p className="font-bold text-[#2A1E17] leading-tight text-xs">{item.product.name}</p>

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
 import { db } from "./firebase";
 
@@ -10,7 +11,7 @@ export interface Category {
 /**
  * Fetch all categories from Firestore ordered alphabetically.
  */
-export async function getAllCategories(): Promise<Category[]> {
+export const getAllCategories = cache(async function getAllCategories(): Promise<Category[]> {
   try {
     const categoriesRef = collection(db, "categories");
     const q = query(categoriesRef, orderBy("name", "asc"));
@@ -29,7 +30,7 @@ export async function getAllCategories(): Promise<Category[]> {
     console.error("Error fetching categories from Firestore:", error);
     return [];
   }
-}
+});
 
 /**
  * Save or update a category document in Firestore.
