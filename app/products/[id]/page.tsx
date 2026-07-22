@@ -40,13 +40,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const product = await getProductById(resolvedParams.id);
+  const [product, allProducts, addons, reviews] = await Promise.all([
+    getProductById(resolvedParams.id),
+    getAllProducts(),
+    getAllAddOns(),
+    getReviewsByProductId(resolvedParams.id)
+  ]);
 
   if (!product || product.isAvailable === false) {
     notFound();
   }
 
-  const allProducts = await getAllProducts();
   const availableProducts = allProducts.filter((p) => p.isAvailable !== false);
 
   // Find 4 related products in the same category, excluding current product
@@ -61,9 +65,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
       .slice(0, 4 - relatedProducts.length);
     relatedProducts.push(...fallbackProducts);
   }
-
-  const addons = await getAllAddOns();
-  const reviews = await getReviewsByProductId(resolvedParams.id);
 
   return <ProductDetailClient product={product} relatedProducts={relatedProducts} initialAddOns={addons} initialReviews={reviews} />;
 }

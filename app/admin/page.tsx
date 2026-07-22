@@ -7,9 +7,11 @@ import { getAllReviews } from "@/lib/reviews";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const products = await getAllProducts();
-  const orders = await getAllOrders();
-  const reviews = await getAllReviews();
+  const [products, orders, reviews] = await Promise.all([
+    getAllProducts(),
+    getAllOrders(),
+    getAllReviews()
+  ]);
 
   // Compute analytics from live database collections
   const totalSales = orders

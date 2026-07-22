@@ -5,8 +5,10 @@ import CategoriesClient from "./CategoriesClient";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
-  const categories = await getAllCategories();
-  const badges = await getAllBadges();
+  const [categories, badges] = await Promise.all([
+    getAllCategories(),
+    getAllBadges()
+  ]);
 
   return (
     <div className="space-y-8">

@@ -10,14 +10,15 @@ interface PageProps {
 }
 
 export default async function AdminProductDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const product = await getProductById(id);
+  const resolvedParams = await params;
+  const [product, reviews] = await Promise.all([
+    getProductById(resolvedParams.id),
+    getReviewsByProductId(resolvedParams.id)
+  ]);
 
   if (!product) {
     notFound();
   }
-
-  const reviews = await getReviewsByProductId(id);
 
   return (
     <div className="space-y-8">

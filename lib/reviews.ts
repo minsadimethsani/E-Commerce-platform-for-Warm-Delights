@@ -1,4 +1,4 @@
-import { collection, getDocs, query, orderBy, where, doc, setDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, where, doc, setDoc, deleteDoc, limit } from "firebase/firestore";
 import { db } from "./firebase";
 import { Review } from "@/types/database";
 
@@ -9,7 +9,7 @@ import { Review } from "@/types/database";
 export async function getAllReviews(): Promise<Review[]> {
   try {
     const reviewsRef = collection(db, "reviews");
-    const q = query(reviewsRef, orderBy("createdAt", "desc"));
+    const q = query(reviewsRef, orderBy("createdAt", "desc"), limit(20));
     const snapshot = await getDocs(q);
     const list: Review[] = [];
     snapshot.forEach((docSnap) => {

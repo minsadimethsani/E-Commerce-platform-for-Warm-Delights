@@ -494,12 +494,14 @@ export default function Header() {
           <nav className="hidden md:flex space-x-10 items-center">
             <Link
               href="/"
+              prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Home
             </Link>
             <Link
               href="/menu"
+              prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Menu
@@ -509,6 +511,7 @@ export default function Header() {
             <div className="relative group">
               <Link
                 href="/menu?category=Cake"
+                prefetch={true}
                 className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
               >
                 <span>Cake</span>
@@ -619,12 +622,14 @@ export default function Header() {
 
             <Link
               href="/about"
+              prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               About Us
             </Link>
             <Link
               href="/contact"
+              prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Contact

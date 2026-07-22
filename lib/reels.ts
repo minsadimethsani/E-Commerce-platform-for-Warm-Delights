@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc, deleteDoc, query, orderBy, limit } from "firebase/firestore";
 import { db } from "./firebase";
 
 export interface Reel {
@@ -15,7 +15,7 @@ export interface Reel {
 export async function getAllReels(): Promise<Reel[]> {
   try {
     const reelsRef = collection(db, "reels");
-    const q = query(reelsRef, orderBy("createdAt", "desc"));
+    const q = query(reelsRef, orderBy("createdAt", "desc"), limit(20));
     const snapshot = await getDocs(q);
     const list: Reel[] = [];
     snapshot.forEach((docSnap) => {

@@ -1,4 +1,4 @@
-import { collection, getDocs, updateDoc, doc, Timestamp, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, Timestamp, query, orderBy, limit } from "firebase/firestore";
 import { db } from "./firebase";
 import { Order } from "@/types/database";
 
@@ -9,7 +9,7 @@ import { Order } from "@/types/database";
 export async function getAllOrders(): Promise<Order[]> {
   try {
     const ordersRef = collection(db, "orders");
-    const q = query(ordersRef, orderBy("createdAt", "desc"));
+    const q = query(ordersRef, orderBy("createdAt", "desc"), limit(20));
     const snapshot = await getDocs(q);
     const list: Order[] = [];
     snapshot.forEach((docSnap) => {

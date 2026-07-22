@@ -66,6 +66,7 @@ export default function AdminLayout({
               <Link
                 key={item.name}
                 href={item.href}
+                prefetch={true}
                 className={`group flex items-center space-x-3 rounded-xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
                   isActive
                     ? "bg-[#DD9E59] text-[#2A1E17] shadow-sm"
@@ -83,6 +84,7 @@ export default function AdminLayout({
         <div className="p-4 border-t border-[#FDF9F0]/10 space-y-3">
           <Link
             href="/"
+            prefetch={true}
             className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold tracking-wide text-[#FDF9F0]/70 hover:bg-white/5 hover:text-white transition-all"
           >
             <StorefrontIcon className="h-5 w-5 text-[#FDF9F0]/50" />
@@ -170,6 +172,7 @@ export default function AdminLayout({
                   <Link
                     key={item.name}
                     href={item.href}
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`group flex items-center space-x-3 rounded-xl px-4 py-3.5 text-sm font-semibold tracking-wide transition-all ${
                       isActive
@@ -187,6 +190,7 @@ export default function AdminLayout({
             <div className="mt-auto border-t border-white/10 pt-4 space-y-3">
               <Link
                 href="/"
+                prefetch={true}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-semibold text-[#FDF9F0]/70 hover:bg-white/5 hover:text-white"
               >

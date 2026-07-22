@@ -6,9 +6,11 @@ import ProductsClient from "./ProductsClient";
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
-  const initialProducts = await getAllProducts();
-  const categories = await getAllCategories();
-  const badges = await getAllBadges();
+  const [initialProducts, categories, badges] = await Promise.all([
+    getAllProducts(),
+    getAllCategories(),
+    getAllBadges()
+  ]);
 
   return (
     <div className="space-y-8">

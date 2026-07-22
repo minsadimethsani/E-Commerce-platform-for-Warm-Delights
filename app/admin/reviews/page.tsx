@@ -6,8 +6,10 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function AdminReviewsPage() {
-  const reviews = await getAllReviews();
-  const products = await getAllProducts();
+  const [reviews, products] = await Promise.all([
+    getAllReviews(),
+    getAllProducts()
+  ]);
 
   return (
     <div className="space-y-8">
