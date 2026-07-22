@@ -90,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     if (isMutating) {
-      alert("Cannot sign out: A database mutation or update is currently in progress. Please wait for it to complete.");
+      console.warn("Sign out blocked: Database mutation in progress.");
       return;
     }
     setLoading(true);

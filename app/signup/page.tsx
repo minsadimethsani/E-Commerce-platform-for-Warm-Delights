@@ -7,11 +7,13 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { sendWelcomeEmail } from "@/app/actions";
+import { useToast } from "@/context/ToastContext";
 
 function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "";
+  const { showSuccess, showError, showWarning } = useToast();
 
   // Form Fields
   const [firstName, setFirstName] = useState("");
@@ -154,7 +156,9 @@ function SignupForm() {
       const qEmail = query(usersRef, where("email", "==", email.trim().toLowerCase()));
       const snapEmail = await getDocs(qEmail);
       if (!snapEmail.empty) {
-        setGeneralError("Account already exists for this email or phone number. Please log in.");
+        const msg = "An account with this email address already exists. Please log in.";
+        setGeneralError(msg);
+        showWarning(msg, "Email Already Registered");
         setIsSubmitting(false);
         return;
       }
@@ -163,7 +167,9 @@ function SignupForm() {
       const qPhone = query(usersRef, where("phoneNumber", "==", phone.trim()));
       const snapPhone = await getDocs(qPhone);
       if (!snapPhone.empty) {
-        setGeneralError("Account already exists for this email or phone number. Please log in.");
+        const msg = "An account with this phone number already exists. Please log in.";
+        setGeneralError(msg);
+        showWarning(msg, "Phone Already Registered");
         setIsSubmitting(false);
         return;
       }
@@ -186,7 +192,7 @@ function SignupForm() {
         updatedAt: new Date()
       });
 
-      console.log("Signup successful. Firestore profile saved.");
+      showSuccess(`Welcome ${firstName}! Your Warm Delights account has been created.`, "Account Created");
 
       // 3. Trigger Welcome Email via Firestore trigger email extension
       try {
@@ -209,15 +215,19 @@ function SignupForm() {
       }, 3000);
     } catch (error: any) {
       console.warn("Signup error:", error);
+      let errMsg = "Failed to create your account. Please check your information and try again.";
       if (error.code === "auth/email-already-in-use") {
-        setErrors((prev) => ({ ...prev, email: "This email address is already in use." }));
+        errMsg = "This email address is already in use.";
+        setErrors((prev) => ({ ...prev, email: errMsg }));
       } else if (error.code === "auth/invalid-email") {
-        setErrors((prev) => ({ ...prev, email: "The email address is invalid." }));
-      } else if (error.code === "auth/configuration-not-found") {
-        setGeneralError("Firebase Authentication is not enabled. Please enable the Email/Password sign-in provider in your Firebase Console.");
-      } else {
-        setGeneralError("Failed to create an account. Please try again later.");
+        errMsg = "The email address is invalid.";
+        setErrors((prev) => ({ ...prev, email: errMsg }));
+      } else if (error.code === "auth/weak-password") {
+        errMsg = "Password is too weak. Please use at least 6 characters.";
+        setErrors((prev) => ({ ...prev, password: errMsg }));
       }
+      setGeneralError(errMsg);
+      showError(errMsg, "Registration Failed");
     } finally {
       setIsSubmitting(false);
     }

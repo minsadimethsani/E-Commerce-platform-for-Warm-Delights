@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { deleteReview } from "@/lib/reviews";
 import { Product } from "@/data/products";
+import { useToast } from "@/context/ToastContext";
 
 interface ReviewsClientProps {
   initialReviews: any[];
@@ -11,6 +12,7 @@ interface ReviewsClientProps {
 }
 
 export default function ReviewsClient({ initialReviews, products }: ReviewsClientProps) {
+  const { showSuccess, showError } = useToast();
   const [reviews, setReviews] = useState<any[]>(initialReviews);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRating, setSelectedRating] = useState<string>("all");
@@ -57,12 +59,13 @@ export default function ReviewsClient({ initialReviews, products }: ReviewsClien
       const success = await deleteReview(id);
       if (success) {
         setReviews(reviews.filter((r) => r.id !== id));
+        showSuccess("Customer review deleted successfully.", "Review Removed");
       } else {
-        alert("Failed to delete the review. Please try again.");
+        showError("Failed to delete customer review. Please try again.", "Delete Failed");
       }
     } catch (error) {
       console.error("Error deleting review:", error);
-      alert("An unexpected error occurred.");
+      showError("An unexpected error occurred while deleting review.", "Review Delete Error");
     } finally {
       setDeletingId(null);
     }

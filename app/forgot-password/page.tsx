@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useToast } from "@/context/ToastContext";
 
 export default function ForgotPasswordPage() {
+  const { showSuccess, showError } = useToast();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [generalError, setGeneralError] = useState("");
@@ -45,14 +47,20 @@ export default function ForgotPasswordPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccessMessage("If an account exists with this email address, a password reset link has been dispatched.");
+        const msg = "If an account exists with this email address, a password reset link has been dispatched.";
+        setSuccessMessage(msg);
+        showSuccess("Password reset instructions sent! Please check your inbox.", "Reset Email Sent");
         setEmail("");
       } else {
-        setGeneralError(data.error || "Failed to process password reset. Please try again.");
+        const errMsg = data.error || "Failed to process password reset. Please try again.";
+        setGeneralError(errMsg);
+        showError(errMsg, "Reset Request Failed");
       }
     } catch (error) {
       console.error("Forgot password error:", error);
-      setGeneralError("An error occurred. Please check your internet connection.");
+      const errMsg = "An error occurred while requesting password reset. Please check connectivity.";
+      setGeneralError(errMsg);
+      showError(errMsg, "Connection Error");
     } finally {
       setIsSubmitting(false);
     }

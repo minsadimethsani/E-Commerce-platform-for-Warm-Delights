@@ -8,9 +8,11 @@ import { Product } from "@/data/products";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import { useToast } from "@/context/ToastContext";
 
 export default function CustomCreationsClient() {
   const { user } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
   const router = useRouter();
 
   // Custom Order States
@@ -28,75 +30,64 @@ export default function CustomCreationsClient() {
   const [cakeIcing, setCakeIcing] = useState("Buttercream");
   const [instructions, setInstructions] = useState("");
   const [customSampleImage, setCustomSampleImage] = useState<string | null>(null);
+  
   const [isCustomSubmitting, setIsCustomSubmitting] = useState(false);
   const [customSuccessId, setCustomSuccessId] = useState<string | null>(null);
   const [customError, setCustomError] = useState<string | null>(null);
 
-  // Form options states loaded dynamically from API
-  const [availableSizes, setAvailableSizes] = useState<string[]>(["500g", "1kg", "1.5kg", "2kg", "3kg"]);
-  const [availableFlavors, setAvailableFlavors] = useState<string[]>(["Signature Chocolate", "Vanilla Sponge", "Red Velvet", "Carrot & Nut"]);
-  const [availableIcings, setAvailableIcings] = useState<string[]>(["Buttercream", "Fondant", "Fresh Cream"]);
+  // Available options
+  const [availableSizes, setAvailableSizes] = useState<string[]>(["1kg", "2kg", "3kg", "Custom Size"]);
+  const [availableFlavors, setAvailableFlavors] = useState<string[]>(["Signature Chocolate", "Vanilla Bean", "Red Velvet", "Ribbon Cake"]);
+  const [availableIcings, setAvailableIcings] = useState<string[]>(["Buttercream", "Fondant", "Chocolate Ganache", "Fresh Cream"]);
 
-  // Custom products gallery state
+  // Custom Creations Gallery State
   const [customProducts, setCustomProducts] = useState<Product[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
 
-  // Prefill user details
+  // Sync profile details
   useEffect(() => {
     if (user) {
-      setFullName(user.displayName || "");
-      setEmail(user.email || "");
+      if (user.displayName) setFullName(user.displayName);
+      if (user.email) setEmail(user.email);
     }
   }, [user]);
 
-  // Load variations and gallery items from API
+  // Load custom creations products and options
   useEffect(() => {
     const loadData = async () => {
+      setIsGalleryLoading(true);
       try {
-        const response = await fetch("/api/products?limit=100", { cache: "no-store" });
-        if (response.ok) {
-          const data = await response.json();
-          const allProducts: Product[] = data.products || [];
+        const productsRef = collection(db, "products");
+        const snapshot = await getDocs(productsRef);
+        const list: Product[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.category === "Custom") {
+            list.push({
+              id: docSnap.id,
+              name: data.name,
+              description: data.description || "",
+              price: data.price || 0,
+              image: data.image || "/category_custom.png",
+              category: data.category,
+              rating: data.rating || 5.0,
+              reviewsCount: data.reviewsCount || 0,
+            } as Product);
+          }
+        });
+        setCustomProducts(list);
 
-          // 1. Filter Custom category products for gallery
-          const filteredCustom = allProducts.filter(
-            (p) => p.category === "Custom" && p.isAvailable !== false
-          );
-          setCustomProducts(filteredCustom);
+        // Fetch dynamic variation options from database if custom template product exists
+        const customTemplate = list.find((p) => p.name.toLowerCase().includes("custom"));
+        if (customTemplate) {
+          const docData = snapshot.docs.find((d) => d.id === customTemplate.id)?.data();
+          const rawSizes = docData?.sizes || [];
+          const rawFlavors = docData?.flavors || [];
+          const rawIcings = docData?.icings || [];
 
-          // 2. Extract variations
-          const sizesSet = new Set<string>();
-          const flavorsSet = new Set<string>();
-          const icingsSet = new Set<string>();
-
-          allProducts.forEach((p) => {
-            if (p.sizes && Array.isArray(p.sizes)) {
-              p.sizes.forEach((s: any) => {
-                if (s && s.name) sizesSet.add(s.name);
-              });
-            }
-            if ((p as any).defaultSize) sizesSet.add((p as any).defaultSize);
-
-            if (p.flavors && Array.isArray(p.flavors)) {
-              p.flavors.forEach((f: any) => {
-                const name = typeof f === "string" ? f : f.name;
-                if (name) flavorsSet.add(name);
-              });
-            }
-            if ((p as any).defaultFlavor) flavorsSet.add((p as any).defaultFlavor);
-
-            if (p.icings && Array.isArray(p.icings)) {
-              p.icings.forEach((ic: any) => {
-                const name = typeof ic === "string" ? ic : ic.name;
-                if (name) icingsSet.add(name);
-              });
-            }
-            if ((p as any).defaultIcing) icingsSet.add((p as any).defaultIcing);
-          });
-
-          const finalSizes = Array.from(sizesSet);
-          const finalFlavors = Array.from(flavorsSet);
-          const finalIcings = Array.from(icingsSet);
+          const finalSizes = rawSizes.map((s: any) => (typeof s === "string" ? s : s.name));
+          const finalFlavors = rawFlavors.map((f: any) => (typeof f === "string" ? f : f.name));
+          const finalIcings = rawIcings.map((ic: any) => (typeof ic === "string" ? ic : ic.name));
 
           if (finalSizes.length > 0) {
             setAvailableSizes(finalSizes);
@@ -126,7 +117,7 @@ export default function CustomCreationsClient() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image is too large. Please upload an image smaller than 5MB.");
+      showWarning("Sample reference image exceeds 5MB limit.", "Image Too Large");
       return;
     }
 
@@ -141,7 +132,9 @@ export default function CustomCreationsClient() {
     e.preventDefault();
     if (!user) return;
     if (!customSampleImage) {
-      setCustomError("Please upload a sample reference image.");
+      const msg = "Please upload a sample reference image for your custom cake.";
+      setCustomError(msg);
+      showWarning(msg, "Sample Image Required");
       return;
     }
 
@@ -179,7 +172,7 @@ export default function CustomCreationsClient() {
         ],
         subtotal: 0.00,
         tax: 0.00,
-        shippingFee: deliveryType === "delivery" ? 350 : 0,
+        deliveryFee: deliveryType === "delivery" ? 350 : 0,
         total: 0.00,
         status: "pending",
         shippingAddress: {
@@ -228,7 +221,8 @@ export default function CustomCreationsClient() {
       await setDoc(orderDocRef, orderData);
 
       setCustomSuccessId(generatedOrderId);
-
+      showSuccess(`Custom Cake Request Order #${generatedOrderId} submitted!`, "Order Request Sent");
+      
       // Reset form
       setPhone("");
       setDeliveryAddress("");
@@ -239,7 +233,9 @@ export default function CustomCreationsClient() {
       setCustomSampleImage(null);
     } catch (err) {
       console.error("Error creating custom order:", err);
-      setCustomError("Failed to submit custom order. Please try again.");
+      const errMsg = "Failed to submit custom cake order. Please check your information.";
+      setCustomError(errMsg);
+      showError(errMsg, "Submission Failed");
     } finally {
       setIsCustomSubmitting(false);
     }

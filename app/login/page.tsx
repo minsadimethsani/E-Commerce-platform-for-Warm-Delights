@@ -7,11 +7,13 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { seedAdminUser } from "@/lib/auth-seed";
+import { useToast } from "@/context/ToastContext";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "";
+  const { showSuccess, showError, showWarning } = useToast();
 
   // Seed the admin user once when the login page mounts
   useEffect(() => {
@@ -116,13 +118,16 @@ function LoginForm() {
       }
 
       if (!accountExists) {
-        setGeneralError("Please create an account");
+        const errMsg = "No registered account found with this email or phone. Please sign up for an account.";
+        setGeneralError(errMsg);
+        showWarning(errMsg, "Account Not Found");
         setIsSubmitting(false);
         return;
       }
 
       // 1. Sign in with Firebase Authentication
       const userCredential = await signInWithEmailAndPassword(auth, targetEmail, password);
+      showSuccess("Welcome back! Signed in successfully to Warm Delights.", "Login Successful");
       const user = userCredential.user;
 
       // 2. Fetch User Profile from Firestore to determine the user role
@@ -201,25 +206,25 @@ function LoginForm() {
       }
     } catch (error: any) {
       console.warn("Login error:", error);
-      // Map error codes to user friendly messages
+      let msg = "Failed to log in. Please check your connection and try again.";
       switch (error.code) {
         case "auth/invalid-credential":
         case "auth/wrong-password":
         case "auth/user-not-found":
-          setGeneralError("Incorrect password. Please try again.");
+          msg = "Incorrect password. Please verify your password and try again.";
           break;
         case "auth/user-disabled":
-          setGeneralError("This account has been disabled. Please contact support.");
+          msg = "This account has been disabled. Please contact support.";
           break;
         case "auth/too-many-requests":
-          setGeneralError("Too many failed attempts. Please try again later.");
+          msg = "Too many failed attempts. Please try again later.";
           break;
         case "auth/configuration-not-found":
-          setGeneralError("Firebase Authentication is not enabled. Please enable the Email/Password sign-in provider in your Firebase Console.");
+          msg = "Firebase Authentication is not configured in console.";
           break;
-        default:
-          setGeneralError("Failed to log in. Please check your connection and try again.");
       }
+      setGeneralError(msg);
+      showError(msg, "Login Failed");
     } finally {
       setIsSubmitting(false);
     }

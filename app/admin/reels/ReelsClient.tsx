@@ -5,6 +5,7 @@ import { Reel } from "@/lib/reels";
 import { doc, setDoc, deleteDoc, collection, query, onSnapshot, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 interface ReelsClientProps {
   initialReels: Reel[];
@@ -12,6 +13,7 @@ interface ReelsClientProps {
 
 export default function ReelsClient({ initialReels }: ReelsClientProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError } = useToast();
   const [reels, setReels] = useState<Reel[]>(initialReels);
 
   // Form states
@@ -36,9 +38,10 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
           list.push({
             id: docSnap.id,
             videoUrl: data.videoUrl,
+            posterUrl: data.posterUrl,
             title: data.title || "",
             createdAt: data.createdAt,
-          });
+          } as Reel);
         });
         // Sort by date descending
         list.sort((a, b) => {
@@ -65,37 +68,51 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
       .replace(/^-+|-+$/g, "");
   };
 
-  const compressVideo = (file: File, onProgress: (progress: number) => void): Promise<{ videoUrl: string; posterUrl: string }> => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVideoFile(file);
+      setLocalPreviewUrl(URL.createObjectURL(file));
+      if (!title) {
+        // Auto populate title from filename
+        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        setTitle(cleanName);
+      }
+    }
+  };
+
+  // Canvas MediaRecorder video compressor
+  const compressVideo = async (file: File, onProgress: (progress: number) => void): Promise<{ videoUrl: string; posterUrl: string }> => {
     return new Promise((resolve, reject) => {
       const video = document.createElement("video");
-      video.preload = "auto";
+      video.src = URL.createObjectURL(file);
       video.muted = true;
       video.playsInline = true;
-      
-      const objectUrl = URL.createObjectURL(file);
-      video.src = objectUrl;
-      
-      video.onloadedmetadata = () => {
-        // Seek to 0.2s to capture a valid poster frame
-        video.currentTime = 0.2;
+
+      video.onloadeddata = async () => {
+        const duration = video.duration || 10;
+        
+        // 1. Capture Poster Snapshot Frame at 0.5s
+        video.currentTime = Math.min(0.5, duration / 2);
       };
 
-      video.onseeked = () => {
-        // 1. Capture Poster Image (WebP)
-        const posterCanvas = document.createElement("canvas");
-        const posterHeight = 360;
+      video.onseeked = async () => {
+        // Render 1080p Poster Canvas
+        const posterHeight = 1080;
         const posterScale = posterHeight / video.videoHeight;
         const posterWidth = Math.round(video.videoWidth * posterScale);
+
+        const posterCanvas = document.createElement("canvas");
         posterCanvas.width = posterWidth;
         posterCanvas.height = posterHeight;
         const posterCtx = posterCanvas.getContext("2d");
         let posterUrl = "";
         if (posterCtx) {
           posterCtx.drawImage(video, 0, 0, posterWidth, posterHeight);
-          posterUrl = posterCanvas.toDataURL("image/webp", 0.6); // 60% quality WebP is ~10KB
+          posterUrl = posterCanvas.toDataURL("image/webp", 0.6);
         }
 
-        // 2. Setup Full HD Video Compressor (Target Height 1080px)
+        // 2. Setup Full HD Video Compressor
         const targetHeight = 1080;
         const scale = targetHeight / video.videoHeight;
         const targetWidth = Math.round(video.videoWidth * scale);
@@ -128,7 +145,7 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
         try {
           recorder = new MediaRecorder(stream, mimeType ? {
             mimeType,
-            videoBitsPerSecond: 1200000 // 1.2 Mbps for 1080p Full HD
+            videoBitsPerSecond: 1200000
           } : undefined);
         } catch (e) {
           reject(e);
@@ -140,63 +157,46 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
             chunks.push(event.data);
           }
         };
-        
+
         recorder.onstop = () => {
-          const blob = new Blob(chunks, { type: "video/webm" });
+          const blob = new Blob(chunks, { type: mimeType || "video/webm" });
           const reader = new FileReader();
-          reader.onload = (e) => {
+          reader.onloadend = () => {
             resolve({
-              videoUrl: e.target?.result as string,
+              videoUrl: reader.result as string,
               posterUrl: posterUrl
             });
           };
-          reader.onerror = (err) => reject(err);
+          reader.onerror = reject;
           reader.readAsDataURL(blob);
-          URL.revokeObjectURL(objectUrl);
         };
-        
-        // Seek back to start and begin play/record
+
         video.currentTime = 0;
-        video.onseeked = null; // Clear seeks listener
-        
-        video.play()
-          .then(() => {
-            recorder.start();
-            
-            const duration = video.duration || 1;
-            let animationId: number;
-            
-            const drawFrame = () => {
-              if (video.paused || video.ended) {
-                recorder.stop();
-                cancelAnimationFrame(animationId);
-                return;
-              }
-              
-              ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-              const progress = Math.min(Math.round((video.currentTime / duration) * 100), 99);
-              onProgress(progress);
-              animationId = requestAnimationFrame(drawFrame);
-            };
-            
-            animationId = requestAnimationFrame(drawFrame);
-          })
-          .catch((err) => {
-            reject(err);
-            URL.revokeObjectURL(objectUrl);
-          });
+        await video.play();
+        recorder.start(100);
+
+        const duration = video.duration || 10;
+        const drawFrame = () => {
+          if (video.paused || video.ended) {
+            if (recorder.state === "recording") {
+              recorder.stop();
+            }
+            return;
+          }
+          ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+          onProgress(Math.min(99, Math.round((video.currentTime / duration) * 100)));
+          requestAnimationFrame(drawFrame);
+        };
+        drawFrame();
       };
-      
-      video.onerror = (err) => {
-        reject(err);
-        URL.revokeObjectURL(objectUrl);
-      };
+
+      video.onerror = (e) => reject(e);
     });
   };
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !videoFile) return;
+    if (!videoFile || !title.trim()) return;
 
     setIsUploading(true);
     setIsMutating(true);
@@ -222,6 +222,7 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
       };
 
       await setDoc(docRef, newReel);
+      showSuccess(`Hero Reel '${title.trim()}' uploaded and live on storefront!`, "Video Reel Published");
       
       setTitle("");
       setVideoFile(null);
@@ -232,7 +233,7 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
       if (fileInput) fileInput.value = "";
     } catch (error) {
       console.error("Compression/Upload failed:", error);
-      alert("Failed to compress and upload the video file. Please check video format.");
+      showError("Video upload failed. Please ensure your file is a valid MP4/WebM video under 50MB.", "Upload Failed");
     } finally {
       setIsUploading(false);
       setIsMutating(false);
@@ -250,9 +251,10 @@ export default function ReelsClient({ initialReels }: ReelsClientProps) {
     try {
       const docRef = doc(db, "reels", reel.id);
       await deleteDoc(docRef);
+      showSuccess(`Video Reel '${reel.title}' deleted.`, "Reel Deleted");
     } catch (error) {
       console.error("Error deleting reel:", error);
-      alert("Failed to delete the video reel.");
+      showError(`Failed to delete reel '${reel.title}'. Check Firestore permissions.`, "Delete Error");
     } finally {
       setIsMutating(false);
     }

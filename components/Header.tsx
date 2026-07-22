@@ -7,12 +7,14 @@ import Image from "next/image";
 import { getCart, removeFromCart, updateCartQuantity, CartItem, clearCart, addToCart } from "@/lib/cart";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { user, userProfile, logout } = useAuth();
+  const { showSuccess, showError } = useToast();
   
   // Profile dropdown menu states
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -407,9 +409,10 @@ export default function Header() {
       setCreatedOrderId(generatedOrderId);
       setIsOrderSuccess(true);
       clearCart();
+      showSuccess(`Order #${generatedOrderId} placed successfully! We're preparing your baked treats.`, "Order Confirmed");
     } catch (error) {
       console.error("Error creating order: ", error);
-      alert("Failed to place order. Please check your network or try again.");
+      showError("Failed to place order. Please check your payment & delivery information.", "Order Placement Failed");
     } finally {
       setIsOrderSubmitting(false);
     }

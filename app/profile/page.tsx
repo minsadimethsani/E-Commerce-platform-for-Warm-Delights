@@ -7,11 +7,13 @@ import { db } from "@/lib/firebase";
 import { doc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { Address, Order } from "@/types/database";
 import Link from "next/link";
+import { useToast } from "@/context/ToastContext";
 
 function ProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, userProfile, loading, logout } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
 
   // Selected tab
   const [activeTab, setActiveTab] = useState<"details" | "addresses" | "orders">("details");
@@ -115,7 +117,9 @@ function ProfileContent() {
     setProfileErrorMsg("");
 
     if (!displayName.trim()) {
-      setProfileErrorMsg("Display name is required.");
+      const msg = "Display name is required.";
+      setProfileErrorMsg(msg);
+      showWarning(msg, "Required Field");
       setIsUpdatingProfile(false);
       return;
     }
@@ -128,9 +132,12 @@ function ProfileContent() {
         updatedAt: new Date(),
       });
       setProfileSuccessMsg("Profile details updated successfully!");
+      showSuccess("Account profile details updated successfully!", "Profile Saved");
     } catch (err: any) {
       console.error("Error updating profile:", err);
-      setProfileErrorMsg("Failed to update profile details. Please try again.");
+      const msg = "Failed to update profile details. Please check connection.";
+      setProfileErrorMsg(msg);
+      showError(msg, "Profile Update Error");
     } finally {
       setIsUpdatingProfile(false);
     }
@@ -143,7 +150,9 @@ function ProfileContent() {
     setAddressError("");
 
     if (!street.trim() || !city.trim() || !state.trim() || !postalCode.trim()) {
-      setAddressError("Please fill out all address fields.");
+      const msg = "Please fill out all address fields.";
+      setAddressError(msg);
+      showWarning(msg, "Incomplete Address");
       setIsUpdatingAddress(false);
       return;
     }
@@ -194,11 +203,14 @@ function ProfileContent() {
         updatedAt: new Date(),
       });
 
+      showSuccess("Shipping address saved successfully!", "Address Saved");
       // Clear address form and close
       resetAddressForm();
     } catch (err: any) {
       console.error("Error saving address:", err);
-      setAddressError("Failed to save address. Please try again.");
+      const msg = "Failed to save address. Please try again.";
+      setAddressError(msg);
+      showError(msg, "Address Save Error");
     } finally {
       setIsUpdatingAddress(false);
     }
@@ -218,8 +230,10 @@ function ProfileContent() {
         shippingAddresses: updatedAddresses,
         updatedAt: new Date(),
       });
+      showSuccess("Default shipping address updated.", "Default Address Set");
     } catch (err) {
       console.error("Error setting default address:", err);
+      showError("Could not update default address.", "Update Error");
     }
   };
 
@@ -242,8 +256,10 @@ function ProfileContent() {
         shippingAddresses: updatedAddresses,
         updatedAt: new Date(),
       });
+      showSuccess("Shipping address removed.", "Address Deleted");
     } catch (err) {
       console.error("Error deleting address:", err);
+      showError("Could not delete address.", "Delete Error");
     }
   };
 

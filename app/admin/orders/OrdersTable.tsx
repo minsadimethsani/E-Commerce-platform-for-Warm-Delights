@@ -5,6 +5,7 @@ import { Order } from "@/types/database";
 import { doc, updateDoc, Timestamp, collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 interface OrdersTableProps {
   initialOrders: Order[];
@@ -21,6 +22,7 @@ const statusOptions: Order["status"][] = [
 
 export default function OrdersTable({ initialOrders }: OrdersTableProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError } = useToast();
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -38,17 +40,26 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
           items: data.items || [],
           subtotal: data.subtotal,
           tax: data.tax,
-          shippingFee: data.shippingFee,
+          deliveryFee: data.deliveryFee,
           total: data.total,
           status: data.status,
+          payment: data.payment,
           shippingAddress: data.shippingAddress,
-          paymentDetails: data.paymentDetails,
           createdAt: data.createdAt,
           updatedAt: data.updatedAt,
-          billingDetails: data.billingDetails,
-          fulfillment: data.fulfillment,
+          isCustomOrder: data.isCustomOrder,
+          cakeName: data.cakeName,
+          servings: data.servings,
+          shape: data.shape,
+          flavor: data.flavor,
+          filling: data.filling,
+          icingType: data.icingType,
+          designColor: data.designColor,
+          deliveryDate: data.deliveryDate,
+          inspirationUrl: data.inspirationUrl,
+          customMessage: data.customMessage,
           orderNote: data.orderNote,
-        } as Order);
+        } as unknown as Order);
       });
       setOrders(list);
 
@@ -86,9 +97,11 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
       if (selectedOrder && selectedOrder.id === orderId) {
         setSelectedOrder((prev) => (prev ? { ...prev, status: newStatus } : null));
       }
+
+      showSuccess(`Order #${orderId} status changed to '${newStatus}'!`, "Order Status Updated");
     } catch (error) {
       console.error("Failed to update status in database:", error);
-      alert("Error: Missing database permissions or network error.");
+      showError(`Failed to update Order #${orderId}. Check staff database permissions.`, "Order Update Error");
     } finally {
       setUpdatingId(null);
       setIsMutating(false);

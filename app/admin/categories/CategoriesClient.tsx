@@ -6,6 +6,7 @@ import { Badge } from "@/lib/badges";
 import { doc, setDoc, deleteDoc, collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 interface CategoriesClientProps {
   initialCategories: Category[];
@@ -17,6 +18,7 @@ export default function CategoriesClient({
   initialBadges,
 }: CategoriesClientProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [badges, setBadges] = useState<Badge[]>(initialBadges);
 
@@ -129,9 +131,10 @@ export default function CategoriesClient({
     setIsMutating(true);
     try {
       await deleteDoc(doc(db, "categories", id));
+      showSuccess("Category deleted successfully from catalog.", "Category Deleted");
     } catch (error) {
       console.error(`Failed to delete category ${id}:`, error);
-      alert("Error deleting category from database.");
+      showError("Could not remove category. Check database connection.", "Category Delete Failed");
     } finally {
       setIsMutating(false);
     }
@@ -146,7 +149,7 @@ export default function CategoriesClient({
     if (!targetCat) return;
 
     if (targetCat.subcategories.includes(subcatText)) {
-      alert("This subcategory already exists.");
+      showWarning(`Subcategory '${subcatText}' already exists in ${targetCat.name}.`, "Duplicate Subcategory");
       return;
     }
 
@@ -160,11 +163,12 @@ export default function CategoriesClient({
         subcategories: updatedSubcategories,
       });
 
+      showSuccess(`Subcategory '${subcatText}' added to ${targetCat.name}!`, "Subcategory Added");
       // Clear input
       setNewSubcatNames((prev) => ({ ...prev, [catId]: "" }));
     } catch (error) {
       console.error("Failed to add subcategory:", error);
-      alert("Error writing subcategory to database.");
+      showError("Failed to save subcategory. Please try again.", "Subcategory Save Error");
     } finally {
       setIsMutating(false);
     }

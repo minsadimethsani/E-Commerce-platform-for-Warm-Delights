@@ -5,6 +5,7 @@ import { AddOn } from "@/lib/addons";
 import { doc, setDoc, deleteDoc, collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 interface AddOnsClientProps {
   initialAddOns: AddOn[];
@@ -12,6 +13,7 @@ interface AddOnsClientProps {
 
 export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
   const [addons, setAddons] = useState<AddOn[]>(initialAddOns);
   const [editingAddOn, setEditingAddOn] = useState<AddOn | null>(null);
 
@@ -43,7 +45,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
         setAddons(list);
       },
       (error) => {
-        console.error("Firestore onSnapshot for addons failed:", error);
+        console.error("Error subscribing to addons:", error);
       }
     );
 
@@ -63,7 +65,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
     setEditingAddOn(addon);
     setName(addon.name);
     setFee(addon.fee.toString());
-    setDesc(addon.desc);
+    setDesc(addon.desc || "");
   };
 
   const handleCancelEdit = () => {
@@ -75,7 +77,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !fee.trim()) return;
+    if (!name.trim()) return;
 
     setIsSubmitting(true);
     setIsMutating(true);
@@ -83,7 +85,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
     try {
       const priceVal = parseFloat(fee);
       if (isNaN(priceVal)) {
-        alert("Please enter a valid price/fee.");
+        showWarning("Please enter a valid numeric fee amount for the add-on modifier.", "Invalid Fee Value");
         setIsSubmitting(false);
         setIsMutating(false);
         return;
@@ -102,12 +104,13 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
           desc: cleanDesc,
         };
         await setDoc(docRef, updatedAddOn);
+        showSuccess(`Add-On '${cleanName}' updated successfully!`, "Add-On Updated");
         setEditingAddOn(null);
       } else {
         // Add new addon
         const newId = slugify(cleanName);
         if (addons.some((a) => a.id === newId)) {
-          alert("An add-on option with this name or identifier already exists.");
+          showWarning(`An add-on option titled '${cleanName}' already exists.`, "Duplicate Add-On Title");
           setIsSubmitting(false);
           setIsMutating(false);
           return;
@@ -121,6 +124,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
           desc: cleanDesc,
         };
         await setDoc(docRef, newAddOn);
+        showSuccess(`Add-On '${cleanName}' created and live for custom orders!`, "Add-On Created");
       }
 
       // Reset Form
@@ -129,7 +133,7 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
       setDesc("");
     } catch (error) {
       console.error("Error saving add-on:", error);
-      alert("Failed to save the optional add-on option.");
+      showError("Could not save add-on item. Please check Firestore connectivity.", "Add-On Save Failed");
     } finally {
       setIsSubmitting(false);
       setIsMutating(false);
@@ -145,12 +149,13 @@ export default function AddOnsClient({ initialAddOns }: AddOnsClientProps) {
     try {
       const docRef = doc(db, "addons", addon.id);
       await deleteDoc(docRef);
+      showSuccess(`Add-On '${addon.name}' deleted.`, "Add-On Removed");
       if (editingAddOn?.id === addon.id) {
         handleCancelEdit();
       }
     } catch (error) {
       console.error("Error deleting add-on:", error);
-      alert("Failed to delete the optional add-on option.");
+      showError("Failed to delete the optional add-on option.", "Delete Failed");
     } finally {
       setIsMutating(false);
     }

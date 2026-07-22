@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -35,9 +36,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#FDF9F0] text-[#2A1E17] antialiased font-sans">
         <AuthProvider>
-          <Header />
-          <main className="flex-1 flex flex-col">{children}</main>
-          <Footer />
+          <ToastProvider>
+            <Header />
+            <main className="flex-1 flex flex-col">{children}</main>
+            <Footer />
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>

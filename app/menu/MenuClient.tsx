@@ -8,6 +8,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductCardSkeleton from "@/components/ProductCardSkeleton";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
+import { useToast } from "@/context/ToastContext";
 
 const ITEMS_PER_PAGE = 6;
 const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom", "Gifts & Hampers"] as const;
@@ -21,6 +22,7 @@ export default function MenuClient() {
   const router = useRouter();
 
   const { user } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
   
   // Dynamic categories from Firestore
   const [dbCategories, setDbCategories] = useState<string[]>(["All"]);
@@ -158,7 +160,7 @@ export default function MenuClient() {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image is too large. Please upload an image smaller than 5MB.");
+      showWarning("Sample image exceeds 5MB limit. Please choose a smaller photo.", "Image Size Limit Exceeded");
       return;
     }
 
@@ -173,7 +175,9 @@ export default function MenuClient() {
     e.preventDefault();
     if (!user) return;
     if (!customSampleImage) {
-      setCustomError("Please upload a sample reference image.");
+      const msg = "Please upload a sample reference image for your custom cake.";
+      setCustomError(msg);
+      showWarning(msg, "Sample Image Required");
       return;
     }
 
@@ -212,7 +216,7 @@ export default function MenuClient() {
         ],
         subtotal: 0.00,
         tax: 0.00,
-        shippingFee: deliveryType === "delivery" ? 350 : 0,
+        deliveryFee: deliveryType === "delivery" ? 350 : 0,
         total: 0.00,
         status: "pending",
         shippingAddress: {
@@ -261,6 +265,7 @@ export default function MenuClient() {
       await setDoc(orderDocRef, orderData);
 
       setCustomSuccessId(generatedOrderId);
+      showSuccess(`Custom Cake Request Order #${generatedOrderId} submitted successfully!`, "Request Submitted");
       
       // Reset form
       setPhone("");
@@ -272,7 +277,9 @@ export default function MenuClient() {
       setCustomSampleImage(null);
     } catch (err) {
       console.error("Error creating custom order:", err);
-      setCustomError("Failed to submit custom order. Please try again.");
+      const errMsg = "Failed to submit custom cake order. Please check your information.";
+      setCustomError(errMsg);
+      showError(errMsg, "Submission Failed");
     } finally {
       setIsCustomSubmitting(false);
     }

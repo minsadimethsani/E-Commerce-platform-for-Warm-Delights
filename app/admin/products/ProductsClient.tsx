@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Category } from "@/lib/categories";
 import { Badge } from "@/lib/badges";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getTimestampMillis } from "@/lib/products";
 
@@ -23,6 +24,7 @@ export default function ProductsClient({
   badgesList,
 }: ProductsClientProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
   const editParam = searchParams ? searchParams.get("edit") : null;
@@ -503,10 +505,10 @@ export default function ProductsClient({
     try {
       await deleteDoc(doc(db, "products", id));
       setProducts((prev) => prev.filter((p) => p.id !== id));
-      console.log(`Product ${id} deleted successfully.`);
+      showSuccess("Product removed from catalog.", "Product Deleted");
     } catch (error) {
       console.error("Error deleting product from Firestore:", error);
-      alert("Error: Database permission denied or network failure.");
+      showError("Could not delete product. Database permission denied or network error.", "Delete Failed");
     } finally {
       setIsMutating(false);
     }
@@ -534,10 +536,10 @@ export default function ProductsClient({
 
       // Empty the selection array
       setSelectedProductIds([]);
-      console.log("Bulk deletion completed successfully.");
+      showSuccess(`Deleted ${selectedProductIds.length} products from catalog.`, "Bulk Delete Complete");
     } catch (error) {
       console.error("Error bulk deleting products from Firestore:", error);
-      alert("Error: Missing database write permissions or network failure during bulk delete.");
+      showError("Missing database write permissions or network failure during bulk delete.", "Bulk Delete Failed");
     } finally {
       setIsUpdating(false);
       setIsMutating(false);
@@ -547,7 +549,7 @@ export default function ProductsClient({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !price || !description) {
-      alert("Please fill in all required fields.");
+      showWarning("Please provide a product name, price, and description.", "Missing Required Fields");
       return;
     }
 
@@ -556,7 +558,7 @@ export default function ProductsClient({
     try {
       const parsedPrice = parseFloat(price);
       if (isNaN(parsedPrice)) {
-        alert("Invalid price value.");
+        showWarning("Please enter a valid numeric base price.", "Invalid Base Price");
         setIsSaving(false);
         setIsMutating(false);
         return;
@@ -691,10 +693,10 @@ export default function ProductsClient({
       }
 
       closeForm();
-      console.log(`Product ${id} saved successfully.`);
+      showSuccess(`Product '${savedProduct.name}' saved successfully in catalog!`, "Product Saved");
     } catch (error) {
       console.error("Error saving product to Firestore:", error);
-      alert("Error: Database write permission denied or network failure.");
+      showError("Could not save product. Database write permission denied or network error.", "Product Save Error");
     } finally {
       setIsSaving(false);
       setIsMutating(false);

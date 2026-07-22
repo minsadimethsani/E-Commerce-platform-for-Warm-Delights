@@ -1,20 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { Product } from "@/data/products";
 import { Review } from "@/types/database";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
-import Link from "next/link";
+import { useToast } from "@/context/ToastContext";
 
 interface AdminProductDetailClientProps {
   product: Product & {
     isAvailable?: boolean;
+    images?: string[];
+    variants?: { name: string; price: number }[];
+    sizes?: { name: string; price: number }[];
+    flavors?: (string | { name: string; price: number })[];
+    icings?: (string | { name: string; price: number })[];
     ingredients?: string[];
     careInstructions?: string;
-    images?: string[];
-    videoUrl?: string;
   };
   initialReviews: Review[];
 }
@@ -24,6 +29,7 @@ export default function AdminProductDetailClient({
   initialReviews,
 }: AdminProductDetailClientProps) {
   const { setIsMutating } = useAuth();
+  const { showSuccess, showError } = useToast();
   const [isAvailable, setIsAvailable] = useState<boolean>(product.isAvailable !== false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [selectedImage, setSelectedImage] = useState<string>(product.image);
@@ -40,9 +46,13 @@ export default function AdminProductDetailClient({
         updatedAt: Timestamp.now(),
       });
       setIsAvailable(newStatus);
+      showSuccess(
+        `Product visibility changed to ${newStatus ? "'Active'" : "'Hidden'"}.`,
+        "Availability Updated"
+      );
     } catch (error) {
       console.error("Error updating availability status in Firestore:", error);
-      alert("Error: Database permission denied or network error.");
+      showError("Could not update product availability. Check staff permissions.", "Update Error");
     } finally {
       setIsUpdating(false);
       setIsMutating(false);
