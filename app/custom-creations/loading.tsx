@@ -1,61 +1,66 @@
 export default function CustomCreationsLoading() {
   return (
-    <div className="bg-[#FDF9F0] min-h-screen py-10 animate-pulse">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb skeleton */}
-        <div className="flex items-center space-x-2 mb-8">
-          <div className="h-3.5 w-10 bg-gray-200/60 rounded-none" />
-          <div className="h-3 w-3 bg-gray-200/40 rounded-none" />
-          <div className="h-3.5 w-24 bg-gray-200/60 rounded-none" />
+    <div className="bg-[#FDF9F0] min-h-screen py-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        {/* Banner Header Skeleton */}
+        <div className="text-center max-w-3xl mx-auto space-y-4 animate-pulse">
+          <div className="h-3 w-32 bg-[#DD9E59]/40 mx-auto rounded-full" />
+          <div className="h-10 w-3/4 bg-gray-300/60 mx-auto rounded-lg" />
+          <div className="h-3.5 w-full bg-gray-200/60 mx-auto rounded max-w-xl" />
         </div>
 
-        {/* Page Banner Header skeleton */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="h-3 w-28 bg-gray-200/60 mx-auto rounded-none" />
-          <div className="h-10 w-2/3 sm:w-1/2 bg-gray-200/60 mx-auto rounded-none" />
-          <div className="h-1 w-16 bg-[#DD9E59]/40 mx-auto rounded-none" />
-          <div className="space-y-2 max-w-xl mx-auto">
-            <div className="h-3.5 w-full bg-gray-200/60 rounded-none" />
-            <div className="h-3.5 w-5/6 bg-gray-200/60 mx-auto rounded-none" />
-          </div>
-        </div>
-
-        {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          {/* Left Column: Process & Gallery */}
-          <div className="lg:col-span-6 space-y-12">
-            <div className="space-y-4">
-              <div className="h-6 w-1/3 bg-gray-200/60 rounded-none" />
-              <div className="space-y-3">
-                <div className="h-3.5 w-full bg-gray-200/60 rounded-none" />
-                <div className="h-3.5 w-full bg-gray-200/60 rounded-none" />
-                <div className="h-3.5 w-3/4 bg-gray-200/60 rounded-none" />
+        {/* 2-Column Order Builder & Gallery Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          
+          {/* Form Builder Column Skeleton */}
+          <div className="lg:col-span-7 bg-white border border-[#A47251]/10 rounded-2xl p-6 sm:p-8 space-y-6 animate-pulse">
+            <div className="h-6 w-48 bg-gray-300/60 rounded" />
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="h-3 w-20 bg-gray-200/60 rounded" />
+                <div className="h-10 w-full bg-gray-200/60 rounded-xl" />
+              </div>
+              <div className="space-y-2">
+                <div className="h-3 w-20 bg-gray-200/60 rounded" />
+                <div className="h-10 w-full bg-gray-200/60 rounded-xl" />
               </div>
             </div>
 
-            {/* Gallery Skeletons */}
-            <div className="space-y-4">
-              <div className="h-6 w-1/4 bg-gray-200/60 rounded-none" />
-              <div className="grid grid-cols-2 gap-4">
-                <div className="aspect-square bg-gray-200/50 rounded-none" />
-                <div className="aspect-square bg-gray-200/50 rounded-none" />
+            {/* Dropzone Box Skeleton */}
+            <div className="space-y-2">
+              <div className="h-3 w-36 bg-gray-200/60 rounded" />
+              <div className="h-40 w-full bg-[#F0D8A1]/30 border-2 border-dashed border-[#A47251]/20 rounded-2xl flex flex-col items-center justify-center space-y-2">
+                <div className="h-10 w-10 bg-gray-300/50 rounded-full" />
+                <div className="h-3 w-32 bg-gray-300/60 rounded" />
               </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="h-10 bg-gray-200/60 rounded-xl" />
+              <div className="h-10 bg-gray-200/60 rounded-xl" />
+              <div className="h-10 bg-gray-200/60 rounded-xl" />
+            </div>
+
+            <div className="h-12 w-full bg-[#A47251]/40 rounded-full" />
+          </div>
+
+          {/* Gallery Showcase Column Skeleton */}
+          <div className="lg:col-span-5 space-y-6 animate-pulse">
+            <div className="h-6 w-44 bg-gray-300/60 rounded" />
+            <div className="grid grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="aspect-square bg-white border border-[#A47251]/10 rounded-2xl overflow-hidden p-3 space-y-2">
+                  <div className="aspect-square w-full bg-[#F0D8A1]/40 rounded-xl" />
+                  <div className="h-3.5 w-3/4 bg-gray-300/60 rounded" />
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Column: Form Skeleton */}
-          <div className="lg:col-span-6">
-            <div className="bg-[#F0D8A1]/35 border border-[#A47251]/10 p-6 sm:p-8 space-y-6">
-              <div className="h-6 w-1/2 bg-gray-200/60 rounded-none" />
-              <div className="space-y-4">
-                <div className="h-8 w-full bg-gray-200/60 rounded-none" />
-                <div className="h-8 w-full bg-gray-200/60 rounded-none" />
-                <div className="h-20 w-full bg-gray-200/60 rounded-none" />
-                <div className="h-10 w-full bg-gray-200/60 rounded-none" />
-              </div>
-            </div>
-          </div>
         </div>
+
       </div>
     </div>
   );
