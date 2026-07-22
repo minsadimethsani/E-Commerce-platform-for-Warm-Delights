@@ -58,6 +58,7 @@ export default function ProductsClient({
           price: data.price,
           image: data.image,
           category: data.category,
+          subcategory: data.subcategory || "",
           badge: data.badge || undefined,
           rating: data.rating,
           reviewsCount: data.reviewsCount,
