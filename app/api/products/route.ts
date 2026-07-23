@@ -45,7 +45,12 @@ export async function GET(request: NextRequest) {
       limit,
     });
 
-    return NextResponse.json(result, { status: 200 });
+    return NextResponse.json(result, {
+      status: 200,
+      headers: {
+        "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=3600",
+      },
+    });
   } catch (error) {
     console.error("Error fetching products from API:", error);
     return NextResponse.json(

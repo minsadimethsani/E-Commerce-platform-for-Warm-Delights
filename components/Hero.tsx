@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Product, products as localProducts } from "@/data/products";
 
 // Slide configurations
@@ -150,10 +151,13 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
                     className="group relative flex flex-col justify-end text-left h-[150px] sm:h-[180px] md:h-[200px] lg:h-[190px] overflow-hidden rounded-none border border-white/10 shadow-lg cursor-pointer bg-[#A47251]"
                   >
                     {/* Product Image */}
-                    <img
+                    <Image
                       src={p.image}
                       alt={p.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      quality={70}
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
                     {/* Subtle Hover Overlay & Vignette */}
@@ -257,10 +261,13 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
                 {/* Photo 1 (Back left, tilted) */}
                 {customCakes[0] && (
                   <div className="absolute top-[10%] left-0 w-[52%] lg:w-[55%] aspect-square rounded-none overflow-hidden shadow-lg border-4 border-white/95 rotate-[-4deg] lg:rotate-[-6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
-                    <img
+                    <Image
                       src={customCakes[0].image}
                       alt={customCakes[0].name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 30vw"
+                      quality={70}
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                       <span className="text-[10px] font-bold text-white truncate w-full">{customCakes[0].name}</span>
@@ -271,10 +278,13 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
                 {/* Photo 2 (Top right, tilted) */}
                 {customCakes[1] && (
                   <div className="absolute top-0 right-4 w-[45%] lg:w-[48%] aspect-square rounded-none overflow-hidden shadow-xl border-4 border-white/95 rotate-[4deg] lg:rotate-[6deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
-                    <img
+                    <Image
                       src={customCakes[1].image}
                       alt={customCakes[1].name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 30vw"
+                      quality={70}
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                       <span className="text-[10px] font-bold text-white truncate w-full">{customCakes[1].name}</span>
@@ -285,10 +295,13 @@ export default function Hero({ products = [] }: { products?: Product[] }) {
                 {/* Photo 3 (Bottom center-right, overlapping) */}
                 {customCakes[2] && (
                   <div className="absolute bottom-[8%] left-[20%] lg:left-[25%] w-[48%] lg:w-[50%] aspect-square rounded-none overflow-hidden shadow-2xl border-4 border-white/95 rotate-[-2deg] transition-all duration-300 hover:rotate-0 hover:scale-105 hover:z-20 group cursor-pointer">
-                    <img
+                    <Image
                       src={customCakes[2].image}
                       alt={customCakes[2].name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 768px) 50vw, 30vw"
+                      quality={70}
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                       <span className="text-[10px] font-bold text-white truncate w-full">{customCakes[2].name}</span>
