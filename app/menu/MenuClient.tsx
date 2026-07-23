@@ -10,7 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { useToast } from "@/context/ToastContext";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 12;
 const CATEGORIES = ["All", "Cake", "Savory", "Pastry", "Cookie", "Custom", "Gifts & Hampers"] as const;
 
 type SortOption = "featured" | "price-asc" | "price-desc" | "rating-desc";
@@ -326,6 +326,8 @@ export default function MenuClient() {
   const [totalProducts, setTotalProducts] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Search Input Debouncing State (Standard Best Practice)
@@ -369,9 +371,14 @@ export default function MenuClient() {
         }
         
         const data = await response.json();
-        setProductsList(data.products as Product[]);
+        if (currentPage === 1) {
+          setProductsList(data.products as Product[]);
+        } else {
+          setProductsList((prev) => [...prev, ...(data.products as Product[])]);
+        }
         setTotalProducts(data.total);
         setTotalPages(data.totalPages);
+        setHasMore(currentPage < data.totalPages);
         setError(null);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "An unexpected error occurred while loading the menu.";
@@ -379,10 +386,10 @@ export default function MenuClient() {
         setError(errorMsg);
       } finally {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     };
 
-    // Fetch products
     fetchProducts();
   }, [selectedCategory, selectedSubcategory, debouncedSearchQuery, minPrice, maxPrice, minRating, onlyBestsellers, sortBy, currentPage]);
 
@@ -723,64 +730,22 @@ export default function MenuClient() {
                       ))}
                     </div>
 
-                    {/* Pagination Controls */}
-                    {totalPages > 1 && (
-                      <div className="flex items-center justify-center space-x-2 mt-16 pt-8 border-t border-[#A47251]/5">
-                        {/* Prev Button */}
+                    {/* Load More Button for Cursor/Paginated Infinite Flow */}
+                    {hasMore && (
+                      <div className="flex flex-col items-center justify-center mt-12 pt-8 border-t border-[#A47251]/10">
                         <button
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                          aria-label="Previous Page"
-                          className="flex h-10 w-10 items-center justify-center rounded-none border border-[#A47251]/10 bg-white text-[#2A1E17] transition-all hover:border-[#DD9E59] hover:bg-[#F0D8A1] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#A47251]/10 disabled:cursor-not-allowed cursor-pointer"
+                          onClick={() => {
+                            setIsLoadingMore(true);
+                            setCurrentPage((prev) => prev + 1);
+                          }}
+                          disabled={isLoadingMore}
+                          className="rounded-none bg-[#A47251] text-white px-8 py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-[#DD9E59] hover:text-[#2A1E17] transition-all disabled:opacity-50 cursor-pointer shadow-sm"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path strokeLinecap="square" strokeLinejoin="miter" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                          </svg>
+                          {isLoadingMore ? "Loading More Delights..." : "Load More Delights"}
                         </button>
-
-                        {/* Page Numbers */}
-                        {Array.from({ length: totalPages }, (_, index) => {
-                          const pageNum = index + 1;
-                          return (
-                            <button
-                              key={pageNum}
-                              onClick={() => handlePageChange(pageNum)}
-                              className={`flex h-10 w-10 items-center justify-center rounded-none text-xs font-bold tracking-wider transition-all cursor-pointer ${
-                                currentPage === pageNum
-                                  ? "bg-[#A47251] text-white shadow-sm"
-                                  : "border border-[#A47251]/10 bg-white text-[#2A1E17] hover:border-[#DD9E59] hover:bg-[#F0D8A1]"
-                              }`}
-                            >
-                              {pageNum}
-                            </button>
-                          );
-                        })}
-
-                        {/* Next Button */}
-                        <button
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                          aria-label="Next Page"
-                          className="flex h-10 w-10 items-center justify-center rounded-none border border-[#A47251]/10 bg-white text-[#2A1E17] transition-all hover:border-[#DD9E59] hover:bg-[#F0D8A1] disabled:opacity-40 disabled:hover:bg-white disabled:hover:border-[#A47251]/10 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="w-4 h-4"
-                          >
-                            <path strokeLinecap="square" strokeLinejoin="miter" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                          </svg>
-                        </button>
+                        <span className="text-xs text-[#2A1E17]/60 mt-3 font-semibold">
+                          Showing {productsList.length} of {totalProducts} items
+                        </span>
                       </div>
                     )}
                   </>

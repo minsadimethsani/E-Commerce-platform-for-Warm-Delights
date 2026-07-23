@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { products as localProducts, Product } from "@/data/products";
-import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, getCountFromServer } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, getCountFromServer, startAfter, DocumentSnapshot } from "firebase/firestore";
 import { db, runWithTimeout } from "./firebase";
 
 export interface FilterParams {
@@ -87,6 +87,73 @@ export function sortProductsByLatest(productsList: Product[]): Product[] {
   });
 }
 
+
+/**
+ * Fetch a page of products using Firestore Cursor-Based Pagination.
+ * Uses query(), orderBy("createdAt", "desc"), limit(pageSize), and startAfter(lastDocSnap).
+ */
+export async function fetchPaginatedProducts(pageSize: number = 12, lastDocSnap?: DocumentSnapshot | null) {
+  try {
+    const productsRef = collection(db, "products");
+    const constraints: any[] = [
+      where("isAvailable", "==", true),
+      orderBy("createdAt", "desc"),
+      limit(pageSize),
+    ];
+
+    if (lastDocSnap) {
+      constraints.push(startAfter(lastDocSnap));
+    }
+
+    const q = query(productsRef, ...constraints);
+    const snapshot = await runWithTimeout(getDocs(q), 1200);
+
+    const list: Product[] = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      list.push({
+        id: data.id || docSnap.id,
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        image: data.image,
+        category: data.category,
+        subcategory: data.subcategory || "",
+        badge: data.badge || undefined,
+        rating: data.rating,
+        reviewsCount: data.reviewsCount,
+        isAvailable: data.isAvailable !== false,
+        ingredients: data.ingredients || [],
+        careInstructions: data.careInstructions || "",
+        images: data.images || [],
+        videoUrl: data.videoUrl !== undefined ? data.videoUrl : (localProducts.find((lp) => lp.id === data.id)?.videoUrl || ""),
+        variants: data.variants || [],
+        sizes: data.sizes || [],
+        flavors: data.flavors || [],
+        icings: data.icings || [],
+        defaultSize: data.defaultSize || "",
+        defaultFlavor: data.defaultFlavor || "",
+        defaultIcing: data.defaultIcing || "",
+        createdAt: toSerializableTimestamp(data.createdAt),
+        updatedAt: toSerializableTimestamp(data.updatedAt),
+      } as any);
+    });
+
+    const newLastDocSnap = snapshot.docs[snapshot.docs.length - 1] || null;
+    return {
+      products: list,
+      lastDocSnap: newLastDocSnap,
+      hasMore: snapshot.docs.length === pageSize,
+    };
+  } catch (error) {
+    console.error("Error in fetchPaginatedProducts. Falling back to local data.", error);
+    return {
+      products: sortProductsByLatest(localProducts).slice(0, pageSize),
+      lastDocSnap: null,
+      hasMore: false,
+    };
+  }
+}
 
 /**
  * Get all products directly from Firestore, sorted by latest added.

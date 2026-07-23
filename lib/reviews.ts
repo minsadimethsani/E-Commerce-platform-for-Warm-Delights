@@ -10,7 +10,7 @@ import { Review } from "@/types/database";
 export const getAllReviews = cache(async function getAllReviews(): Promise<Review[]> {
   try {
     const reviewsRef = collection(db, "reviews");
-    const q = query(reviewsRef, orderBy("createdAt", "desc"), limit(20));
+    const q = query(reviewsRef, orderBy("createdAt", "desc"), limit(15));
     const snapshot = await getDocs(q);
     const list: Review[] = [];
     snapshot.forEach((docSnap) => {

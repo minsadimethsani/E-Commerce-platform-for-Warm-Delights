@@ -10,7 +10,7 @@ import { Order } from "@/types/database";
 export const getAllOrders = cache(async function getAllOrders(): Promise<Order[]> {
   try {
     const ordersRef = collection(db, "orders");
-    const q = query(ordersRef, orderBy("createdAt", "desc"), limit(20));
+    const q = query(ordersRef, orderBy("createdAt", "desc"), limit(15));
     const snapshot = await getDocs(q);
     const list: Order[] = [];
     snapshot.forEach((docSnap) => {
