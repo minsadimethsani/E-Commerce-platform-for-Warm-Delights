@@ -106,7 +106,7 @@ export async function fetchPaginatedProducts(pageSize: number = 12, lastDocSnap?
     }
 
     const q = query(productsRef, ...constraints);
-    const snapshot = await runWithTimeout(getDocs(q), 1200);
+    const snapshot = await runWithTimeout(getDocs(q), 15000);
 
     const list: Product[] = [];
     snapshot.forEach((docSnap) => {
@@ -162,7 +162,7 @@ export async function fetchPaginatedProducts(pageSize: number = 12, lastDocSnap?
 export const getAllProducts = cache(async function getAllProducts(): Promise<Product[]> {
   try {
     const productsRef = collection(db, "products");
-    const snapshot = await runWithTimeout(getDocs(productsRef), 1200);
+    const snapshot = await runWithTimeout(getDocs(productsRef), 15000);
     
     if (snapshot.empty) {
       return [];
@@ -211,7 +211,7 @@ export const getAllProducts = cache(async function getAllProducts(): Promise<Pro
 export const getProductById = cache(async function getProductById(id: string): Promise<Product | undefined> {
   try {
     const docRef = doc(db, "products", id);
-    const docSnap = await runWithTimeout(getDoc(docRef), 1200);
+    const docSnap = await runWithTimeout(getDoc(docRef), 15000);
     
     if (docSnap.exists()) {
       const data = docSnap.data();
@@ -326,13 +326,13 @@ export async function getFilteredProducts(filters: FilterParams): Promise<Pagina
 
     // 6. Execute Count Query on Server (Extremely cheap: 1 document read per 1,000 counted)
     const countQuery = query(productsRef, ...constraints);
-    const countSnapshot = await runWithTimeout(getCountFromServer(countQuery), 1200);
+    const countSnapshot = await runWithTimeout(getCountFromServer(countQuery), 15000);
     const total = countSnapshot.data().count;
 
     // 7. Execute Data Query (Paginating up to page * limit to resolve page lists)
     const maxFetchCount = page * limitVal;
     const dataQuery = query(productsRef, ...constraints, limit(maxFetchCount));
-    const snapshot = await runWithTimeout(getDocs(dataQuery), 1200);
+    const snapshot = await runWithTimeout(getDocs(dataQuery), 15000);
 
     const allFetched: Product[] = [];
     snapshot.forEach((docSnap) => {

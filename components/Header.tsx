@@ -43,10 +43,17 @@ export default function Header() {
   const [isOrderPlaced, setIsOrderPlaced] = useState(false);
   const [dbCategories, setDbCategories] = useState<any[]>([]);
 
+  // Megamenu state & image preview mappings
+  const [categoryProductMap, setCategoryProductMap] = useState<Record<string, any>>({});
+  const [subcategoryProductMap, setSubcategoryProductMap] = useState<Record<string, any>>({});
+  const [activeAllProductsCat, setActiveAllProductsCat] = useState<string>("");
+  const [activeCakeSubcat, setActiveCakeSubcat] = useState<string>("");
+
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchHeaderData = async () => {
       try {
-        const { collection, getDocs } = await import("firebase/firestore");
+        const { collection, getDocs, query, limit } = await import("firebase/firestore");
+        // 1. Fetch categories
         const categoriesRef = collection(db, "categories");
         const snapshot = await getDocs(categoriesRef);
         const list: any[] = [];
@@ -54,11 +61,32 @@ export default function Header() {
           list.push(docSnap.data());
         });
         setDbCategories(list);
+        if (list.length > 0) {
+          setActiveAllProductsCat(list[0].name || list[0].id || "Cake");
+        }
+
+        // 2. Fetch products to build image map for each category & subcategory
+        const productsRef = collection(db, "products");
+        const prodSnap = await getDocs(query(productsRef, limit(100)));
+        const catMap: Record<string, any> = {};
+        const subcatMap: Record<string, any> = {};
+
+        prodSnap.forEach((docSnap) => {
+          const prod = docSnap.data();
+          if (prod.category && !catMap[prod.category.toLowerCase()]) {
+            catMap[prod.category.toLowerCase()] = prod;
+          }
+          if (prod.subcategory && !subcatMap[prod.subcategory.toLowerCase()]) {
+            subcatMap[prod.subcategory.toLowerCase()] = prod;
+          }
+        });
+        setCategoryProductMap(catMap);
+        setSubcategoryProductMap(subcatMap);
       } catch (error) {
-        console.error("Error fetching categories in Header:", error);
+        console.error("Error fetching categories and products in Header:", error);
       }
     };
-    fetchCategories();
+    fetchHeaderData();
   }, []);
 
   const [featuredProducts, setFeaturedProducts] = useState<Record<string, any>>({});
@@ -429,12 +457,24 @@ export default function Header() {
     setOrderedDeliveryFee(0);
   };
 
-  // Helper mapping for database categories/subcategories dynamically
-  const cakeCategory = dbCategories.find(c => c.id === "cake" || c.name?.toLowerCase() === "cake");
-  const cakeSubcategories = cakeCategory?.subcategories || ["Sponge Cake", "Fudge Cake", "Cheesecakes"];
+  // Active Category Object for "All Products" Megamenu
+  const activeCategoryObj = dbCategories.find(
+    (c) => (c.name || c.id || "").toLowerCase() === (activeAllProductsCat || dbCategories[0]?.name || "cake").toLowerCase()
+  ) || dbCategories[0];
 
-  const bakedCategory = dbCategories.find(c => c.id === "baked-goods-and-desserts" || c.name?.toLowerCase() === "baked goods and desserts" || c.name?.toLowerCase() === "baked goods & desserts");
-  const bakedSubcategories = bakedCategory?.subcategories || ["Breads", "Brownies", "Cup cakes"];
+  const activeSubcategories: string[] = activeCategoryObj?.subcategories || [];
+
+  // Category & Subcategory Product Images for previews
+  const activeCategoryProduct = categoryProductMap[
+    (activeCategoryObj?.name || activeAllProductsCat || "").toLowerCase()
+  ] || categoryProductMap[(activeCategoryObj?.id || "").toLowerCase()];
+
+  const cakeCategory = dbCategories.find((c) => c.id === "cake" || c.name?.toLowerCase() === "cake");
+  const cakeSubcategories: string[] = cakeCategory?.subcategories || ["Sponge Cake", "Fudge Cake", "Cheesecakes"];
+
+  const activeCakeProduct = subcategoryProductMap[
+    (activeCakeSubcat || cakeSubcategories[0] || "").toLowerCase()
+  ] || categoryProductMap["cake"];
 
   // Hide public storefront header on admin portal pages
   if (pathname && pathname.startsWith("/admin")) {
@@ -494,7 +534,8 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex space-x-10 items-center">
+          <nav className="hidden md:flex space-x-7 lg:space-x-9 items-center">
+            {/* 1. Home */}
             <Link
               href="/"
               prefetch={true}
@@ -502,40 +543,170 @@ export default function Header() {
             >
               Home
             </Link>
-            <Link
-              href="/menu"
-              prefetch={true}
-              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
-            >
-              Menu
-            </Link>
 
-            {/* Cake Link + Mega Menu */}
+            {/* 2. All products Mega Menu */}
+            <div className="relative group">
+              <Link
+                href="/menu"
+                prefetch={true}
+                className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
+              >
+                <span>All products</span>
+                <svg className="ml-1 h-3 w-3 text-[#0D1B2A]/50 group-hover:text-[#E09F3E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+              
+              {/* All Products Megamenu Dropdown */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[680px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-12 gap-5">
+                  
+                  {/* Left Column: Categories List (4 cols) */}
+                  <div className="col-span-4 border-r border-[#0D1B2A]/5 pr-3 space-y-2 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Categories</h4>
+                    <ul className="space-y-1 max-h-[300px] overflow-y-auto pr-1">
+                      {dbCategories.map((cat: any) => {
+                        const catName = cat.name || cat.id;
+                        const isSelected = (activeAllProductsCat || dbCategories[0]?.name || "").toLowerCase() === catName.toLowerCase();
+                        return (
+                          <li key={cat.id || catName}>
+                            <Link
+                              href={`/menu?category=${encodeURIComponent(catName)}`}
+                              onMouseEnter={() => setActiveAllProductsCat(catName)}
+                              className={`block px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                isSelected
+                                  ? "bg-[#E09F3E]/10 text-[#E09F3E] font-bold"
+                                  : "text-[#2A1E17] hover:bg-[#0D1B2A]/5 hover:text-[#E09F3E]"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span>{catName}</span>
+                                <span className="text-[10px] opacity-60">&rarr;</span>
+                              </div>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <div className="pt-2 border-t border-[#0D1B2A]/5">
+                      <Link
+                        href="/menu"
+                        className="text-[11px] font-bold text-[#E09F3E] hover:underline block text-left"
+                      >
+                        Browse All Products &rarr;
+                      </Link>
+                    </div>
+                  </div>
+
+                  {/* Middle Column: Subcategories for Active Category (4 cols) */}
+                  <div className="col-span-4 space-y-2 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">
+                      {activeCategoryObj?.name || "Subcategories"}
+                    </h4>
+                    <ul className="space-y-1.5 max-h-[280px] overflow-y-auto pr-1">
+                      {activeSubcategories.length > 0 ? (
+                        activeSubcategories.map((subcat: string) => (
+                          <li key={subcat}>
+                            <Link
+                              href={`/menu?category=${encodeURIComponent(activeCategoryObj?.name || activeAllProductsCat)}&subcategory=${encodeURIComponent(subcat)}`}
+                              className="block group/subitem text-xs font-medium text-[#2A1E17]/80 hover:text-[#E09F3E] transition-colors py-0.5"
+                            >
+                              <span className="group-hover/subitem:translate-x-1 inline-block transition-transform">
+                                &bull; {subcat}
+                              </span>
+                            </Link>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="text-xs text-[#2A1E17]/50 italic">All items in category</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {/* Right Column: Featured Image & Product Card (4 cols) */}
+                  <div className="col-span-4 relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3.5 flex flex-col justify-between text-left">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
+                      <Image
+                        src={
+                          activeCategoryProduct?.image ||
+                          featuredProducts["prod-2"]?.image ||
+                          "/category_cakes.png"
+                        }
+                        alt={activeCategoryProduct?.name || "Warm Delights Product"}
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        sizes="200px"
+                        quality={70}
+                      />
+                    </div>
+                    <div className="mt-2.5 space-y-1">
+                      <span className="inline-block text-[8px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1.5 py-0.5 rounded">
+                        {activeCategoryProduct?.category || activeAllProductsCat || "Featured"}
+                      </span>
+                      <h5 className="text-[11px] font-bold text-[#2A1E17] leading-tight truncate">
+                        {activeCategoryProduct?.name || `${activeAllProductsCat} Special`}
+                      </h5>
+                      <p className="text-[9px] text-[#2A1E17]/70 leading-snug line-clamp-2">
+                        {activeCategoryProduct?.description || "Handcrafted fresh daily with premium ingredients."}
+                      </p>
+                      {activeCategoryProduct?.price && (
+                        <p className="text-xs font-bold text-[#E09F3E]">
+                          LKR {activeCategoryProduct.price.toLocaleString()}
+                        </p>
+                      )}
+                      <Link
+                        href={
+                          activeCategoryProduct?.id
+                            ? `/menu/${activeCategoryProduct.id}`
+                            : `/menu?category=${encodeURIComponent(activeAllProductsCat)}`
+                        }
+                        className="inline-block text-[10px] font-bold text-[#E09F3E] hover:underline pt-0.5"
+                      >
+                        Shop Product &rarr;
+                      </Link>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Cakes Mega Menu */}
             <div className="relative group">
               <Link
                 href="/menu?category=Cake"
                 prefetch={true}
                 className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
               >
-                <span>Cake</span>
+                <span>Cakes</span>
                 <svg className="ml-1 h-3 w-3 text-[#0D1B2A]/50 group-hover:text-[#E09F3E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                 </svg>
               </Link>
-              {/* Mega Menu Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[450px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
-                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-2 gap-6">
+              {/* Cake Mega Menu Dropdown */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[480px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-2 gap-5">
+                  
                   {/* Left Column: Subcategories */}
-                  <div className="space-y-4 text-left">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Cake Categories</h4>
-                    <ul className="space-y-3">
-                      {cakeSubcategories.map((subcat: string) => (
-                        <li key={subcat}>
-                          <Link href={`/menu?category=Cake&subcategory=${encodeURIComponent(subcat)}`} className="block group/item">
-                            <span className="text-xs font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
-                          </Link>
-                        </li>
-                      ))}
+                  <div className="space-y-3 text-left">
+                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Cake Varieties</h4>
+                    <ul className="space-y-1.5">
+                      {cakeSubcategories.map((subcat: string) => {
+                        const isSubHovered = (activeCakeSubcat || cakeSubcategories[0]).toLowerCase() === subcat.toLowerCase();
+                        return (
+                          <li key={subcat}>
+                            <Link
+                              href={`/menu?category=Cake&subcategory=${encodeURIComponent(subcat)}`}
+                              onMouseEnter={() => setActiveCakeSubcat(subcat)}
+                              className={`block group/item transition-colors px-2 py-1 rounded-md ${
+                                isSubHovered ? "bg-[#E09F3E]/10 text-[#E09F3E]" : "hover:text-[#E09F3E] text-[#2A1E17]"
+                              }`}
+                            >
+                              <span className="text-xs font-bold block">{subcat}</span>
+                            </Link>
+                          </li>
+                        );
+                      })}
                       <li className="pt-2 border-t border-[#0D1B2A]/5">
                         <Link href="/signature-cakes" className="block group/item">
                           <span className="text-xs font-bold text-[#DD9E59] transition-colors block">Signature Showcase &rarr;</span>
@@ -543,105 +714,81 @@ export default function Header() {
                       </li>
                     </ul>
                   </div>
-                  {/* Right Column: Featured Image / Promo */}
-                  <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-4 flex flex-col justify-between text-left">
+
+                  {/* Right Column: Dynamic Cake Product Preview */}
+                  <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3.5 flex flex-col justify-between text-left">
                     <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
                       <Image
-                        src={featuredProducts["prod-2"]?.image || "/category_cakes.png"}
-                        alt={featuredProducts["prod-2"]?.name || "Signature Strawberry Gateau"}
+                        src={
+                          activeCakeProduct?.image ||
+                          categoryProductMap["cake"]?.image ||
+                          featuredProducts["prod-2"]?.image ||
+                          "/category_cakes.png"
+                        }
+                        alt={activeCakeProduct?.name || "Cake Selection"}
                         fill
-                        className="object-cover"
-                        sizes="180px"
-                        quality={65}
-                        placeholder="blur"
-                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        sizes="200px"
+                        quality={70}
                       />
                     </div>
-                    <div className="mt-3 space-y-1">
-                      <span className="inline-block text-[8px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1.5 py-0.5">Chef's Choice</span>
+                    <div className="mt-2.5 space-y-1">
+                      <span className="inline-block text-[8px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1.5 py-0.5 rounded">
+                        {activeCakeSubcat || "Freshly Baked"}
+                      </span>
                       <h5 className="text-[11px] font-bold text-[#2A1E17] leading-tight truncate">
-                        {featuredProducts["prod-2"]?.name || "Strawberry Gateau"}
+                        {activeCakeProduct?.name || "Signature Cake Creation"}
                       </h5>
-                      <p className="text-[9px] text-[#2A1E17]/70 leading-normal line-clamp-2">
-                        {featuredProducts["prod-2"]?.description || "Organic strawberries & chantilly cream."}
+                      <p className="text-[9px] text-[#2A1E17]/70 leading-snug line-clamp-2">
+                        {activeCakeProduct?.description || "Moist sponge layers with artisanal buttercream and fresh fillings."}
                       </p>
-                      <Link href="/menu/prod-2" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-1">
-                        Order Now &rarr;
+                      {activeCakeProduct?.price && (
+                        <p className="text-xs font-bold text-[#E09F3E]">
+                          LKR {activeCakeProduct.price.toLocaleString()}
+                        </p>
+                      )}
+                      <Link
+                        href={
+                          activeCakeProduct?.id
+                            ? `/menu/${activeCakeProduct.id}`
+                            : `/menu?category=Cake`
+                        }
+                        className="inline-block text-[10px] font-bold text-[#DD9E59] hover:underline pt-0.5"
+                      >
+                        Order Cake &rarr;
                       </Link>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
 
-            {/* Combined Baked Goods & Desserts Link + Mega Menu */}
-            <div className="relative group">
-              <div
-                className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] flex items-center py-2 cursor-pointer"
-              >
-                <span>Baked Goods & Desserts</span>
-                <svg className="ml-1 h-3 w-3 text-[#0D1B2A]/50 group-hover:text-[#E09F3E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              {/* Mega Menu Dropdown */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-0 pt-2 w-[450px] opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-300 z-50">
-                <div className="bg-white border border-[#A47251]/15 shadow-2xl p-5 rounded-2xl grid grid-cols-2 gap-6">
-                  {/* Left Column: Subcategories */}
-                  <div className="space-y-4 text-left">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#DD9E59]">Baked Goods & Desserts</h4>
-                    <ul className="space-y-3">
-                      {bakedSubcategories.map((subcat: string) => (
-                        <li key={subcat}>
-                          <Link href={`/menu?category=${encodeURIComponent(bakedCategory?.name || "Baked Goods and Desserts")}&subcategory=${encodeURIComponent(subcat)}`} className="block group/item">
-                            <span className="text-xs font-bold text-[#2A1E17] group-hover/item:text-[#DD9E59] transition-colors block">{subcat}</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Right Column: Promo card */}
-                  <div className="relative overflow-hidden rounded-xl bg-[#FDF9F0] border border-[#A47251]/10 p-3 flex flex-col justify-between text-left">
-                    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-[#A47251]/5">
-                      <Image
-                        src={featuredProducts["prod-21"]?.image || "/about_bakery.png"}
-                        alt={featuredProducts["prod-21"]?.name || "Floral cup cakes"}
-                        fill
-                        className="object-cover"
-                        sizes="150px"
-                        quality={65}
-                        placeholder="blur"
-                        blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI0YwRDhBMSIvPjwvc3ZnPg=="
-                      />
-                    </div>
-                    <div className="mt-2 space-y-0.5">
-                      <span className="inline-block text-[7px] font-bold uppercase tracking-wider text-white bg-[#DD9E59] px-1 py-0.5">Featured</span>
-                      <h5 className="text-[10px] font-bold text-[#2A1E17] leading-tight truncate">
-                        {featuredProducts["prod-21"]?.name || "Floral cup cakes"}
-                      </h5>
-                      <Link href="/menu/prod-21" className="inline-block text-[9px] font-bold text-[#DD9E59] hover:underline pt-0.5">
-                        Order Now &rarr;
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            {/* 4. About us */}
             <Link
               href="/about"
               prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
-              About Us
+              About us
             </Link>
+
+            {/* 5. Contact */}
             <Link
               href="/contact"
               prefetch={true}
               className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
             >
               Contact
+            </Link>
+
+            {/* 6. Catering */}
+            <Link
+              href="/catering"
+              prefetch={true}
+              className="font-sans text-sm font-medium tracking-wide text-[#0D1B2A]/85 transition-colors hover:text-[#E09F3E] py-2"
+            >
+              Catering
             </Link>
           </nav>
 
@@ -931,28 +1078,21 @@ export default function Header() {
               onClick={() => setIsOpen(false)}
               className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E]"
             >
-              Menu
+              All products
             </Link>
             <Link
               href="/menu?category=Cake"
               onClick={() => setIsOpen(false)}
               className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E] pl-6 border-l-2 border-[#E09F3E]/40"
             >
-              &mdash; Cake
-            </Link>
-            <Link
-              href="/menu"
-              onClick={() => setIsOpen(false)}
-              className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E] pl-6 border-l-2 border-[#E09F3E]/40"
-            >
-              &mdash; Baked Goods & Desserts
+              &mdash; Cakes
             </Link>
             <Link
               href="/about"
               onClick={() => setIsOpen(false)}
               className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E]"
             >
-              About Us
+              About us
             </Link>
             <Link
               href="/contact"
@@ -960,6 +1100,13 @@ export default function Header() {
               className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E]"
             >
               Contact
+            </Link>
+            <Link
+              href="/catering"
+              onClick={() => setIsOpen(false)}
+              className="block rounded-md px-3 py-2.5 text-base font-medium text-[#0D1B2A]/85 hover:bg-[#EAE8E4] hover:text-[#E09F3E]"
+            >
+              Catering
             </Link>
 
             {/* Mobile Search input inline */}
